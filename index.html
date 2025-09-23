@@ -1,416 +1,210 @@
-<!doctype html>
-<html lang="en" dir="ltr">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Researchers — Panji & Mojtabazadeh</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg1:#0b3b2e;      /* deep emerald */
-      --bg2:#067a4b;      /* vivid emerald */
-      --accent1:#8ef0c1;  /* light mint */
-      --accent2:#ffd36b;  /* golden accent */
-      --glass: rgba(255,255,255,0.06);
-      --glass-strong: rgba(255,255,255,0.09);
-      --text:#f6fff9;
-      --muted: rgba(246,255,249,0.75);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:"Poppins",system-ui,Segoe UI,Roboto,Helvetica,Arial;
-      background: linear-gradient(135deg,var(--bg1),var(--bg2));
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      overflow-x:hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Researchers Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ----------------------------- */
+/* Reset */
+*{margin:0;padding:0;box-sizing:border-box;}
+body, html{width:100%;height:100%;overflow-x:hidden;font-family:'Roboto',sans-serif;background:#0d0d0d;color:white;}
+a{text-decoration:none;color:inherit;}
 
-    /* --- network background canvas full-screen --- */
-    #networkCanvas{
-      position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;
-      mix-blend-mode:overlay;opacity:0.95;
-    }
+/* ----------------------------- */
+/* Neon particle background */
+#particles {position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:#0d0d0d;}
 
-    /* --- page layout --- */
-    .wrap{
-      position:relative;z-index:1;
-      max-width:1200px;margin:40px auto;padding:28px;
-    }
+/* ----------------------------- */
+/* Container for everything */
+.container {max-width:1400px;margin:0 auto;padding:40px 20px;text-align:center;}
 
-    /* header with two researcher cards */
-    .header{
-      display:flex;gap:28px;align-items:center;justify-content:center;
-      flex-wrap:wrap;margin-bottom:36px;
-    }
-    .researcher{
-      position:relative;width:300px;min-width:260px;
-      display:flex;flex-direction:column;align-items:center;
-      backdrop-filter: blur(6px);
-      padding:18px;border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      box-shadow: 0 10px 40px rgba(4,20,10,0.45), inset 0 1px 0 rgba(255,255,255,0.02);
-      transition:transform .35s ease, box-shadow .35s ease;
-    }
-    .researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.5); }
+/* ----------------------------- */
+/* Researchers section */
+.researchers {display:flex;justify-content:center;gap:120px;margin-top:60px;flex-wrap:wrap;}
+.researcher {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  transition:transform 0.3s ease;
+}
+.researcher:hover {transform:translateY(-10px);}
+.researcher img {width:220px;height:220px;border-radius:50%;border:6px solid #00f0ff;box-shadow:0 0 25px #00f0ff, 0 0 50px #a100ff;object-fit:cover;transition:all 0.3s ease;}
 
-    /* fancy frame for photo */
-    .photo-frame{
-      position:relative;width:168px;height:168px;border-radius:50%;
-      padding:10px;
-      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.06), transparent 30%),
-                  linear-gradient(135deg, rgba(255,255,255,0.03), rgba(0,0,0,0.08));
-      display:flex;align-items:center;justify-content:center;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(0,0,0,0.25) inset;
-      border: 2px solid rgba(255,255,255,0.06);
-      margin-bottom:12px;
-      transform: translateZ(0);
-    }
-    /* double-ring decorative */
-    .photo-frame::before, .photo-frame::after{
-      content:"";position:absolute;border-radius:50%;pointer-events:none;
-    }
-    .photo-frame::before{
-      inset: -8px; background: conic-gradient(from 120deg, rgba(142,240,193,0.12), rgba(255,211,107,0.12)); filter: blur(8px);
-    }
-    .photo-frame::after{
-      inset: -22px; border: 2px dashed rgba(255,255,255,0.03);
-    }
+/* Researcher Name */
+.researcher-name {
+  margin-top:16px;
+  font-size:1.6rem;
+  font-weight:700;
+  background:linear-gradient(90deg,#00f0ff,#a100ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 12px rgba(160,0,255,0.6);
+}
 
-    .photo-frame img{
-      width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-      border:6px solid rgba(0,0,0,0.25);
-    }
+/* Orbital Buttons */
+.orbit {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:300px;
+  height:300px;
+  pointer-events:none;
+}
+.orbit button {
+  position:absolute;
+  width:60px;height:60px;border-radius:50%;
+  border:none;background:linear-gradient(135deg,#00f0ff,#a100ff);
+  color:white;cursor:pointer;font-weight:600;
+  box-shadow:0 0 15px #00f0ff,0 0 30px #a100ff;
+  transition:all 0.3s ease;
+  pointer-events:auto;
+}
+.orbit button:hover {
+  transform:scale(1.2);
+  box-shadow:0 0 25px #00f0ff,0 0 50px #a100ff;
+}
 
-    /* orbital buttons wrapper */
-    .orbit {
-      position:absolute;left:50%;top:18px;transform:translateX(-50%);width:100%;height:200px;pointer-events:none;
-    }
-    .orbit .orbit-btn{
-      --size:44px;
-      position:absolute;left:50%;top:50%;transform-origin: -120px 0; /* rotate around photo */
-      width:var(--size);height:var(--size);border-radius:50%;
-      display:flex;align-items:center;justify-content:center;
-      font-size:14px;background:linear-gradient(180deg,var(--accent1),var(--accent2));
-      color:#00231a;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.35);
-      pointer-events:auto;transition:transform .25s ease;
-      text-decoration:none;
-    }
-    .orbit .orbit-btn:hover{ transform:scale(1.08) translateZ(0); }
+/* ----------------------------- */
+/* Articles Section */
+.articles {margin-top:100px;display:flex;flex-direction:column;align-items:center;gap:20px;}
+.article-link {
+  display:flex;align-items:center;gap:12px;
+  background:rgba(0,0,0,0.6);padding:14px 22px;border-radius:16px;
+  cursor:pointer;position:relative;transition:all 0.3s ease;
+}
+.article-link:hover {background:rgba(0,0,0,0.85);}
+.article-link span {font-weight:600;}
+.article-wizard {
+  position:absolute;top:-220px;left:50%;transform:translateX(-50%);
+  width:300px;background:#111;border:1px solid #00f0ff;border-radius:16px;
+  padding:12px;color:white;text-align:left;opacity:0;visibility:hidden;
+  box-shadow:0 0 25px #00f0ff,0 0 50px #a100ff;transition:opacity 0.3s ease,visibility 0.3s ease;
+  z-index:10;
+}
+.article-link:hover .article-wizard {opacity:1;visibility:visible;}
 
-    /* we'll place buttons by JS using rotate transforms; each .btn gets data-angle */
+/* Wizard Image */
+.article-wizard img {width:100%;border-radius:12px;margin-bottom:8px;}
 
-    .name {
-      font-family:"Playfair Display",serif;
-      font-size:1.25rem;font-weight:700;color:var(--text);
-      letter-spacing:0.6px;margin-top:8px;text-align:center;display:flex;flex-direction:column;align-items:center;
-    }
-    .name .title-small { font-size:0.8rem;font-weight:500;color:var(--muted);margin-top:6px; }
-
-    /* --- articles list --- */
-    .papers{
-      margin-top:28px;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.07), rgba(255,255,255,0.01));
-      box-shadow:0 12px 30px rgba(0,0,0,0.4);
-    }
-    .papers h3{ margin:0 0 12px 0;font-size:1.1rem }
-    .paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px; }
-    .paper {
-      background:var(--glass);padding:12px;border-radius:10px;display:flex;gap:10px;align-items:center;
-      transition:transform .18s ease, box-shadow .18s ease;
-    }
-    .paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
-    .paper .thumb{
-      width:64px;height:64px;border-radius:6px;flex:0 0 64px;background:#eee;overflow:hidden;
-      display:flex;align-items:center;justify-content:center;color:#222;
-    }
-    .paper .meta{ flex:1; text-align:left; }
-    .paper .meta .p-title{ font-weight:600; font-size:0.95rem; color:var(--text); margin-bottom:6px; }
-    .paper .meta .p-auth{ font-size:0.8rem; color:var(--muted); }
-
-    /* floating wizard preview */
-    .wizard{
-      position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.9);
-      transition:all .16s ease;max-width:380px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-      display:flex;gap:10px;
-    }
-    .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-    .wizard .w-thumb{ width:110px;height:90px;border-radius:8px;overflow:hidden;flex:0 0 110px;background:#111; }
-    .wizard .w-body{ font-size:0.9rem; color:var(--muted); line-height:1.3; max-height:170px; overflow:auto; }
-
-    /* responsive */
-    @media (max-width:900px){
-      .header{gap:18px}
-      .researcher{width:42%}
-      .photo-frame{width:140px;height:140px}
-    }
-    @media (max-width:640px){
-      .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
-      .photo-frame{width:96px;height:96px;margin-right:12px}
-      .name{align-items:flex-start;font-size:1rem}
-    }
-  </style>
+/* Responsive */
+@media(max-width:800px){.researchers{flex-direction:column;gap:60px;}}
+</style>
 </head>
 <body>
-  <canvas id="networkCanvas" aria-hidden="true"></canvas>
 
-  <div class="wrap" role="main">
-    <header class="header" aria-label="Researchers">
-      <!-- Researcher 1 -->
-      <section class="researcher" id="r1" aria-labelledby="r1-name">
-        <div class="photo-frame" aria-hidden="true">
-          <!-- replace src with real photo -->
-          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Dr. Mehdi Panji photo">
-          <div class="orbit" data-owner="r1"></div>
-        </div>
-        <div class="name" id="r1-name">
-          <span>Dr. Mehdi Panji</span>
-          <span class="title-small">Researcher • Geotechnical Engineering</span>
-        </div>
-      </section>
+<canvas id="particles"></canvas>
 
-      <!-- Researcher 2 -->
-      <section class="researcher" id="r2" aria-labelledby="r2-name">
-        <div class="photo-frame" aria-hidden="true">
-          <!-- replace src with real photo -->
-          <img src="https://images.unsplash.com/photo-1545996124-1b7d20d8ccb3?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Dr. Saeed Mojtabazadeh photo">
-          <div class="orbit" data-owner="r2"></div>
-        </div>
-        <div class="name" id="r2-name">
-          <span>Dr. Saeed Mojtabazadeh</span>
-          <span class="title-small">Postdoc • Seismic Geomechanics</span>
-        </div>
-      </section>
-    </header>
+<div class="container">
 
-    <section class="papers" aria-label="Papers">
-      <h3>Free Downloadable Papers</h3>
-      <div class="paper-list" id="paperList">
-        <!-- populated by JS -->
-      </div>
-    </section>
+  <!-- Researchers -->
+  <div class="researchers">
+    <div class="researcher">
+      <img src="https://via.placeholder.com/220x220?text=Mehdi+Panji" alt="Dr. Mehdi Panji">
+      <div class="researcher-name">Dr. Mehdi Panji</div>
+      <div class="orbit" id="orbit1"></div>
+    </div>
+    <div class="researcher">
+      <img src="https://via.placeholder.com/220x220?text=Saeed+Mojtabazadeh" alt="Dr. Saeed Mojtabazadeh">
+      <div class="researcher-name">Dr. Saeed Mojtabazadeh</div>
+      <div class="orbit" id="orbit2"></div>
+    </div>
   </div>
 
-  <!-- Floating wizard preview -->
-  <div id="wizard" class="wizard" role="dialog" aria-hidden="true">
-    <div class="w-thumb" id="w-thumb"></div>
-    <div class="w-body" id="w-body"></div>
-  </div>
+  <!-- Articles -->
+  <div class="articles" id="articles"></div>
 
-  <script>
-    /* ============================
-       Network canvas (green grid with nodes)
-       ============================ */
-    (function(){
-      const canvas = document.getElementById('networkCanvas');
-      const ctx = canvas.getContext('2d');
-      let particles = [];
-      function resize(){
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = innerWidth * dpr;
-        canvas.height = innerHeight * dpr;
-        canvas.style.width = innerWidth + 'px';
-        canvas.style.height = innerHeight + 'px';
-        ctx.setTransform(dpr,0,0,dpr,0,0);
-        initParticles();
+</div>
+
+<script>
+// -------------------
+// Particle Background
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;createParticles();}
+window.addEventListener('resize',resize);
+function createParticles(){
+  const count = Math.floor((window.innerWidth*window.innerHeight)/12000);
+  particles = Array.from({length:count},()=>({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*2+1,
+    dx:(Math.random()-0.5)*0.5,
+    dy:(Math.random()-0.5)*0.5
+  }));
+}
+resize();
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#00f0ff";
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+  });
+  // lines
+  ctx.strokeStyle="rgba(160,0,255,0.3)";
+  ctx.lineWidth=0.5;
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.stroke();
       }
-      function initParticles(){
-        const area = innerWidth * innerHeight;
-        let count = Math.floor(area / 14000);
-        count = Math.max(22, Math.min(count, 120));
-        particles = Array.from({length:count}, ()=>({
-          x: Math.random()*innerWidth,
-          y: Math.random()*innerHeight,
-          r: Math.random()*2.8 + 1.8,
-          vx: (Math.random()-0.5)*0.35,
-          vy: (Math.random()-0.5)*0.35,
-          hue: 160 + Math.random()*60  // green-cyan hues
-        }));
-      }
-      function draw(){
-        ctx.clearRect(0,0,innerWidth,innerHeight);
-        // subtle background noise
-        // draw lines
-        for(let i=0;i<particles.length;i++){
-          const a = particles[i];
-          // node
-          ctx.fillStyle = `hsla(${a.hue}, 70%, 60%, 0.95)`;
-          ctx.beginPath(); ctx.arc(a.x,a.y,a.r,0,Math.PI*2); ctx.fill();
-          // move
-          a.x += a.vx; a.y += a.vy;
-          if(a.x<0||a.x>innerWidth) a.vx *= -1;
-          if(a.y<0||a.y>innerHeight) a.vy *= -1;
-        }
-        ctx.lineWidth = 0.9;
-        for(let i=0;i<particles.length;i++){
-          for(let j=i+1;j<particles.length;j++){
-            const p = particles[i], q = particles[j];
-            const dx = p.x - q.x, dy = p.y - q.y;
-            const dist = Math.hypot(dx,dy);
-            if(dist < 140){
-              const alpha = 1 - dist/160;
-              const hue = Math.round((p.hue+q.hue)/2);
-              ctx.strokeStyle = `hsla(${hue},70%,60%,${alpha*0.18})`;
-              ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
-            }
-          }
-        }
-        requestAnimationFrame(draw);
-      }
-      // pause when tab hidden
-      document.addEventListener('visibilitychange', ()=> {
-        if(document.hidden) cancelAnimationFrame(0);
-      });
-      window.addEventListener('resize', resize);
-      resize(); draw();
-    })();
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
 
-    /* ============================
-       Orbital buttons around photos
-       ============================ */
-    (function(){
-      // config for each researcher: buttons (icon/text + href)
-      const orbits = {
-        r1: [
-          {label:'Google Scholar', href:'#'},
-          {label:'ResearchGate', href:'#'},
-          {label:'Email', href:'mailto:me@example.com'},
-          {label:'CV', href:'#'},
-        ],
-        r2: [
-          {label:'Google Scholar', href:'#'},
-          {label:'Personal', href:'#'},
-          {label:'LinkedIn', href:'#'},
-          {label:'Contact', href:'#'},
-        ]
-      };
-      Object.keys(orbits).forEach(owner=>{
-        const container = document.querySelector(`.orbit[data-owner="${owner}"]`);
-        if(!container) return;
-        // place buttons evenly in an arc
-        const items = orbits[owner];
-        const arcDeg = 220; // degrees of arc
-        const start = -110; // rotate start
-        items.forEach((it, idx)=>{
-          const angle = start + (idx/(items.length-1||1))*arcDeg;
-          const a = document.createElement('a');
-          a.className='orbit-btn';
-          a.textContent = it.label;
-          a.href = it.href;
-          a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          // position using transform: translate to center and then rotate + translate outwards
-          const dist = 120 + (idx%2)*6; // slight variation
-          a.style.transform = `translate(-50%,-50%) rotate(${angle}deg) translate(${dist}px) rotate(${ -angle }deg)`;
-          a.setAttribute('aria-label', it.label);
-          container.appendChild(a);
-        });
-      });
-    })();
+// -------------------
+// Orbital Buttons
+function createOrbit(id, buttons){
+  const container = document.getElementById(id);
+  const radius = 140;
+  buttons.forEach((btnText,i)=>{
+    const angle = (i/buttons.length)*Math.PI*2;
+    const btn = document.createElement('button');
+    btn.textContent = btnText;
+    btn.style.left = `${50+Math.cos(angle)*radius}%`;
+    btn.style.top  = `${50+Math.sin(angle)*radius}%`;
+    container.appendChild(btn);
+  });
+}
+// Example buttons
+createOrbit('orbit1',['Profile','Research','Contact','Projects']);
+createOrbit('orbit2',['Profile','Research','Contact','Projects']);
 
-    /* ============================
-       Papers and hover wizard
-       ============================ */
-    (function(){
-      // sample data -- replace these with real articles (title, authors, href, thumbnail, abstract)
-      const papers = [
-        {
-          title:"Wave Propagation in Orthotropic Media",
-          authors:"M. Panji, S. Mojtabazadeh",
-          href:"#",
-          thumb:"https://images.unsplash.com/photo-1526378727754-2f9a8570b321?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",
-          abstract:"This paper studies SH-wave propagation in orthotropic media and proposes a novel boundary-element approach in the time-domain..."
-        },
-        {
-          title:"Topographic Effects on Seismic Response",
-          authors:"S. Mojtabazadeh",
-          href:"#",
-          thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",
-          abstract:"We examine how surface topography affects ground motion using hybrid numerical techniques and parametric studies..."
-        },
-        {
-          title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",
-          authors:"M. Panji",
-          href:"#",
-          thumb:"https://images.unsplash.com/photo-1517976487492-8b2ce31987f8?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",
-          abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."
-        },
-        {
-          title:"Isolation Systems for Seismic Mitigation",
-          authors:"S. Mojtabazadeh, M. Panji",
-          href:"#",
-          thumb:"https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",
-          abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."
-        }
-      ];
+// -------------------
+// Articles
+const articlesData=[
+  {title:'Paper 1',img:'https://via.placeholder.com/300x150',abstract:'Abstract of paper 1 here.'},
+  {title:'Paper 2',img:'https://via.placeholder.com/300x150',abstract:'Abstract of paper 2 here.'},
+  {title:'Paper 3',img:'https://via.placeholder.com/300x150',abstract:'Abstract of paper 3 here.'},
+];
+const articlesContainer = document.getElementById('articles');
+articlesData.forEach(a=>{
+  const div = document.createElement('div');
+  div.className='article-link';
+  div.innerHTML=`<span>${a.title}</span>
+                 <div class="article-wizard">
+                  <img src="${a.img}" alt="${a.title}">
+                  <p>${a.abstract}</p>
+                 </div>`;
+  articlesContainer.appendChild(div);
+});
+</script>
 
-      const list = document.getElementById('paperList');
-      const wizard = document.getElementById('wizard');
-      const wThumb = document.getElementById('w-thumb');
-      const wBody = document.getElementById('w-body');
-
-      papers.forEach((p, i)=>{
-        const node = document.createElement('article');
-        node.className = 'paper';
-        node.innerHTML = `
-          <div class="thumb"><img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="meta">
-            <div class="p-title"><a href="${p.href}" download style="color:inherit;text-decoration:none">${p.title}</a></div>
-            <div class="p-auth">${p.authors}</div>
-          </div>
-        `;
-        // events for showing wizard on hover
-        node.addEventListener('mouseenter', (ev)=>{
-          // populate wizard
-          wThumb.innerHTML = `<img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover">`;
-          wBody.innerHTML = `<strong style="color:var(--text);display:block;margin-bottom:6px">${p.title}</strong>
-                             <div style="color:var(--muted);font-size:0.9rem">${p.abstract}</div>
-                             <div style="margin-top:8px"><a href="${p.href}" download style="color:var(--accent1);text-decoration:none;font-weight:600">Download PDF</a></div>`;
-          // compute position near cursor but keep inside viewport
-          const x = ev.clientX + 18;
-          const y = ev.clientY + 12;
-          positionWizard(x,y);
-          wizard.classList.add('show');
-          wizard.setAttribute('aria-hidden','false');
-        }, {passive:true});
-        node.addEventListener('mousemove', (ev)=>{
-          // follow cursor slightly
-          const x = ev.clientX + 18;
-          const y = ev.clientY + 12;
-          positionWizard(x,y);
-        }, {passive:true});
-        node.addEventListener('mouseleave', ()=>{
-          wizard.classList.remove('show');
-          wizard.setAttribute('aria-hidden','true');
-        });
-        list.appendChild(node);
-      });
-
-      function positionWizard(x,y){
-        const w = wizard.offsetWidth, h = wizard.offsetHeight;
-        let nx = x, ny = y;
-        if(nx + w > window.innerWidth - 12) nx = window.innerWidth - w - 12;
-        if(ny + h > window.innerHeight - 12) ny = window.innerHeight - h - 12;
-        wizard.style.left = nx + 'px';
-        wizard.style.top = ny + 'px';
-      }
-    })();
-
-    /* ============================
-       Accessibility & small niceties
-       ============================ */
-    (function(){
-      // keyboard: allow focusing paper items and show wizard on focus
-      document.addEventListener('keydown', (e)=>{
-        if(e.key === 'Escape'){
-          const wiz = document.getElementById('wizard');
-          wiz.classList.remove('show'); wiz.setAttribute('aria-hidden','true');
-        }
-      });
-    })();
-  </script>
 </body>
 </html>
