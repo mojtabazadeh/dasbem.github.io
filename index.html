@@ -14,30 +14,46 @@
       --accent2:#6beaff;
       --glass: rgba(255,255,255,0.06);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg-gradient);color:var(--text);overflow-x:hidden}
+    *{box-sizing:border-box;}
+    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg-gradient);color:var(--text);overflow-x:hidden;}
     
     #networkCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mix-blend-mode:overlay;opacity:0.9;}
 
     /* Header */
     header.site-header{
-      position:relative;z-index:1;text-align:center;padding:28px 18px;font-family:"Playfair Display",serif;
+      position:relative;z-index:1;text-align:center;padding:40px 18px;font-family:"Playfair Display",serif;
     }
     header.site-header h1{
-      font-size:2.8rem;
+      font-size:3rem;
       font-weight:700;
       margin:0 0 12px;
       letter-spacing:1px;
       color:var(--accent1);
       text-shadow:0 2px 12px rgba(0,0,0,0.45);
-      animation: pulse 4s ease-in-out infinite alternate;
+      animation: floatWave 6s ease-in-out infinite;
+      background: linear-gradient(45deg, #ffd700, #6beaff, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display:inline-block;
     }
-    @keyframes pulse{
-      0%{ transform: translateY(0px);}
-      50%{ transform: translateY(-6px);}
-      100%{ transform: translateY(0px);}
+    @keyframes floatWave{
+      0%{ transform: translateY(0px) rotate(-1deg);}
+      25%{ transform: translateY(-8px) rotate(1deg);}
+      50%{ transform: translateY(-4px) rotate(-1deg);}
+      75%{ transform: translateY(-6px) rotate(1deg);}
+      100%{ transform: translateY(0px) rotate(0deg);}
     }
-    header.site-header p{font-size:1.1rem;color:var(--muted);margin:0;}
+    header.site-header p{
+      font-size:1.2rem;
+      color:var(--muted);
+      margin:0;
+      animation: fadePulse 4s ease-in-out infinite alternate;
+    }
+    @keyframes fadePulse{
+      0%{ opacity:0.8;}
+      50%{ opacity:1;}
+      100%{ opacity:0.8;}
+    }
 
     /* Researchers */
     .wrap{position:relative;z-index:1;max-width:1200px;margin:20px auto;padding:0 18px;}
@@ -88,20 +104,21 @@
       background:var(--glass);padding:12px;border-radius:10px;display:flex;gap:10px;align-items:center;
       transition:transform .18s ease, box-shadow .18s ease;
       cursor:pointer;
+      flex-direction:column;
     }
     .paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
-    .paper .thumb{ width:64px;height:64px;border-radius:6px;flex:0 0 64px;background:#111;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
+    .paper .thumb{ width:100%;height:160px;border-radius:6px;background:#111;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
     .paper .thumb img{width:100%;height:100%;object-fit:cover;}
-    .paper .meta{ flex:1; text-align:left; }
+    .paper .meta{ flex:1; text-align:center;margin-top:6px; }
     .paper .meta .p-title{ font-weight:600; font-size:0.95rem; color:var(--text); margin-bottom:4px; }
-    .paper .meta .p-auth{ font-size:0.8rem; color:var(--muted);}
-    .paper .meta .p-auth span.year{ margin-left:8px; font-style:italic; color:var(--accent2); font-weight:500;}
+    .paper .meta .p-auth{ font-size:0.85rem; color:var(--muted);}
+    .paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent2); margin-top:2px; }
 
     /* wizard */
-    .wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.9);transition:all .16s ease;max-width:380px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);display:flex;gap:10px;}
+    .wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);transition:all .16s ease;max-width:380px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);display:flex;gap:10px;flex-direction:column;}
     .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-    .wizard .w-thumb{ width:110px;height:90px;border-radius:8px;overflow:hidden;flex:0 0 110px;background:#111; }
-    .wizard .w-body{ font-size:0.9rem; color:var(--muted); line-height:1.3; max-height:170px; overflow:auto; scrollbar-width:none; }
+    .wizard .w-thumb{ width:100%;height:160px;border-radius:8px;overflow:hidden;background:#111; }
+    .wizard .w-body{ font-size:0.9rem; color:var(--muted); line-height:1.3; max-height:160px; overflow:hidden; scrollbar-width:none; }
     .wizard .w-body::-webkit-scrollbar{ display:none; }
 
     /* responsive */
@@ -125,6 +142,7 @@
         <div class="name" id="r1-name">
           <span>Dr. Mehdi Panji</span>
           <span class="title-small">Associate Professor</span>
+          <span class="year">2023</span>
           <div class="contact">
             <a href="mailto:m.panji@iauz.ac.ir">m.panji@iauz.ac.ir</a>
             <a href="https://www.panji.ir">www.panji.ir</a>
@@ -140,6 +158,7 @@
         <div class="name" id="r2-name">
           <span>Dr. Saeed Mojtabazadeh</span>
           <span class="title-small">Postdoctoral Fellow</span>
+          <span class="year">2022</span>
           <div class="contact">
             <a href="mailto:saeed.@mojtabazadeh.ir">saeed.@mojtabazadeh.ir</a>
             <a href="https://www.mojtabazadeh.ir">www.mojtabazadeh.ir</a>
@@ -219,7 +238,7 @@
     (function(){
       const papers=[
         {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://images.unsplash.com/photo-1526378727754-2f9a8570b321?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing the 2-D scalar wave problems in a homogenous isotropic linear elastic medium..."},
-        {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing the 2-D scalar wave problems in a homogenous isotropic linear elastic medium. Using the existing transient full-plane fundamental solution and asking for the assistance of method of source image to satisfy the stress-free boundary conditions, first, a half-plane time-domain fundamental solution was obtained for displacement and traction fields. Then, the condensed closed-form of half-plane time-convoluted kernels were extracted analytically by applying the time-convolution integral on the determined half-plane fundamental solutions. After implementing the half-plane time-domain BEM in computer codes, its applicability and efficiency were verified and compared with those of the published works by analysing several practical examples. The studies showed that the proposed method had good agreement with the existing solutions. Compared to the full-plane time-domain BEM, half-plane time-domain BEM had more capability and better accuracy as well as much shorter run time. It is obvious that this method can be practically used to analyse the site response in substituting the old-style time-domain BEM formulation as well."},
+        {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"We examine how surface topography affects ground motion using hybrid numerical techniques and parametric studies..."},
         {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://images.unsplash.com/photo-1517976487492-8b2ce31987f8?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
         {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
       ];
@@ -235,16 +254,17 @@
                         <div class="p-auth">${p.authors} <span class="year">${p.year}</span></div></div>`;
         node.addEventListener('mouseenter',(ev)=>{
           wThumb.innerHTML=`<img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover">`;
-          wBody.innerHTML=`<div style="color:var(--muted);font-size:0.9rem;overflow:auto;max-height:150px">${p.abstract}</div>`;
+          wBody.innerHTML=`<div style="overflow:hidden;max-height:150px" id="w-content">${p.abstract}</div>`;
           positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
         });
         node.addEventListener('mousemove',(ev)=>{positionWizard(ev.clientX+18,ev.clientY+12);});
         node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-        // scroll با چرخش موس
+        // scroll با چرخش موس بدون نوار
         node.addEventListener('wheel', (e) => {
           if (wizard.classList.contains('show')) {
             e.preventDefault();
-            wBody.scrollTop += e.deltaY;
+            const wContent = document.getElementById('w-content');
+            wContent.scrollTop += e.deltaY;
           }
         });
         list.appendChild(node);
