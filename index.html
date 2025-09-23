@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The DASBEM Project — Researchers</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg-gradient: linear-gradient(135deg,#0a0f3f,#1a3b8b,#0a0f3f);
@@ -15,17 +15,27 @@
       --glass: rgba(255,255,255,0.06);
     }
     *{box-sizing:border-box;}
-    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg-gradient);color:var(--text);overflow-x:hidden;}
+    html,body{height:100%;margin:0;font-family:"Raleway",sans-serif;background:var(--bg-gradient);color:var(--text);overflow-x:hidden;}
 
-    /* ===== Network Canvas ===== */
-    #networkCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mix-blend-mode:overlay;opacity:0.95;}
+    #networkCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mix-blend-mode:overlay;opacity:0.9;}
 
-    /* Header */
+    /* Header طلایی با افکت تنفسی */
     header.site-header{
       position:relative;z-index:1;text-align:center;padding:28px 18px;font-family:"Playfair Display",serif;
     }
-    header.site-header h1{font-size:2.8rem;font-weight:700;margin:0 0 12px;letter-spacing:1px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.45);}
-    header.site-header p{font-size:1.1rem;color:var(--muted);margin:0;}
+    header.site-header h1{
+      font-size:3rem;font-weight:700;margin:0 0 12px;letter-spacing:1px;
+      color:var(--accent1);
+      text-shadow:0 2px 12px rgba(0,0,0,0.45);
+      animation: pulse 2.5s infinite alternate;
+    }
+    header.site-header p{font-size:1.2rem;color:var(--accent2);margin:0;}
+
+    @keyframes pulse{
+      0%{text-shadow:0 2px 8px rgba(255,215,0,0.6),0 0 6px rgba(255,255,150,0.3);}
+      50%{text-shadow:0 4px 18px rgba(255,215,0,0.9),0 0 12px rgba(255,255,180,0.6);}
+      100%{text-shadow:0 2px 8px rgba(255,215,0,0.6),0 0 6px rgba(255,255,150,0.3);}
+    }
 
     /* Researchers */
     .wrap{position:relative;z-index:1;max-width:1200px;margin:20px auto;padding:0 18px;}
@@ -35,9 +45,16 @@
       backdrop-filter: blur(6px);padding:18px;border-radius:20px;
       background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
       box-shadow:0 10px 40px rgba(4,20,10,0.45), inset 0 1px 0 rgba(255,255,255,0.02);
-      transition:transform .35s ease, box-shadow .35s ease;
+      transition:transform .4s ease, box-shadow .35s ease;
     }
-    .researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.5); }
+    .researcher:hover{ transform:translateY(-6px); box-shadow:0 18px 50px rgba(0,0,0,0.5); }
+
+    /* حرکت بسیار خفیف تصویر و مشخصات */
+    .researcher .photo-frame, .researcher .name{
+      transition: transform 2.5s ease-in-out;
+    }
+    .researcher:hover .photo-frame{ transform: translateY(-2px) rotateZ(1deg); }
+    .researcher:hover .name{ transform: translateY(2px); }
 
     /* circular photo frame */
     .photo-frame{
@@ -55,17 +72,17 @@
     }
 
     .name{
-      font-family:"Playfair Display",serif;font-size:1.25rem;font-weight:700;color:var(--text);
+      font-family:"Playfair Display",serif;font-size:1.35rem;font-weight:700;color:var(--text);
       letter-spacing:0.6px;margin-top:6px;text-align:center;display:flex;flex-direction:column;align-items:center;
     }
-    .name .title-small{ font-size:0.85rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
-    .contact{margin-top:6px;font-size:0.8rem;color:var(--accent2);text-align:center;display:flex;flex-direction:column;gap:2px;}
+    .name .title-small{ font-size:0.9rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+    .contact{margin-top:6px;font-size:0.85rem;color:var(--accent2);text-align:center;display:flex;flex-direction:column;gap:2px;}
     .contact a{color:var(--accent2);text-decoration:none;font-weight:600;}
     .contact a:hover{text-decoration:underline;}
 
     /* Papers */
     .papers{margin-top:28px;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.07), rgba(255,255,255,0.01));box-shadow:0 12px 30px rgba(0,0,0,0.4);}
-    .papers h3{ margin:0 0 12px 0;font-size:1.2rem;font-family:"Playfair Display",serif;}
+    .papers h3{ margin:0 0 12px 0;font-size:1.25rem;font-family:"Playfair Display",serif;}
     .paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px; }
     .paper{
       background:var(--glass);padding:12px;border-radius:10px;display:flex;gap:10px;align-items:center;
@@ -79,15 +96,15 @@
     .paper .meta .p-title{ font-weight:600; font-size:0.95rem; color:var(--text); margin-bottom:4px; }
     .paper .meta .p-auth{ font-size:0.8rem; color:var(--muted); }
 
-    /* wizard */
-    .wizard{
-      position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.9);transition:all .16s ease;
-      max-width:380px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);display:flex;gap:10px;
-    }
+    /* wizard بدون scrollbar و با اسکرول موس */
+    .wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.9);transition:all .16s ease;max-width:380px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);display:flex;gap:10px;}
     .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
     .wizard .w-thumb{ width:110px;height:90px;border-radius:8px;overflow:hidden;flex:0 0 110px;background:#111; }
-    .wizard .w-body{ font-size:0.9rem; color:var(--muted); line-height:1.4; max-height:200px; overflow:auto; text-align:justify; }
+    .wizard .w-body{
+      font-size:0.9rem; color:var(--muted); line-height:1.3; max-height:170px; overflow:auto; 
+      scrollbar-width:none;-ms-overflow-style:none;
+    }
+    .wizard .w-body::-webkit-scrollbar{ display:none; }
 
     /* responsive */
     @media (max-width:900px){ .header{gap:18px} .researcher{width:42%} .photo-frame{width:140px;height:140px} }
@@ -146,7 +163,7 @@
   </div>
 
   <script>
-    /* ======= Network background - Golden Glow ======= */
+    /* ======= Network background ======= */
     (function(){
       const canvas = document.getElementById('networkCanvas');
       const ctx = canvas.getContext('2d');
@@ -162,39 +179,35 @@
       }
       function initParticles(){
         const area = innerWidth*innerHeight;
-        let count = Math.floor(area/12000);
-        count = Math.max(30,Math.min(count,100));
+        let count = Math.floor(area/15000);
+        count = Math.max(20,Math.min(count,90));
         particles=Array.from({length:count},()=>({
           x: Math.random()*innerWidth,
           y: Math.random()*innerHeight,
           r: Math.random()*3.5 + 2,
-          vx: (Math.random()-0.5)*0.35,
-          vy: (Math.random()-0.5)*0.35,
-          hue: 45 + Math.random()*20, // golden tones
-          glow: Math.random()*6 + 4
+          vx: (Math.random()-0.5)*0.25,
+          vy: (Math.random()-0.5)*0.25,
+          hue: 45 + Math.random()*20
         }));
       }
       function draw(){
         ctx.clearRect(0,0,innerWidth,innerHeight);
         for(let p of particles){
-          let gradient = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.glow);
-          gradient.addColorStop(0,'hsla('+p.hue+',100%,75%,1)');
-          gradient.addColorStop(0.4,'hsla('+p.hue+',100%,60%,0.6)');
-          gradient.addColorStop(1,'hsla('+p.hue+',100%,50%,0)');
-          ctx.fillStyle = gradient;
-          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-          p.x += p.vx; p.y += p.vy;
-          if(p.x<0||p.x>innerWidth) p.vx*=-1;
-          if(p.y<0||p.y>innerHeight) p.vy*=-1;
+          ctx.fillStyle=`hsla(${p.hue},100%,65%,0.95)`;
+          ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+          p.x+=p.vx;p.y+=p.vy;
+          if(p.x<0||p.x>innerWidth)p.vx*=-1;
+          if(p.y<0||p.y>innerHeight)p.vy*=-1;
         }
-        ctx.lineWidth = 1;
+        ctx.lineWidth=1.1;
         for(let i=0;i<particles.length;i++){
           for(let j=i+1;j<particles.length;j++){
             const a=particles[i], b=particles[j];
             const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
             if(d<160){
               const alpha = 1 - d/160;
-              ctx.strokeStyle = `hsla(${(a.hue+b.hue)/2},100%,60%,${alpha*0.15})`;
+              const hue = Math.round((a.hue+b.hue)/2);
+              ctx.strokeStyle=`hsla(${hue},100%,65%,${alpha*0.25})`;
               ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
             }
           }
@@ -204,61 +217,40 @@
       window.addEventListener('resize',resize); resize(); draw();
     })();
 
-    /* ======= Papers & Wizard with year & justified abstract ======= */
+    /* ======= Papers & Wizard with scroll-mouse ======= */
     (function(){
       const papers=[
-        {
-          title:"Wave Propagation in Orthotropic Media",
-          authors:"M. Panji, S. Mojtabazadeh",
-          year:"2023",
-          href:"#",
-          thumb:"https://images.unsplash.com/photo-1526378727754-2f9a8570b321?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",
-          abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing the 2-D scalar wave problems in a homogenous isotropic linear elastic medium. Using the existing transient full-plane fundamental solution and asking for the assistance of method of source image to satisfy the stress-free boundary conditions, first, a half-plane time-domain fundamental solution was obtained for displacement and traction fields. Then, the condensed closed-form of half-plane time-convoluted kernels were extracted analytically by applying the time-convolution integral on the determined half-plane fundamental solutions. After implementing the half-plane time-domain BEM in computer codes, its applicability and efficiency were verified and compared with those of the published works by analysing several practical examples. The studies showed that the proposed method had good agreement with the existing solutions. Compared to the full-plane time-domain BEM, half-plane time-domain BEM had more capability and better accuracy as well as much shorter run time. It is obvious that this method can be practically used to analyse the site response in substituting the old-style time-domain BEM formulation as well."
-        },
-        {
-          title:"Topographic Effects on Seismic Response",
-          authors:"S. Mojtabazadeh",
-          year:"2022",
-          href:"#",
-          thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",
-          abstract:"We examine how surface topography affects ground motion using hybrid numerical techniques and parametric studies..."
-        }
+        {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",href:"#",thumb:"https://images.unsplash.com/photo-1526378727754-2f9a8570b321?q=80&w=640&auto=format&fit=crop",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing the 2-D scalar wave problems in a homogenous isotropic linear elastic medium. Using the existing transient full-plane fundamental solution and asking for the assistance of method of source image to satisfy the stress-free boundary conditions..."},
+        {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",href:"#",thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop",abstract:"We examine how surface topography affects ground motion using hybrid numerical techniques and parametric studies..."}
       ];
-
       const list = document.getElementById('paperList');
       const wizard = document.getElementById('wizard');
       const wThumb = document.getElementById('w-thumb');
       const wBody = document.getElementById('w-body');
 
       papers.forEach(p=>{
-        const node=document.createElement('article'); 
-        node.className='paper';
-        node.innerHTML=`
-          <div class="thumb"><img src="${p.thumb}" alt=""></div>
-          <div class="meta">
-            <div class="p-title"><a href="${p.href}" download style="color:inherit;text-decoration:none">${p.title} (${p.year})</a></div>
-            <div class="p-auth">${p.authors}</div>
-          </div>
-        `;
+        const node=document.createElement('article'); node.className='paper';
+        node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
+                        <div class="meta"><div class="p-title"><a href="${p.href}" download style="color:inherit;text-decoration:none">${p.title}</a></div>
+                        <div class="p-auth">${p.authors}</div></div>`;
         node.addEventListener('mouseenter',(ev)=>{
           wThumb.innerHTML=`<img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover">`;
-          wBody.innerHTML=`
-            <strong style="color:var(--text);display:block;margin-bottom:6px">${p.title} (${p.year})</strong>
-            <div style="color:var(--muted);font-size:0.9rem;overflow:auto;max-height:200px;text-align:justify;line-height:1.4">
-              ${p.abstract}
-            </div>
-            <div style="margin-top:8px">
-              <a href="${p.href}" download style="color:var(--accent1);text-decoration:none;font-weight:600">Download PDF</a>
-            </div>`;
-          positionWizard(ev.clientX+18,ev.clientY+12); 
-          wizard.classList.add('show'); 
-          wizard.setAttribute('aria-hidden','false');
+          wBody.innerHTML=`<strong style="color:var(--text);display:block;margin-bottom:6px">${p.title}</strong>
+                           <div style="color:var(--muted);font-size:0.9rem;overflow:auto;max-height:170px">${p.abstract}</div>
+                           <div style="margin-top:8px"><a href="${p.href}" download style="color:var(--accent1);text-decoration:none;font-weight:600">Download PDF</a></div>`;
+          positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
         });
         node.addEventListener('mousemove',(ev)=>{positionWizard(ev.clientX+18,ev.clientY+12);});
         node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+
+        // Scroll with mouse wheel
+        node.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          wBody.scrollTop += e.deltaY;
+        });
+
         list.appendChild(node);
       });
-
       function positionWizard(x,y){
         const w = wizard.offsetWidth,h = wizard.offsetHeight;
         let nx=x,ny=y;
