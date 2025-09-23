@@ -1,172 +1,280 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Researchers Hub</title>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Researchers — Panji & Mojtabazadeh</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* ----------------------------- */
-/* Reset */
-*{margin:0;padding:0;box-sizing:border-box;}
-html, body{width:100%;height:100%;overflow-x:hidden;font-family:'Poppins',sans-serif;background:#0d0d0d;color:white;text-align:center;}
-
-/* ----------------------------- */
-/* Particle Background */
-#particles {position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:#0d0d0d;}
-
-/* ----------------------------- */
-/* Container */
-.container {max-width:1200px;margin:0 auto;padding:40px 20px;}
-
-/* ----------------------------- */
-/* Researchers Section */
-.researchers {display:flex;justify-content:center;gap:120px;flex-wrap:wrap;margin-top:60px;}
-.researcher {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+:root{
+  --bg1:#0fffc1;   /* modern bright green */
+  --bg2:#00d68f;   /* vivid emerald */
+  --accent1:#a0ffe0;  
+  --accent2:#88ffc8;
+  --glass: rgba(255,255,255,0.08);
+  --glass-strong: rgba(255,255,255,0.12);
+  --text:#f6fff9;
+  --muted: rgba(246,255,249,0.75);
 }
-.researcher img {
-  width:220px; height:220px; object-fit:cover;
-  border-radius:20% 50% 30% 50% / 40% 30% 50% 30%; /* نامتقارن */
-  border:5px solid;
-  border-image: linear-gradient(135deg,#00f0ff,#a100ff) 1;
-  box-shadow:0 0 25px #00f0ff,0 0 50px #a100ff;
-  transition:transform 0.3s ease;
-}
-.researcher img:hover {transform:scale(1.05);}
-
-/* Researcher Name */
-.researcher-name {
-  margin-top:16px;
-  font-size:1.6rem;
-  font-weight:700;
-  background:linear-gradient(90deg,#00f0ff,#a100ff);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-shadow:0 0 12px rgba(160,0,255,0.6);
+*{box-sizing:border-box}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:"Poppins",system-ui,Segoe UI,Roboto,Helvetica,Arial;
+  background: linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
 }
 
-/* ----------------------------- */
-/* Articles Section */
-.articles {margin-top:100px;display:flex;flex-direction:column;align-items:center;gap:20px;}
-.article-link {
-  display:flex;align-items:center;gap:12px;
-  background:rgba(0,0,0,0.6);padding:14px 22px;border-radius:16px;
-  cursor:pointer;position:relative;transition:all 0.3s ease;
+/* --- network background canvas full-screen --- */
+#networkCanvas{
+  position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;
+  mix-blend-mode:overlay;opacity:0.95;
 }
-.article-link:hover {background:rgba(0,0,0,0.85);}
-.article-link span {font-weight:600;}
-.article-wizard {
-  position:absolute;top:-220px;left:50%;transform:translateX(-50%);
-  width:300px;background:#111;border:1px solid #00f0ff;border-radius:16px;
-  padding:12px;color:white;text-align:left;opacity:0;visibility:hidden;
-  box-shadow:0 0 25px #00f0ff,0 0 50px #a100ff;transition:opacity 0.3s ease,visibility 0.3s ease;
-  z-index:10;
-}
-.article-link:hover .article-wizard {opacity:1;visibility:visible;}
-.article-wizard img {width:100%;border-radius:12px;margin-bottom:8px;}
 
-/* Responsive */
-@media(max-width:800px){
-  .researchers{flex-direction:column;gap:60px;}
-  .researcher img {width:180px;height:180px;}
+/* --- page layout --- */
+.wrap{
+  position:relative;z-index:1;
+  max-width:1200px;margin:40px auto;padding:28px;
+}
+
+/* header with two researcher cards */
+.header{
+  display:flex;gap:28px;align-items:center;justify-content:center;
+  flex-wrap:wrap;margin-bottom:36px;
+}
+.researcher{
+  position:relative;width:300px;min-width:260px;
+  display:flex;flex-direction:column;align-items:center;
+  backdrop-filter: blur(10px);
+  padding:20px;border-radius:24px;background:var(--glass);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+  transition:transform .35s ease, box-shadow .35s ease;
+}
+.researcher:hover{ transform:translateY(-10px); box-shadow:0 20px 60px rgba(0,0,0,0.45); }
+
+/* fancy crystal frame for photo */
+.photo-frame{
+  position:relative;width:180px;height:180px;border-radius:32% 48% 30% 50% / 40% 35% 50% 32%;
+  padding:12px;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border:2px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 25px rgba(255,255,255,0.15) inset, 0 8px 30px rgba(0,0,0,0.3);
+  margin-bottom:14px;
+  transform: translateZ(0);
+}
+
+/* decorative crystal rings */
+.photo-frame::before, .photo-frame::after{
+  content:"";position:absolute;border-radius:50%;pointer-events:none;
+}
+.photo-frame::before{
+  inset: -10px; background: conic-gradient(from 90deg, rgba(255,255,255,0.12), rgba(136,255,200,0.12));
+  filter: blur(10px);
+}
+.photo-frame::after{
+  inset: -22px; border: 2px dashed rgba(255,255,255,0.03);
+}
+
+.photo-frame img{
+  width:100%;height:100%;border-radius:inherit;object-fit:cover;
+  display:block;box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  border:6px solid rgba(255,255,255,0.12);
+}
+
+/* researcher name */
+.name{
+  font-family:"Playfair Display",serif;
+  font-size:1.3rem;font-weight:700;color:var(--text);
+  letter-spacing:0.6px;margin-top:10px;text-align:center;display:flex;flex-direction:column;align-items:center;
+}
+.name .title-small{
+  font-size:0.85rem;font-weight:500;color:var(--muted);margin-top:6px;
+}
+
+/* --- articles list --- */
+.papers{
+  margin-top:32px;padding:20px;border-radius:14px;background:var(--glass-strong);
+  box-shadow:0 14px 40px rgba(0,0,0,0.4);
+}
+.papers h3{ margin:0 0 16px 0;font-size:1.2rem; }
+.paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px; }
+.paper{
+  background:var(--glass);padding:14px;border-radius:12px;display:flex;gap:12px;align-items:center;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
+.paper .thumb{
+  width:64px;height:64px;border-radius:8px;flex:0 0 64px;background:#eee;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;color:#222;
+}
+.paper .meta{ flex:1; text-align:left; }
+.paper .meta .p-title{ font-weight:600; font-size:0.95rem; color:var(--text); margin-bottom:6px; }
+.paper .meta .p-auth{ font-size:0.8rem; color:var(--muted); }
+
+/* floating wizard preview */
+.wizard{
+  position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.9);
+  transition:all .16s ease;max-width:380px;
+  background: var(--glass-strong);backdrop-filter: blur(10px);
+  border-radius:14px;padding:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6);
+  display:flex;gap:10px;overflow:hidden;
+}
+.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+.wizard .w-thumb{ width:110px;height:90px;border-radius:8px;overflow:hidden;flex:0 0 110px;background:#111; }
+.wizard .w-body{ font-size:0.9rem; color:var(--muted); line-height:1.3; max-height:170px; overflow:auto; }
+
+/* responsive */
+@media (max-width:900px){
+  .header{gap:18px}
+  .researcher{width:42%}
+  .photo-frame{width:140px;height:140px}
+}
+@media (max-width:640px){
+  .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
+  .photo-frame{width:96px;height:96px;margin-right:12px}
+  .name{align-items:flex-start;font-size:1rem}
 }
 </style>
 </head>
 <body>
+<canvas id="networkCanvas" aria-hidden="true"></canvas>
 
-<canvas id="particles"></canvas>
+<div class="wrap" role="main">
+  <header class="header" aria-label="Researchers">
+    <!-- Researcher 1 -->
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop" alt="Dr. Mehdi Panji photo">
+      </div>
+      <div class="name" id="r1-name">
+        <span>Dr. Mehdi Panji</span>
+        <span class="title-small">Researcher • Geotechnical Engineering</span>
+      </div>
+    </section>
 
-<div class="container">
+    <!-- Researcher 2 -->
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1545996124-1b7d20d8ccb3?q=80&w=800&auto=format&fit=crop" alt="Dr. Saeed Mojtabazadeh photo">
+      </div>
+      <div class="name" id="r2-name">
+        <span>Dr. Saeed Mojtabazadeh</span>
+        <span class="title-small">Postdoc • Seismic Geomechanics</span>
+      </div>
+    </section>
+  </header>
 
-  <!-- Researchers -->
-  <div class="researchers">
-    <div class="researcher">
-      <img src="https://via.placeholder.com/220x220?text=Mehdi+Panji" alt="Dr. Mehdi Panji">
-      <div class="researcher-name">Dr. Mehdi Panji</div>
-    </div>
-    <div class="researcher">
-      <img src="https://via.placeholder.com/220x220?text=Saeed+Mojtabazadeh" alt="Dr. Saeed Mojtabazadeh">
-      <div class="researcher-name">Dr. Saeed Mojtabazadeh</div>
-    </div>
-  </div>
+  <section class="papers" aria-label="Papers">
+    <h3>Free Downloadable Papers</h3>
+    <div class="paper-list" id="paperList"></div>
+  </section>
+</div>
 
-  <!-- Articles -->
-  <div class="articles" id="articles"></div>
-
+<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+  <div class="w-thumb" id="w-thumb"></div>
+  <div class="w-body" id="w-body"></div>
 </div>
 
 <script>
-// -------------------
-// Particle Background
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-let particles = [];
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;createParticles();}
-window.addEventListener('resize',resize);
-function createParticles(){
-  const count = Math.floor((window.innerWidth*window.innerHeight)/12000);
-  particles = Array.from({length:count},()=>({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    r:Math.random()*2+1,
-    dx:(Math.random()-0.5)*0.5,
-    dy:(Math.random()-0.5)*0.5
-  }));
-}
-resize();
-function drawParticles(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "#00f0ff";
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fill();
-    p.x+=p.dx; p.y+=p.dy;
-    if(p.x<0||p.x>canvas.width)p.dx*=-1;
-    if(p.y<0||p.y>canvas.height)p.dy*=-1;
-  });
-  // lines
-  ctx.strokeStyle="rgba(160,0,255,0.3)";
-  ctx.lineWidth=0.5;
-  for(let i=0;i<particles.length;i++){
-    for(let j=i+1;j<particles.length;j++){
-      const dx=particles[i].x-particles[j].x;
-      const dy=particles[i].y-particles[j].y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<120){
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x,particles[i].y);
-        ctx.lineTo(particles[j].x,particles[j].y);
-        ctx.stroke();
+/* ================= network canvas ================= */
+(function(){
+  const canvas=document.getElementById('networkCanvas');
+  const ctx=canvas.getContext('2d');
+  let particles=[];
+  function resize(){
+    const dpr=window.devicePixelRatio||1;
+    canvas.width=innerWidth*dpr;canvas.height=innerHeight*dpr;
+    canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    initParticles();
+  }
+  function initParticles(){
+    const area=innerWidth*innerHeight;
+    let count=Math.floor(area/7000);
+    count=Math.max(20,Math.min(count,120));
+    particles=Array.from({length:count},()=>({
+      x: Math.random()*innerWidth,
+      y: Math.random()*innerHeight,
+      r: Math.random()*4 + 3,   // bigger points
+      vx: (Math.random()-0.5)*0.45,
+      vy: (Math.random()-0.5)*0.45,
+      hue: 150 + Math.random()*80
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for(let p of particles){
+      ctx.fillStyle=`hsla(${p.hue},70%,60%,0.95)`;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>innerWidth) p.vx*=-1;
+      if(p.y<0||p.y>innerHeight) p.vy*=-1;
+    }
+    ctx.lineWidth=1.2;
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const p=particles[i],q=particles[j];
+        const dx=p.x-q.x,dy=p.y-q.y,dist=Math.hypot(dx,dy);
+        if(dist<160){
+          const alpha=1-dist/180;
+          const hue=Math.round((p.hue+q.hue)/2);
+          ctx.strokeStyle=`hsla(${hue},70%,60%,${alpha*0.2})`;
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+        }
       }
     }
+    requestAnimationFrame(draw);
   }
-  requestAnimationFrame(drawParticles);
-}
-drawParticles();
+  window.addEventListener('resize',resize); resize(); draw();
+})();
 
-// -------------------
-// Articles Section
-const articlesData=[
-  {title:'Paper 1',img:'https://via.placeholder.com/300x150',abstract:'Abstract of paper 1 here.'},
-  {title:'Paper 2',img:'https://via.placeholder.com/300x150',abstract:'Abstract of paper 2 here.'},
-  {title:'Paper 3',img:'https://via.placeholder.com/300x150',abstract:'Abstract of paper 3 here.'},
-];
-const articlesContainer = document.getElementById('articles');
-articlesData.forEach(a=>{
-  const div = document.createElement('div');
-  div.className='article-link';
-  div.innerHTML=`<span>${a.title}</span>
-                 <div class="article-wizard">
-                  <img src="${a.img}" alt="${a.title}">
-                  <p>${a.abstract}</p>
-                 </div>`;
-  articlesContainer.appendChild(div);
-});
+/* ================= papers & wizard ================= */
+(function(){
+  const papers=[
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",href:"#",thumb:"https://images.unsplash.com/photo-1526378727754-2f9a8570b321?q=80&w=640&auto=format&fit=crop",abstract:"This paper studies SH-wave propagation in orthotropic media and proposes a novel boundary-element approach in the time-domain..."},
+    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",href:"#",thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop",abstract:"We examine how surface topography affects ground motion using hybrid numerical techniques and parametric studies..."},
+    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",href:"#",thumb:"https://images.unsplash.com/photo-1517976487492-8b2ce31987f8?q=80&w=640&auto=format&fit=crop",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
+    {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",href:"#",thumb:"https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=640&auto=format&fit=crop",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
+  ];
+  const list=document.getElementById('paperList');
+  const wizard=document.getElementById('wizard');
+  const wThumb=document.getElementById('w-thumb');
+  const wBody=document.getElementById('w-body');
+
+  papers.forEach(p=>{
+    const node=document.createElement('article'); node.className='paper';
+    node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+                    <div class="meta"><div class="p-title"><a href="${p.href}" download style="color:inherit;text-decoration:none">${p.title}</a></div>
+                    <div class="p-auth">${p.authors}</div></div>`;
+    node.addEventListener('mouseenter',ev=>{
+      wThumb.innerHTML=`<img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+      wBody.innerHTML=`<strong style="color:var(--text);display:block;margin-bottom:6px">${p.title}</strong>
+                       <div style="color:var(--muted);font-size:0.9rem;max-height:170px;overflow:auto">${p.abstract}</div>
+                       <div style="margin-top:8px"><a href="${p.href}" download style="color:var(--accent1);text-decoration:none;font-weight:600">Download PDF</a></div>`;
+      const x=ev.clientX+18,y=ev.clientY+12; positionWizard(x,y);
+      wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+    });
+    node.addEventListener('mousemove',ev=>{
+      const x=ev.clientX+18,y=ev.clientY+12; positionWizard(x,y);
+    });
+    node.addEventListener('mouseleave',()=>{
+      wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
+    });
+    list.appendChild(node);
+  });
+  function positionWizard(x,y){
+    const w=wizard.offsetWidth,h=wizard.offsetHeight;
+    let nx=x,ny=y;
+    if(nx+w>window.innerWidth-12) nx=window.innerWidth-w-12;
+    if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
+    wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
+  }
+})();
 </script>
-
 </body>
 </html>
