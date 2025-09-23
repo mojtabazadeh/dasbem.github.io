@@ -1,286 +1,237 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>The DASBEM Project — Researchers</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg1:#0b2c5e; /* royal dark blue */
-  --bg2:#2747a1; /* royal lighter */
-  --accent1:#ffd36b;  /* golden accent */
-  --accent2:#fffae0;  /* pale gold */
-  --glass: rgba(255,255,255,0.06);
-  --glass-strong: rgba(255,255,255,0.1);
-  --text:#f6fff9;
-  --muted: rgba(246,255,249,0.75);
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:"Poppins",system-ui,Segoe UI,Roboto,Helvetica,Arial;
-  background: linear-gradient(135deg,var(--bg1),var(--bg2));
-  color:var(--text);
-  overflow-x:hidden;
-}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The DASBEM Project — Researchers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-gradient: linear-gradient(135deg,#0a0f3f,#1a3b8b,#0a0f3f);
+      --text:#f6fff9;
+      --muted: rgba(246,255,249,0.75);
+      --accent1:#00f5d4;
+      --accent2:#6beaff;
+      --glass: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg-gradient);color:var(--text);overflow-x:hidden}
+    
+    #networkCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mix-blend-mode:overlay;opacity:0.9;}
 
-/* ===== Network background canvas ===== */
-#networkCanvas{
-  position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;
-}
+    /* Header */
+    header.site-header{
+      position:relative;z-index:1;text-align:center;padding:28px 18px;font-family:"Playfair Display",serif;
+    }
+    header.site-header h1{font-size:2.8rem;font-weight:700;margin:0 0 12px;letter-spacing:1px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.45);}
+    header.site-header p{font-size:1.1rem;color:var(--muted);margin:0;}
 
-/* ===== Page layout ===== */
-.wrap{
-  position:relative;z-index:1;
-  max-width:1200px;margin:40px auto;padding:28px;
-}
+    /* Researchers */
+    .wrap{position:relative;z-index:1;max-width:1200px;margin:20px auto;padding:0 18px;}
+    .header{display:flex;gap:28px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+    .researcher{
+      position:relative;width:300px;min-width:260px;display:flex;flex-direction:column;align-items:center;
+      backdrop-filter: blur(6px);padding:18px;border-radius:20px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      box-shadow:0 10px 40px rgba(4,20,10,0.45), inset 0 1px 0 rgba(255,255,255,0.02);
+      transition:transform .35s ease, box-shadow .35s ease;
+    }
+    .researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.5); }
 
-/* Header title */
-.site-header{
-  text-align:center;margin-bottom:36px;
-  font-family:"Playfair Display",serif;
-  font-size:2rem;font-weight:700;color:var(--accent1);
-  text-shadow:0 2px 8px rgba(0,0,0,0.45);
-}
+    /* circular photo frame */
+    .photo-frame{
+      position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
+      padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.15) inset;
+      margin-bottom:12px;
+      border: 3px solid rgba(255,255,255,0.09);
+    }
+    .photo-frame img{
+      width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      border:4px solid rgba(255,255,255,0.15);
+    }
 
-/* header with two researcher cards */
-.header{
-  display:flex;gap:28px;align-items:center;justify-content:center;
-  flex-wrap:wrap;margin-bottom:36px;
-}
-.researcher{
-  position:relative;width:280px;min-width:260px;
-  display:flex;flex-direction:column;align-items:center;
-  backdrop-filter: blur(6px);
-  padding:18px;border-radius:24px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-  box-shadow: 0 10px 40px rgba(4,20,10,0.45), inset 0 1px 0 rgba(255,255,255,0.02);
-  transition:transform .35s ease, box-shadow .35s ease;
-}
-.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.5); }
+    .name{
+      font-family:"Playfair Display",serif;font-size:1.25rem;font-weight:700;color:var(--text);
+      letter-spacing:0.6px;margin-top:6px;text-align:center;display:flex;flex-direction:column;align-items:center;
+    }
+    .name .title-small{ font-size:0.85rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+    .contact{margin-top:6px;font-size:0.8rem;color:var(--accent2);text-align:center;display:flex;flex-direction:column;gap:2px;}
+    .contact a{color:var(--accent2);text-decoration:none;font-weight:600;}
+    .contact a:hover{text-decoration:underline;}
 
-/* photo frame - circular and glossy */
-.photo-frame{
-  position:relative;width:160px;height:160px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.25) inset;
-  border:3px solid rgba(255,255,255,0.08);
-  margin-bottom:12px;
-  overflow:hidden;
-}
-.photo-frame img{
-  width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-  border:4px solid rgba(255,255,255,0.15);
-}
+    /* Papers */
+    .papers{margin-top:28px;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.07), rgba(255,255,255,0.01));box-shadow:0 12px 30px rgba(0,0,0,0.4);}
+    .papers h3{ margin:0 0 12px 0;font-size:1.2rem;font-family:"Playfair Display",serif;}
+    .paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px; }
+    .paper{
+      background:var(--glass);padding:12px;border-radius:10px;display:flex;gap:10px;align-items:center;
+      transition:transform .18s ease, box-shadow .18s ease;
+      cursor:pointer;
+    }
+    .paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
+    .paper .thumb{ width:64px;height:64px;border-radius:6px;flex:0 0 64px;background:#111;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
+    .paper .thumb img{width:100%;height:100%;object-fit:cover;}
+    .paper .meta{ flex:1; text-align:left; }
+    .paper .meta .p-title{ font-weight:600; font-size:0.95rem; color:var(--text); margin-bottom:4px; }
+    .paper .meta .p-auth{ font-size:0.8rem; color:var(--muted); }
 
-/* Researcher name and info */
-.name {
-  font-family:"Playfair Display",serif;
-  font-size:1.25rem;font-weight:700;color:var(--text);
-  letter-spacing:0.6px;margin-top:8px;text-align:center;display:flex;flex-direction:column;align-items:center;
-}
-.name .title-small { font-size:0.85rem;font-weight:500;color:var(--muted);margin-top:4px; }
-.name .contact{ font-size:0.75rem;color:var(--accent2);margin-top:6px;text-align:center; }
-.name .contact a{ color:var(--accent2); text-decoration:none; transition:color .2s; }
-.name .contact a:hover{ color:var(--accent1); }
+    /* wizard */
+    .wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.9);transition:all .16s ease;max-width:380px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);display:flex;gap:10px;}
+    .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+    .wizard .w-thumb{ width:110px;height:90px;border-radius:8px;overflow:hidden;flex:0 0 110px;background:#111; }
+    .wizard .w-body{ font-size:0.9rem; color:var(--muted); line-height:1.3; max-height:170px; overflow:auto; }
 
-/* --- articles list --- */
-.papers{
-  margin-top:28px;padding:18px;border-radius:12px;
-  background:linear-gradient(180deg, rgba(0,0,0,0.07), rgba(255,255,255,0.01));
-  box-shadow:0 12px 30px rgba(0,0,0,0.4);
-}
-.papers h3{ margin:0 0 12px 0;font-size:1.2rem;font-weight:700 }
-.paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px; }
-.paper {
-  background:var(--glass);padding:12px;border-radius:10px;display:flex;gap:10px;align-items:center;
-  transition:transform .18s ease, box-shadow .18s ease;
-}
-.paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
-.paper .thumb{
-  width:64px;height:64px;border-radius:6px;flex:0 0 64px;background:#eee;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;color:#222;
-}
-.paper .meta{ flex:1; text-align:left; }
-.paper .meta .p-title{ font-weight:600; font-size:0.95rem; color:var(--text); margin-bottom:6px; }
-.paper .meta .p-auth{ font-size:0.8rem; color:var(--muted); }
-
-/* floating wizard preview */
-.wizard{
-  position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.9);
-  transition:all .16s ease;max-width:380px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-  display:flex;gap:10px;
-}
-.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-.wizard .w-thumb{ width:110px;height:90px;border-radius:8px;overflow:hidden;flex:0 0 110px;background:#111; }
-.wizard .w-body{ font-size:0.9rem; color:var(--muted); line-height:1.3; max-height:170px; overflow:auto; }
-
-/* responsive */
-@media (max-width:900px){
-  .header{gap:18px}
-  .researcher{width:42%}
-  .photo-frame{width:140px;height:140px}
-}
-@media (max-width:640px){
-  .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
-  .photo-frame{width:96px;height:96px;margin-right:12px}
-  .name{align-items:flex-start;font-size:1rem}
-}
-</style>
+    /* responsive */
+    @media (max-width:900px){ .header{gap:18px} .researcher{width:42%} .photo-frame{width:140px;height:140px} }
+    @media (max-width:640px){ .researcher{width:100%;flex-direction:row;align-items:center;padding:12px} .photo-frame{width:96px;height:96px;margin-right:12px} .name{align-items:flex-start;font-size:1rem} }
+  </style>
 </head>
 <body>
-<canvas id="networkCanvas" aria-hidden="true"></canvas>
-
-<div class="wrap" role="main">
-  <header class="site-header">The DASBEM Project</header>
-  <header class="header" aria-label="Researchers">
-    <!-- Researcher 1 -->
-    <section class="researcher" id="r1" aria-labelledby="r1-name">
-      <div class="photo-frame" aria-hidden="true">
-        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Dr. Mehdi Panji photo">
-      </div>
-      <div class="name" id="r1-name">
-        <span>Dr. Mehdi Panji</span>
-        <span class="title-small">Researcher • Geotechnical Engineering</span>
-        <div class="contact">
-          <a href="mailto:mehdi.panji@example.com">mehdi.panji@example.com</a><br>
-          <a href="http://www.mehdipanji.com" target="_blank">www.mehdipanji.com</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Researcher 2 -->
-    <section class="researcher" id="r2" aria-labelledby="r2-name">
-      <div class="photo-frame" aria-hidden="true">
-        <img src="https://images.unsplash.com/photo-1545996124-1b7d20d8ccb3?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Dr. Saeed Mojtabazadeh photo">
-      </div>
-      <div class="name" id="r2-name">
-        <span>Dr. Saeed Mojtabazadeh</span>
-        <span class="title-small">Postdoc • Seismic Geomechanics</span>
-        <div class="contact">
-          <a href="mailto:saeed.mojtabazadeh@example.com">saeed.mojtabazadeh@example.com</a><br>
-          <a href="http://www.saeedmojtabazadeh.com" target="_blank">www.saeedmojtabazadeh.com</a>
-        </div>
-      </div>
-    </section>
+  <canvas id="networkCanvas" aria-hidden="true"></canvas>
+  <header class="site-header">
+    <h1>The DASBEM Project</h1>
+    <p>Exploring Advanced Geotechnical & Seismic Research</p>
   </header>
+  <div class="wrap" role="main">
+    <div class="header" aria-label="Researchers">
+      <!-- Researcher 1 -->
+      <section class="researcher" id="r1" aria-labelledby="r1-name">
+        <div class="photo-frame" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Dr. Mehdi Panji photo">
+        </div>
+        <div class="name" id="r1-name">
+          <span>Dr. Mehdi Panji</span>
+          <span class="title-small">Researcher • Geotechnical Engineering</span>
+          <div class="contact">
+            <a href="mailto:mehdi.panji@example.com">mehdi.panji@example.com</a>
+            <a href="https://example.com">example.com</a>
+          </div>
+        </div>
+      </section>
 
-  <section class="papers" aria-label="Papers">
-    <h3>Free Downloadable Papers</h3>
-    <div class="paper-list" id="paperList"></div>
-  </section>
-</div>
+      <!-- Researcher 2 -->
+      <section class="researcher" id="r2" aria-labelledby="r2-name">
+        <div class="photo-frame" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1545996124-1b7d20d8ccb3?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Dr. Saeed Mojtabazadeh photo">
+        </div>
+        <div class="name" id="r2-name">
+          <span>Dr. Saeed Mojtabazadeh</span>
+          <span class="title-small">Postdoc • Seismic Geomechanics</span>
+          <div class="contact">
+            <a href="mailto:saeed.mojtabazadeh@example.com">saeed.mojtabazadeh@example.com</a>
+            <a href="https://example.com">example.com</a>
+          </div>
+        </div>
+      </section>
+    </div>
 
-<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
-  <div class="w-thumb" id="w-thumb"></div>
-  <div class="w-body" id="w-body"></div>
-</div>
+    <section class="papers" aria-label="Papers">
+      <h3>Free Downloadable Papers</h3>
+      <div class="paper-list" id="paperList"></div>
+    </section>
+  </div>
 
-<script>
-/* ===== Golden network background ===== */
-(function(){
-  const canvas = document.getElementById('networkCanvas');
-  const ctx = canvas.getContext('2d');
-  let particles=[];
-  function resize(){
-    const dpr = window.devicePixelRatio||1;
-    canvas.width = innerWidth*dpr;
-    canvas.height = innerHeight*dpr;
-    canvas.style.width = innerWidth+'px';
-    canvas.style.height = innerHeight+'px';
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    initParticles();
-  }
-  function initParticles(){
-    const area = innerWidth*innerHeight;
-    let count = Math.floor(area/12000);
-    count = Math.max(30,Math.min(count,100));
-    particles=Array.from({length:count},()=>({
-      x: Math.random()*innerWidth,
-      y: Math.random()*innerHeight,
-      r: Math.random()*3.5 + 2,
-      vx: (Math.random()-0.5)*0.35,
-      vy: (Math.random()-0.5)*0.35,
-      hue: 45 + Math.random()*20,
-      glow: Math.random()*6 + 4
-    }));
-  }
-  function draw(){
-    ctx.clearRect(0,0,innerWidth,innerHeight);
-    for(let p of particles){
-      let gradient = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.glow);
-      gradient.addColorStop(0,'hsla('+p.hue+',100%,75%,1)');
-      gradient.addColorStop(0.4,'hsla('+p.hue+',100%,60%,0.6)');
-      gradient.addColorStop(1,'hsla('+p.hue+',100%,50%,0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-      p.x += p.vx; p.y += p.vy;
-      if(p.x<0||p.x>innerWidth) p.vx*=-1;
-      if(p.y<0||p.y>innerHeight) p.vy*=-1;
-    }
-    ctx.lineWidth = 1;
-    for(let i=0;i<particles.length;i++){
-      for(let j=i+1;j<particles.length;j++){
-        const a=particles[i], b=particles[j];
-        const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
-        if(d<160){
-          const alpha = 1 - d/160;
-          ctx.strokeStyle = `hsla(${(a.hue+b.hue)/2},100%,60%,${alpha*0.15})`;
-          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-        }
+  <!-- Wizard preview -->
+  <div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+    <div class="w-thumb" id="w-thumb"></div>
+    <div class="w-body" id="w-body"></div>
+  </div>
+
+  <script>
+    /* ======= Network background - Galaxy style ======= */
+    (function(){
+      const canvas = document.getElementById('networkCanvas');
+      const ctx = canvas.getContext('2d');
+      let particles=[];
+      function resize(){
+        const dpr = window.devicePixelRatio||1;
+        canvas.width = innerWidth*dpr;
+        canvas.height = innerHeight*dpr;
+        canvas.style.width = innerWidth+'px';
+        canvas.style.height = innerHeight+'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        initParticles();
       }
-    }
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener('resize',resize); resize(); draw();
-})();
+      function initParticles(){
+        const area = innerWidth*innerHeight;
+        let count = Math.floor(area/15000);
+        count = Math.max(20,Math.min(count,90));
+        particles=Array.from({length:count},()=>({
+          x: Math.random()*innerWidth,
+          y: Math.random()*innerHeight,
+          r: Math.random()*3.5 + 2,
+          vx: (Math.random()-0.5)*0.25,
+          vy: (Math.random()-0.5)*0.25,
+          hue: 180+Math.random()*60
+        }));
+      }
+      function draw(){
+        ctx.clearRect(0,0,innerWidth,innerHeight);
+        for(let p of particles){
+          ctx.fillStyle=`hsla(${p.hue},80%,65%,0.95)`;
+          ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+          p.x+=p.vx;p.y+=p.vy;
+          if(p.x<0||p.x>innerWidth)p.vx*=-1;
+          if(p.y<0||p.y>innerHeight)p.vy*=-1;
+        }
+        ctx.lineWidth=1.1;
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a=particles[i], b=particles[j];
+            const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
+            if(d<160){
+              const alpha = 1 - d/160;
+              const hue = Math.round((a.hue+b.hue)/2);
+              ctx.strokeStyle=`hsla(${hue},80%,65%,${alpha*0.25})`;
+              ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      window.addEventListener('resize',resize); resize(); draw();
+    })();
 
-/* ===== Papers & hover wizard ===== */
-(function(){
-  const papers = [
-    { title:"Wave Propagation in Orthotropic Media", authors:"M. Panji, S. Mojtabazadeh", href:"#", thumb:"https://images.unsplash.com/photo-1526378727754-2f9a8570b321?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder", abstract:"This paper studies SH-wave propagation in orthotropic media and proposes a novel boundary-element approach in the time-domain..." },
-    { title:"Topographic Effects on Seismic Response", authors:"S. Mojtabazadeh", href:"#", thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder", abstract:"We examine how surface topography affects ground motion using hybrid numerical techniques and parametric studies..." },
-    { title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems", authors:"M. Panji", href:"#", thumb:"https://images.unsplash.com/photo-1517976487492-8b2ce31987f8?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder", abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..." },
-    { title:"Isolation Systems for Seismic Mitigation", authors:"S. Mojtabazadeh, M. Panji", href:"#", thumb:"https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder", abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..." }
-  ];
+    /* ======= Papers & Wizard ======= */
+    (function(){
+      const papers=[
+        {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",href:"#",thumb:"https://images.unsplash.com/photo-1526378727754-2f9a8570b321?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"This paper studies SH-wave propagation in orthotropic media and proposes a novel boundary-element approach in the time-domain..."},
+        {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",href:"#",thumb:"https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"We examine how surface topography affects ground motion using hybrid numerical techniques and parametric studies..."},
+        {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",href:"#",thumb:"https://images.unsplash.com/photo-1517976487492-8b2ce31987f8?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
+        {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",href:"#",thumb:"https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
+      ];
+      const list = document.getElementById('paperList');
+      const wizard = document.getElementById('wizard');
+      const wThumb = document.getElementById('w-thumb');
+      const wBody = document.getElementById('w-body');
 
-  const list = document.getElementById('paperList');
-  const wizard = document.getElementById('wizard');
-  const wThumb = document.getElementById('w-thumb');
-  const wBody = document.getElementById('w-body');
-
-  papers.forEach((p)=>{
-    const node = document.createElement('article');
-    node.className='paper';
-    node.innerHTML = `<div class="thumb"><img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>
-      <div class="meta">
-        <div class="p-title"><a href="${p.href}" download style="color:inherit;text-decoration:none">${p.title}</a></div>
-        <div class="p-auth">${p.authors}</div>
-      </div>`;
-    node.addEventListener('mouseenter',(ev)=>{
-      wThumb.innerHTML=`<img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover">`;
-      wBody.innerHTML=`<strong style="color:var(--text);display:block;margin-bottom:6px">${p.title}</strong>
-        <div style="color:var(--muted);font-size:0.9rem;max-height:150px;overflow:auto">${p.abstract}</div>
-        <div style="margin-top:8px"><a href="${p.href}" download style="color:var(--accent1);text-decoration:none;font-weight:600">Download PDF</a></div>`;
-      const x = ev.clientX + 18, y = ev.clientY + 12;
-      wizard.style.left = x + 'px'; wizard.style.top = y + 'px';
-      wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-    },{passive:true});
-    node.addEventListener('mousemove',(ev)=>{
-      const x = ev.clientX + 18, y = ev.clientY + 12;
-      wizard.style.left = x + 'px'; wizard.style.top = y + 'px';
-    },{passive:true});
-    node.addEventListener('mouseleave',()=>{
-      wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
-    });
-    list.appendChild(node);
-  });
-})();
-</script>
+      papers.forEach(p=>{
+        const node=document.createElement('article'); node.className='paper';
+        node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
+                        <div class="meta"><div class="p-title"><a href="${p.href}" download style="color:inherit;text-decoration:none">${p.title}</a></div>
+                        <div class="p-auth">${p.authors}</div></div>`;
+        node.addEventListener('mouseenter',(ev)=>{
+          wThumb.innerHTML=`<img src="${p.thumb}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+          wBody.innerHTML=`<strong style="color:var(--text);display:block;margin-bottom:6px">${p.title}</strong>
+                           <div style="color:var(--muted);font-size:0.9rem;overflow:auto;max-height:150px">${p.abstract}</div>
+                           <div style="margin-top:8px"><a href="${p.href}" download style="color:var(--accent1);text-decoration:none;font-weight:600">Download PDF</a></div>`;
+          positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+        });
+        node.addEventListener('mousemove',(ev)=>{positionWizard(ev.clientX+18,ev.clientY+12);});
+        node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+        list.appendChild(node);
+      });
+      function positionWizard(x,y){
+        const w = wizard.offsetWidth,h = wizard.offsetHeight;
+        let nx=x,ny=y;
+        if(nx+w>window.innerWidth-12) nx=window.innerWidth-w-12;
+        if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
+        wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
+      }
+    })();
+  </script>
 </body>
 </html>
