@@ -1,135 +1,190 @@
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>شبکه علمی دکتر سعید مجتبی‌زاده</title>
+  <title>The DASBEM Project — Researchers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
-    /* --- تنظیمات عمومی --- */
     body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #0a0a0a; /* زمینه تیره */
-      font-family: 'Tahoma', sans-serif;
-      color: #eee;
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background:#0e0e0e;
+      color:#fff;
+      overflow-x:hidden;
     }
 
-    /* --- هدر --- */
-    header {
-      position: absolute;
-      top: 15%;
-      width: 100%;
-      text-align: center;
-      z-index: 2;
-    }
-    header h1 {
-      font-size: 3rem;
-      color: #f8f8f8;
-      text-shadow: 
-        0 0 15px rgba(255,255,255,0.8),
-        0 0 35px rgba(180,180,180,0.6),
-        0 0 60px rgba(150,150,150,0.4);
-    }
-    header h2 {
-      font-size: 1.2rem;
-      color: #ccc;
-      margin-top: 0.5rem;
-      text-shadow: 0 0 10px rgba(200,200,200,0.3);
+    /* ===== Header ===== */
+    header.site-header{
+      position:relative;
+      z-index:2;
+      text-align:center;
+      padding:80px 20px 60px;
+      overflow:hidden;
     }
 
-    /* --- بوم ذرات --- */
-    canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      z-index: 1;
+    header.site-header .header-overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg,rgba(15,15,15,0.9),rgba(40,40,40,0.7));
+      backdrop-filter: blur(5px);
+      z-index:-1;
     }
+
+    header.site-header h1{
+      font-size:3.8rem;
+      font-weight:900;
+      margin:0 0 18px;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      background:linear-gradient(90deg,#f5f5f5 0%,#dcdcdc 50%,#ffffff 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      position:relative;
+      display:inline-block;
+      text-shadow:0 0 25px rgba(220,220,220,0.35),
+                   0 0 55px rgba(255,255,255,0.45);
+      animation: silverGlow 6s ease-in-out infinite;
+    }
+
+    @keyframes silverGlow{
+      0%{ text-shadow:0 0 20px rgba(200,200,200,0.25),0 0 50px rgba(255,255,255,0.25);}
+      50%{ text-shadow:0 0 40px rgba(230,230,230,0.6),0 0 90px rgba(255,255,255,0.55);}
+      100%{ text-shadow:0 0 20px rgba(200,200,200,0.25),0 0 50px rgba(255,255,255,0.25);}
+    }
+
+    header.site-header p{
+      font-size:1.3rem;
+      color:rgba(230,230,230,0.9);
+      max-width:780px;
+      margin:0 auto;
+      line-height:1.5;
+      text-shadow:0 0 12px rgba(255,255,255,0.25);
+      animation: fadePulse 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes fadePulse{
+      0%{ opacity:0.75; transform:translateY(0);}
+      50%{ opacity:1; transform:translateY(-3px);}
+      100%{ opacity:0.75; transform:translateY(0);}
+    }
+
+    @media(max-width:768px){
+      header.site-header h1{ font-size:2.4rem; }
+      header.site-header p{ font-size:1rem; }
+    }
+
+    /* ===== Researchers ===== */
+    .researchers-wrap {
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      max-width:1000px;
+      margin:40px auto;
+      gap:28px;
+      padding:0 20px;
+    }
+    .researcher{
+      background:rgba(255,255,255,0.03);
+      backdrop-filter:blur(6px);
+      border-radius:20px;
+      padding:20px;
+      width:280px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
+      transition:transform .3s, box-shadow .3s;
+    }
+    .researcher:hover{
+      transform:translateY(-8px);
+      box-shadow:0 18px 50px rgba(0,0,0,0.6);
+    }
+    .photo-frame{
+      width:160px; height:160px;
+      border-radius:50%;
+      overflow:hidden;
+      padding:4px;
+      background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 40%);
+      box-shadow:0 6px 20px rgba(0,0,0,0.45), inset 0 0 15px rgba(255,255,255,0.1);
+      margin-bottom:14px;
+      border:2px solid rgba(255,255,255,0.08);
+      transition: transform .5s;
+    }
+    .photo-frame img{
+      width:100%; height:100%;
+      object-fit:cover;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,0.15);
+      transition: transform .5s;
+    }
+    .researcher:hover .photo-frame{ transform: scale(1.05) rotateZ(1deg); }
+
+    .name span:first-child{
+      font-family:"Playfair Display",serif;
+      font-size:1.3rem;
+      font-weight:700;
+      display:block;
+      margin-bottom:4px;
+      color:#f5f5f5;
+    }
+    .title-small{
+      font-size:0.9rem;
+      color:rgba(200,200,200,0.8);
+      margin-bottom:6px;
+    }
+    .contact a{
+      display:block;
+      color:#bcdcff;
+      font-size:0.85rem;
+      text-decoration:none;
+      margin:2px 0;
+    }
+    .contact a:hover{ text-decoration:underline; }
   </style>
 </head>
 <body>
-  <!-- بوم ذرات -->
-  <canvas id="particles"></canvas>
 
-  <!-- هدر سایت -->
-  <header>
-    <h1>شبکه علمی دکتر سعید مجتبی‌زاده</h1>
-    <h2>تحقیقات، مقالات و همکاری‌های علمی</h2>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-overlay"></div>
+    <h1>The DASBEM Project</h1>
+    <p>Dynamic Analysis of Structures by Boundary Element Method</p>
   </header>
 
-  <!-- اسکریپت ذرات -->
-  <script>
-    const canvas = document.getElementById("particles");
-    const ctx = canvas.getContext("2d");
+  <!-- Researchers -->
+  <div class="researchers-wrap">
+    <!-- Researcher 1 -->
+    <section class="researcher" id="r1">
+      <div class="photo-frame">
+        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji">
+      </div>
+      <div class="name">
+        <span>Dr. Mehdi Panji</span>
+        <span class="title-small">Associate Professor</span>
+        <div class="contact">
+          <a href="mailto:m.panji@iauz.ac.ir">m.panji@iauz.ac.ir</a>
+          <a href="https://www.panji.ir">www.panji.ir</a>
+        </div>
+      </div>
+    </section>
 
-    let w, h;
-    function resize(){
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resize);
-    resize();
+    <!-- Researcher 2 -->
+    <section class="researcher" id="r2">
+      <div class="photo-frame">
+        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh">
+      </div>
+      <div class="name">
+        <span>Dr. Saeed Mojtabazadeh</span>
+        <span class="title-small">Postdoctoral Fellow</span>
+        <div class="contact">
+          <a href="mailto:saeed.@mojtabazadeh.ir">saeed.@mojtabazadeh.ir</a>
+          <a href="https://www.mojtabazadeh.ir">www.mojtabazadeh.ir</a>
+        </div>
+      </div>
+    </section>
+  </div>
 
-    const numParticles = 100;
-    const particles = [];
-
-    class Particle {
-      constructor(){
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.vx = (Math.random() - 0.5) * 0.7;
-        this.vy = (Math.random() - 0.5) * 0.7;
-        this.radius = 2;
-      }
-      move(){
-        this.x += this.vx;
-        this.y += this.vy;
-        if(this.x < 0 || this.x > w) this.vx *= -1;
-        if(this.y < 0 || this.y > h) this.vy *= -1;
-      }
-      draw(){
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
-        ctx.fillStyle = "#ddd";
-        ctx.fill();
-      }
-    }
-
-    for(let i=0;i<numParticles;i++){
-      particles.push(new Particle());
-    }
-
-    function animate(){
-      ctx.clearRect(0,0,w,h);
-
-      // رسم خطوط بین ذرات
-      for(let i=0;i<numParticles;i++){
-        for(let j=i+1;j<numParticles;j++){
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if(dist < 130){ // فاصله اتصال
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = "rgba(200,200,200," + (1 - dist/130) + ")";
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // رسم ذرات
-      particles.forEach(p=>{
-        p.move();
-        p.draw();
-      });
-
-      requestAnimationFrame(animate);
-    }
-    animate();
-  </script>
 </body>
 </html>
