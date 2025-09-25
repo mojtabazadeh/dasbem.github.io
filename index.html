@@ -1,114 +1,137 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The DASBEM Project — Researchers</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The DASBEM Project — Researchers & Papers</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg-gradient: linear-gradient(135deg,#1f2c34,#3a506b,#5bc0be);
-    --text:#f4f4f9;
-    --muted: rgba(244,244,249,0.8);
-    --accent1:#ffffff;
-    --accent2:#7fffd4;
-    --glass: rgba(255,255,255,0.06);
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:"Poppins",sans-serif;background:var(--bg-gradient);color:var(--text);overflow-x:hidden;}
+:root{
+  --bg-dark:#1a1a1a;
+  --bg-wave:#ff7e5f; /* warm gradient start */
+  --bg-wave2:#feb47b; /* warm gradient end */
+  --text-light:#fff;
+  --glass: rgba(255,255,255,0.1);
+  --accent:#ffb347;
+  --muted:#ddd;
+}
 
-  canvas#networkCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
-  /* Header */
-  header.site-header{
-    position:relative;z-index:1;text-align:center;padding:80px 18px 60px;
-  }
-  header.site-header h1{
-    font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;
-    background:linear-gradient(90deg,#ffffff,#dcdcdc,#f0f8ff);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    text-shadow:0 0 25px rgba(255,255,255,0.3),0 0 50px rgba(255,255,255,0.45);
-  }
-  header.site-header p{
-    font-size:1.3rem;color:var(--muted);max-width:780px;margin:12px auto 0;line-height:1.5;
-    text-shadow:0 0 12px rgba(255,255,255,0.25);
-  }
+/* ===== Background canvas ===== */
+#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 
-  /* Researchers */
-  .wrap{position:relative;z-index:1;max-width:1200px;margin:20px auto;padding:0 18px;}
-  .header{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;margin-bottom:36px;}
-  .researcher{
-    position:relative;width:300px;min-width:260px;display:flex;flex-direction:column;align-items:center;
-    backdrop-filter: blur(12px);padding:20px;border-radius:20px;
-    background:rgba(255,255,255,0.05);box-shadow:0 8px 30px rgba(0,0,0,0.35);
-    transition:transform 0.4s ease,box-shadow 0.4s ease;
-  }
-  .researcher:hover{transform:translateY(-8px);box-shadow:0 18px 50px rgba(0,0,0,0.5);}
-  .photo-frame{width:160px;height:160px;border-radius:50%;overflow:hidden;margin-bottom:12px;
-    border:2px solid rgba(255,255,255,0.15);transition:transform 1s;}
-  .photo-frame img{width:100%;height:100%;object-fit:cover;border-radius:50%;transition:transform 1s;}
-  .name{font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;text-align:center;color:var(--text);display:flex;flex-direction:column;align-items:center;transition:transform 0.5s;}
-  .title-small{font-size:0.95rem;font-weight:500;color:var(--muted);margin-top:4px;}
-  .contact{margin-top:8px;font-size:0.85rem;color:var(--accent2);display:flex;flex-direction:column;gap:4px;}
-  .contact a{color:var(--accent2);text-decoration:none;font-weight:500;}
-  .contact a:hover{text-decoration:underline;}
-  .researcher:hover .photo-frame{transform:scale(1.05);}
-  .researcher:hover .name{transform:translateY(2px);}
+/* ===== Header ===== */
+header.site-header{
+  position:relative;z-index:2;text-align:center;padding:80px 20px 60px;
+}
+header.site-header h1{
+  font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;
+  margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 20px rgba(255,200,150,0.3);
+  display:inline-block;
+  animation: glow 6s ease-in-out infinite;
+}
+@keyframes glow{
+  0%,100%{text-shadow:0 0 15px rgba(255,200,150,0.2);}
+  50%{text-shadow:0 0 35px rgba(255,180,120,0.6);}
+}
+header.site-header p{
+  font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;
+  text-shadow:0 0 12px rgba(255,180,120,0.25);
+  animation: pulse 5s ease-in-out infinite alternate;
+}
+@keyframes pulse{
+  0%{opacity:0.8;transform:translateY(0);}
+  50%{opacity:1;transform:translateY(-3px);}
+  100%{opacity:0.8;transform:translateY(0);}
+}
 
-  /* Papers */
-  .papers{max-width:1000px;margin:40px auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
-  .paper{
-    background:rgba(255,255,255,0.05);backdrop-filter:blur(6px);border-radius:12px;padding:12px;display:flex;flex-direction:column;cursor:pointer;
-    transition:transform 0.3s, box-shadow 0.3s;
-  }
-  .paper:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
-  .thumb{width:100%;height:160px;border-radius:8px;overflow:hidden;margin-bottom:8px;}
-  .thumb img{width:100%;height:100%;object-fit:cover;}
-  .p-title{
-    font-weight:600;font-size:1.05rem;margin-bottom:4px;color:var(--accent1);
-    transition:text-shadow 0.3s,color 0.3s;
-  }
-  .paper:hover .p-title{
-    color:#ffffff;
-    text-shadow:0 0 6px #7fffd4,0 0 12px #7fffd4,0 0 18px #ffffff;
-  }
-  .p-auth{font-size:0.85rem;color:var(--muted);}
+/* ===== Researchers ===== */
+.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 18px;}
+.header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.researcher{
+  position:relative;width:300px;min-width:260px;
+  display:flex;flex-direction:column;align-items:center;
+  backdrop-filter: blur(8px);padding:18px;border-radius:20px;
+  background:var(--glass);
+  box-shadow:0 10px 40px rgba(0,0,0,0.45);
+  transition:transform .35s ease, box-shadow .35s ease;
+}
+.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.6); }
 
-  /* Abstract popup */
-  #wizard{
-    position:absolute;background:rgba(0,0,0,0.85);border-radius:12px;padding:14px;
-    width:320px;max-width:90vw;max-height:300px;overflow:hidden;
-    box-shadow:0 8px 30px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:1000;
-  }
-  #wizard.show{opacity:1;pointer-events:auto;}
-  #wizard .thumb{width:100%;height:140px;border-radius:8px;overflow:hidden;margin-bottom:8px;}
-  #wizard .thumb img{width:100%;height:100%;object-fit:cover;}
-  #wizard .body{color:#f4f4f9;font-size:0.9rem;line-height:1.4;overflow-y:auto;max-height:130px;padding-right:4px;}
-  #wizard .body::-webkit-scrollbar{width:6px;}
-  #wizard .body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);border-radius:3px;}
-  #wizard .body::-webkit-scrollbar-track{background:transparent;}
+.photo-frame{
+  position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
+  padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.15) inset;
+  margin-bottom:12px;
+  border: 3px solid rgba(255,255,255,0.09);
+  transition: transform 1.2s ease-in-out;
+}
+.photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;transition: transform 1.2s ease-in-out;}
 
-  /* Responsive */
-  @media(max-width:900px){.researcher{width:45%;}.photo-frame{width:140px;height:140px;}}
-  @media(max-width:640px){.researcher{width:100%;flex-direction:row;align-items:center;padding:12px}.photo-frame{width:96px;height:96px;margin-right:12px}.name{align-items:flex-start;font-size:1rem;}}
+.name{
+  font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;color:var(--text-light);
+  letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out;
+}
+.name .title-small{ font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+.contact{margin-top:6px;font-size:0.9rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:2px;}
+.contact a{color:var(--accent);text-decoration:none;font-weight:600;}
+.contact a:hover{text-decoration:underline;}
+.researcher:hover .photo-frame{ transform: translateY(-2px);}
+.researcher:hover .name{ transform: translateY(2px);}
+
+/* ===== Papers ===== */
+.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.4);}
+.papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
+.paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
+.paper{
+  background:rgba(255,255,255,0.05);padding:12px;border-radius:12px;display:flex;flex-direction:column;
+  gap:10px;align-items:center;transition:transform .2s ease, box-shadow .2s ease;
+  cursor:pointer;
+}
+.paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
+.paper .thumb{ width:100%;height:160px;border-radius:8px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
+.paper .thumb img{width:100%;height:100%;object-fit:cover;}
+.paper .meta{ flex:1; text-align:center;margin-top:6px; }
+.paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
+.paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
+.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px; }
+
+/* ===== Wizard popup ===== */
+.wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
+transition:all .16s ease;max-width:380px;background: var(--glass);border-radius:12px;padding:12px;
+box-shadow: 0 12px 40px rgba(0,0,0,0.6);display:flex;gap:10px;flex-direction:column;}
+.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+.wizard .w-thumb{ width:100%;height:150px;border-radius:8px;overflow:hidden;background:#111; }
+.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
+.wizard .w-body{ font-size:0.9rem; color:var(--text-light); line-height:1.4; max-height:150px; overflow-y:auto; padding-right:4px;}
+
+/* responsive */
+@media (max-width:900px){ .header{gap:18px} .researcher{width:42%} .photo-frame{width:140px;height:140px} }
+@media (max-width:640px){ .researcher{width:100%;flex-direction:row;align-items:center;padding:12px} .photo-frame{width:96px;height:96px;margin-right:12px} .name{align-items:flex-start;font-size:1rem} }
 </style>
 </head>
 <body>
-<canvas id="networkCanvas"></canvas>
+<canvas id="waveCanvas" aria-hidden="true"></canvas>
 
 <header class="site-header">
   <h1>The DASBEM Project</h1>
   <p>Dynamic Analysis of Structures by Boundary Element Method</p>
 </header>
 
-<div class="wrap" role="main">
+<div class="wrap">
   <div class="header" aria-label="Researchers">
     <!-- Researcher 1 -->
-    <section class="researcher">
-      <div class="photo-frame">
-        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji">
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
       </div>
-      <div class="name">
+      <div class="name" id="r1-name">
         <span>Dr. Mehdi Panji</span>
         <span class="title-small">Associate Professor</span>
         <div class="contact">
@@ -119,11 +142,11 @@
     </section>
 
     <!-- Researcher 2 -->
-    <section class="researcher">
-      <div class="photo-frame">
-        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh">
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
       </div>
-      <div class="name">
+      <div class="name" id="r2-name">
         <span>Dr. Saeed Mojtabazadeh</span>
         <span class="title-small">Postdoctoral Fellow</span>
         <div class="contact">
@@ -134,105 +157,101 @@
     </section>
   </div>
 
-  <!-- Papers -->
-  <section class="papers" id="paperList"></section>
+  <!-- Papers Section -->
+  <section class="papers" aria-label="Papers">
+    <h3>Free Downloadable Papers</h3>
+    <div class="paper-list" id="paperList"></div>
+  </section>
 </div>
 
-<!-- Abstract popup -->
-<div id="wizard">
-  <div class="thumb" id="w-thumb"></div>
-  <div class="body" id="w-body"></div>
+<!-- Wizard popup -->
+<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+  <div class="w-thumb" id="w-thumb"></div>
+  <div class="w-body" id="w-body"></div>
 </div>
 
 <script>
-/* ===== Network Background ===== */
+/* ===== Background waves ===== */
 (function(){
-  const canvas=document.getElementById('networkCanvas');
+  const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
   let particles=[];
-  function resizeCanvas(){
-    const dpr=window.devicePixelRatio||1;
-    canvas.width=innerWidth*dpr;
-    canvas.height=innerHeight*dpr;
-    canvas.style.width=innerWidth+'px';
-    canvas.style.height=innerHeight+'px';
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    initParticles();
-  }
+  function resize(){canvas.width=innerWidth;canvas.height=innerHeight;initParticles();}
   function initParticles(){
-    const area=innerWidth*innerHeight;
-    let count=Math.floor(area/12000); count=Math.max(25,Math.min(count,60));
+    const count=80;
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
-      r:Math.random()*6+3,
-      vx:(Math.random()-0.5)*0.3,
-      vy:(Math.random()-0.5)*0.3,
-      hue:Math.random()*360
+      r:Math.random()*4+3,
+      vx:(Math.random()-0.5)*0.6,
+      vy:(Math.random()-0.5)*0.6,
+      color:`hsl(${Math.random()*50+20},70%,60%)`
     }));
   }
   function draw(){
     ctx.clearRect(0,0,innerWidth,innerHeight);
     for(let p of particles){
-      ctx.fillStyle=`hsla(${p.hue},70%,80%,0.8)`;
+      ctx.fillStyle=p.color;
       ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
       p.x+=p.vx;p.y+=p.vy;
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
-    ctx.lineWidth=1.2;
+    // connect close particles
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
         const a=particles[i],b=particles[j];
         const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
         if(d<180){
-          const alpha=1-d/180;
-          const hue=Math.round((a.hue+b.hue)/2);
-          ctx.strokeStyle=`hsla(${hue},70%,80%,${alpha*0.3})`;
+          ctx.strokeStyle=`rgba(255,180,120,${1-d/180})`;
           ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
         }
       }
     }
     requestAnimationFrame(draw);
   }
-  window.addEventListener('resize',resizeCanvas); resizeCanvas(); draw();
+  window.addEventListener('resize',resize);resize();draw();
 })();
 
-/* ===== Papers & Popup ===== */
+/* ===== Papers & Wizard ===== */
 (function(){
   const papers=[
-    {title:"Half-plane time-domain BEM for 2D scalar wave",authors:"Saeed Mojtabazadeh, ...",thumb:"https://picsum.photos/200",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for 2D scalar waves..."},
-    {title:"Advanced BEM for dynamic structures",authors:"Mehdi Panji, ...",thumb:"https://picsum.photos/201",abstract:"This study introduces an advanced BEM approach for dynamic analysis of structures..."}
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing the 2-D scalar wave problems in a homogenous isotropic linear elastic medium..."},
+    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects..."},
+    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
+    {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
   ];
-  const list=document.getElementById("paperList");
-  const wizard=document.getElementById("wizard");
-  const wThumb=document.getElementById("w-thumb");
-  const wBody=document.getElementById("w-body");
-  let timer=null;
+  const list=document.getElementById('paperList');
+  const wizard=document.getElementById('wizard');
+  const wThumb=document.getElementById('w-thumb');
+  const wBody=document.getElementById('w-body');
 
-  papers.forEach((p)=>{
-    const el=document.createElement("div");el.className="paper";
-    el.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt="thumb"></div>
-      <div class="p-title">${p.title}</div><div class="p-auth">${p.authors}</div>`;
-    el.addEventListener("mouseenter",(e)=>showWizard(p,e));
-    el.addEventListener("mouseleave",hideWizard);
-    list.appendChild(el);
+  papers.forEach(p=>{
+    const node=document.createElement('div'); node.className='paper';
+    node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
+                    <div class="meta"><div class="p-title">${p.title}</div>
+                    <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
+    node.addEventListener('mouseenter',(ev)=>{
+      wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+      wBody.textContent=p.abstract;
+      positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+    });
+    node.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+    node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+    // scroll abstract
+    node.addEventListener('wheel',(e)=>{
+      if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+    });
+    list.appendChild(node);
   });
 
-  function showWizard(p,e){
-    clearTimeout(timer);
-    wThumb.innerHTML=`<img src="${p.thumb}" alt="paper thumb">`;
-    wBody.textContent=p.abstract;
-    wizard.classList.add("show");
-    const rect=e.target.getBoundingClientRect();
-    let top=window.scrollY+rect.top-wizard.offsetHeight-8;
-    if(top<8) top=window.scrollY+rect.bottom+8;
-    let left=window.scrollX+rect.left;
-    if(left+wizard.offsetWidth>window.innerWidth-8) left=window.innerWidth-wizard.offsetWidth-8;
-    wizard.style.top=top+"px";
-    wizard.style.left=left+"px";
+  function positionWizard(x,y){
+    const w=wizard.offsetWidth,h=wizard.offsetHeight;
+    let nx=x,ny=y;
+    if(nx+w>window.innerWidth-12) nx=window.innerWidth-w-12;
+    if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
+    wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
   }
-  function hideWizard(){ timer=setTimeout(()=>wizard.classList.remove("show"),80); }
 })();
 </script>
 </body>
