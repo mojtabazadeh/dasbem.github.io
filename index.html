@@ -55,6 +55,33 @@
   .researcher:hover .photo-frame{transform:scale(1.05);}
   .researcher:hover .name{transform:translateY(2px);}
 
+  /* Papers */
+  .papers{max-width:1000px;margin:40px auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+  .paper{
+    background:rgba(255,255,255,0.05);backdrop-filter:blur(6px);border-radius:12px;padding:12px;display:flex;flex-direction:column;cursor:pointer;
+    transition:transform 0.3s, box-shadow 0.3s;
+  }
+  .paper:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+  .thumb{width:100%;height:160px;border-radius:8px;overflow:hidden;margin-bottom:8px;}
+  .thumb img{width:100%;height:100%;object-fit:cover;}
+  .p-title{font-weight:600;font-size:1.05rem;margin-bottom:4px;color:var(--accent1);}
+  .p-auth{font-size:0.85rem;color:var(--muted);}
+
+  /* Abstract popup */
+  #wizard{
+    position:absolute;background:rgba(0,0,0,0.85);border-radius:12px;padding:14px;
+    width:320px;max-width:90vw;max-height:300px;overflow:hidden;
+    box-shadow:0 8px 30px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:1000;
+  }
+  #wizard.show{opacity:1;pointer-events:auto;}
+  #wizard .thumb{width:100%;height:140px;border-radius:8px;overflow:hidden;margin-bottom:8px;}
+  #wizard .thumb img{width:100%;height:100%;object-fit:cover;}
+  #wizard .body{color:#f4f4f9;font-size:0.9rem;line-height:1.4;overflow-y:auto;max-height:130px;padding-right:4px;}
+  /* scrollbar */
+  #wizard .body::-webkit-scrollbar{width:6px;}
+  #wizard .body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);border-radius:3px;}
+  #wizard .body::-webkit-scrollbar-track{background:transparent;}
+
   /* Responsive */
   @media(max-width:900px){.researcher{width:45%;}.photo-frame{width:140px;height:140px;}}
   @media(max-width:640px){.researcher{width:100%;flex-direction:row;align-items:center;padding:12px}.photo-frame{width:96px;height:96px;margin-right:12px}.name{align-items:flex-start;font-size:1rem;}}
@@ -71,11 +98,11 @@
 <div class="wrap" role="main">
   <div class="header" aria-label="Researchers">
     <!-- Researcher 1 -->
-    <section class="researcher" id="r1" aria-labelledby="r1-name">
+    <section class="researcher">
       <div class="photo-frame">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji">
       </div>
-      <div class="name" id="r1-name">
+      <div class="name">
         <span>Dr. Mehdi Panji</span>
         <span class="title-small">Associate Professor</span>
         <div class="contact">
@@ -86,11 +113,11 @@
     </section>
 
     <!-- Researcher 2 -->
-    <section class="researcher" id="r2" aria-labelledby="r2-name">
+    <section class="researcher">
       <div class="photo-frame">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh">
       </div>
-      <div class="name" id="r2-name">
+      <div class="name">
         <span>Dr. Saeed Mojtabazadeh</span>
         <span class="title-small">Postdoctoral Fellow</span>
         <div class="contact">
@@ -100,9 +127,19 @@
       </div>
     </section>
   </div>
+
+  <!-- Papers -->
+  <section class="papers" id="paperList"></section>
+</div>
+
+<!-- Abstract popup -->
+<div id="wizard">
+  <div class="thumb" id="w-thumb"></div>
+  <div class="body" id="w-body"></div>
 </div>
 
 <script>
+/* ===== Network Background ===== */
 (function(){
   const canvas=document.getElementById('networkCanvas');
   const ctx=canvas.getContext('2d');
@@ -153,6 +190,43 @@
     requestAnimationFrame(draw);
   }
   window.addEventListener('resize',resizeCanvas); resizeCanvas(); draw();
+})();
+
+/* ===== Papers & Popup ===== */
+(function(){
+  const papers=[
+    {title:"Half-plane time-domain BEM for 2D scalar wave",authors:"Saeed Mojtabazadeh, ...",thumb:"https://picsum.photos/200",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for 2D scalar waves..."},
+    {title:"Advanced BEM for dynamic structures",authors:"Mehdi Panji, ...",thumb:"https://picsum.photos/201",abstract:"This study introduces an advanced BEM approach for dynamic analysis of structures..."}
+  ];
+  const list=document.getElementById("paperList");
+  const wizard=document.getElementById("wizard");
+  const wThumb=document.getElementById("w-thumb");
+  const wBody=document.getElementById("w-body");
+  let timer=null;
+
+  papers.forEach((p)=>{
+    const el=document.createElement("div");el.className="paper";
+    el.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt="thumb"></div>
+      <div class="p-title">${p.title}</div><div class="p-auth">${p.authors}</div>`;
+    el.addEventListener("mouseenter",(e)=>showWizard(p,e));
+    el.addEventListener("mouseleave",hideWizard);
+    list.appendChild(el);
+  });
+
+  function showWizard(p,e){
+    clearTimeout(timer);
+    wThumb.innerHTML=`<img src="${p.thumb}" alt="paper thumb">`;
+    wBody.textContent=p.abstract;
+    wizard.classList.add("show");
+    const rect=e.target.getBoundingClientRect();
+    let top=window.scrollY+rect.top-wizard.offsetHeight-8;
+    if(top<8) top=window.scrollY+rect.bottom+8;
+    let left=window.scrollX+rect.left;
+    if(left+wizard.offsetWidth>window.innerWidth-8) left=window.innerWidth-wizard.offsetWidth-8;
+    wizard.style.top=top+"px";
+    wizard.style.left=left+"px";
+  }
+  function hideWizard(){ timer=setTimeout(()=>wizard.classList.remove("show"),80); }
 })();
 </script>
 </body>
