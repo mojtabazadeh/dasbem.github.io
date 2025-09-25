@@ -1,192 +1,135 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>The DASBEM Project — Researchers</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <title>شبکه علمی دکتر سعید مجتبی‌زاده</title>
   <style>
+    /* --- تنظیمات عمومی --- */
     body {
-      margin:0;
-      font-family:"Poppins",sans-serif;
-      background:#0e0e0e;
-      color:#fff;
-      overflow-x:hidden;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #0a0a0a; /* زمینه تیره */
+      font-family: 'Tahoma', sans-serif;
+      color: #eee;
     }
 
-    /* ===== Header ===== */
-    header.site-header{
-      position:relative;
-      z-index:2;
-      text-align:center;
-      padding:80px 20px 60px;
-      overflow:hidden;
+    /* --- هدر --- */
+    header {
+      position: absolute;
+      top: 15%;
+      width: 100%;
+      text-align: center;
+      z-index: 2;
+    }
+    header h1 {
+      font-size: 3rem;
+      color: #f8f8f8;
+      text-shadow: 
+        0 0 15px rgba(255,255,255,0.8),
+        0 0 35px rgba(180,180,180,0.6),
+        0 0 60px rgba(150,150,150,0.4);
+    }
+    header h2 {
+      font-size: 1.2rem;
+      color: #ccc;
+      margin-top: 0.5rem;
+      text-shadow: 0 0 10px rgba(200,200,200,0.3);
     }
 
-    header.site-header .header-overlay{
-      position:absolute;
-      inset:0;
-      background:linear-gradient(180deg,rgba(15,15,15,0.9),rgba(40,40,40,0.7));
-      backdrop-filter: blur(5px);
-      z-index:-1;
+    /* --- بوم ذرات --- */
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
     }
-
-    header.site-header h1{
-      font-size:3.8rem;
-      font-weight:900;
-      margin:0 0 18px;
-      letter-spacing:2px;
-      text-transform:uppercase;
-      background:linear-gradient(90deg,#f5f5f5 0%,#dcdcdc 50%,#ffffff 100%);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      position:relative;
-      display:inline-block;
-      text-shadow:0 0 25px rgba(220,220,220,0.35),
-                   0 0 55px rgba(255,255,255,0.45);
-      animation: silverGlow 6s ease-in-out infinite;
-    }
-
-    header.site-header h1::before{
-      content:attr(data-text);
-      position:absolute;
-      inset:0;
-      -webkit-text-fill-color:transparent;
-      text-stroke:2px rgba(200,200,200,0.25);
-    }
-
-    @keyframes silverGlow{
-      0%{ text-shadow:0 0 20px rgba(200,200,200,0.25),0 0 50px rgba(255,255,255,0.25);}
-      50%{ text-shadow:0 0 40px rgba(230,230,230,0.6),0 0 90px rgba(255,255,255,0.55);}
-      100%{ text-shadow:0 0 20px rgba(200,200,200,0.25),0 0 50px rgba(255,255,255,0.25);}
-    }
-
-    header.site-header p{
-      font-size:1.3rem;
-      color:rgba(230,230,230,0.9);
-      max-width:780px;
-      margin:0 auto;
-      line-height:1.5;
-      text-shadow:0 0 12px rgba(255,255,255,0.25);
-      animation: fadePulse 5s ease-in-out infinite alternate;
-    }
-
-    @keyframes fadePulse{
-      0%{ opacity:0.75; transform:translateY(0);}
-      50%{ opacity:1; transform:translateY(-3px);}
-      100%{ opacity:0.75; transform:translateY(0);}
-    }
-
-    @media(max-width:768px){
-      header.site-header h1{ font-size:2.4rem; }
-      header.site-header p{ font-size:1rem; }
-    }
-
-    /* ===== Papers Section ===== */
-    .papers {
-      max-width:1000px;
-      margin:40px auto;
-      padding:20px;
-    }
-    .paper {
-      display:flex;
-      align-items:center;
-      background:#1a1a1a;
-      border-radius:12px;
-      padding:12px;
-      margin:12px 0;
-      text-decoration:none;
-      color:#eee;
-      transition:transform .2s, background .3s;
-    }
-    .paper:hover{
-      background:#2a2a2a;
-      transform:translateY(-4px);
-    }
-    .thumb {
-      width:70px;height:70px;flex-shrink:0;
-      border-radius:8px;
-      overflow:hidden;
-      margin-right:14px;
-    }
-    .thumb img{ width:100%;height:100%;object-fit:cover;}
-    .meta{ flex:1;}
-    .p-title{ font-weight:600; margin-bottom:4px;}
-    .p-auth{ font-size:0.9rem; color:#bbb;}
-    .year{ margin-left:6px; color:#999;}
-
-    /* Tooltip (wizard popup) */
-    #wizard{
-      position:absolute;
-      background:#222;
-      border:1px solid #444;
-      border-radius:10px;
-      padding:14px;
-      width:300px;
-      max-width:80vw;
-      box-shadow:0 8px 20px rgba(0,0,0,0.6);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .3s;
-      z-index:1000;
-    }
-    #wizard.show{ opacity:1;}
-    #wizard .thumb{ width:100%;height:150px;margin-bottom:10px;}
-    #wizard .body{ font-size:0.9rem;color:#ddd;}
   </style>
 </head>
 <body>
-  <!-- ======= Header ======= -->
-  <header class="site-header">
-    <div class="header-overlay"></div>
-    <h1>The DASBEM Project</h1>
-    <p>Dynamic Analysis of Structures by Boundary Element Method</p>
+  <!-- بوم ذرات -->
+  <canvas id="particles"></canvas>
+
+  <!-- هدر سایت -->
+  <header>
+    <h1>شبکه علمی دکتر سعید مجتبی‌زاده</h1>
+    <h2>تحقیقات، مقالات و همکاری‌های علمی</h2>
   </header>
 
-  <!-- ======= Papers Section ======= -->
-  <section class="papers" id="paperList">
-    <!-- papers load via JS -->
-  </section>
-
-  <!-- Tooltip -->
-  <div id="wizard">
-    <div id="w-thumb" class="thumb"></div>
-    <div id="w-body" class="body"></div>
-  </div>
-
+  <!-- اسکریپت ذرات -->
   <script>
-    (function(){
-      const papers=[
-        {title:"Half-plane time-domain BEM for 2D scalar wave",authors:"Saeed Mojtabazadeh, ...",year:"2024",thumb:"https://picsum.photos/100",href:"#",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented..."}
-      ];
-      const list=document.getElementById("paperList");
-      papers.forEach((p)=>{
-        const el=document.createElement("a");
-        el.href=p.href; el.className="paper";
-        el.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt="thumb"></div>
-          <div class="meta"><div class="p-title">${p.title}</div><div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
-        el.addEventListener("mouseenter",()=>showWizard(p,el));
-        el.addEventListener("mouseleave",hideWizard);
-        list.appendChild(el);
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+
+    let w, h;
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const numParticles = 100;
+    const particles = [];
+
+    class Particle {
+      constructor(){
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+        this.radius = 2;
+      }
+      move(){
+        this.x += this.vx;
+        this.y += this.vy;
+        if(this.x < 0 || this.x > w) this.vx *= -1;
+        if(this.y < 0 || this.y > h) this.vy *= -1;
+      }
+      draw(){
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+        ctx.fillStyle = "#ddd";
+        ctx.fill();
+      }
+    }
+
+    for(let i=0;i<numParticles;i++){
+      particles.push(new Particle());
+    }
+
+    function animate(){
+      ctx.clearRect(0,0,w,h);
+
+      // رسم خطوط بین ذرات
+      for(let i=0;i<numParticles;i++){
+        for(let j=i+1;j<numParticles;j++){
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 130){ // فاصله اتصال
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = "rgba(200,200,200," + (1 - dist/130) + ")";
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // رسم ذرات
+      particles.forEach(p=>{
+        p.move();
+        p.draw();
       });
 
-      const wizard=document.getElementById("wizard");
-      const wThumb=document.getElementById("w-thumb");
-      const wBody=document.getElementById("w-body");
-      let timer=null;
-      function showWizard(p,anchor){
-        clearTimeout(timer);
-        wThumb.innerHTML=`<img src="${p.thumb}" alt="paper thumb" style="width:100%;height:100%;object-fit:cover">`;
-        wBody.textContent=p.abstract;
-        wizard.classList.add("show");
-        const rect=anchor.getBoundingClientRect();
-        wizard.style.top=(window.scrollY+rect.top- wizard.offsetHeight-10)+"px";
-        wizard.style.left=(window.scrollX+rect.left)+"px";
-      }
-      function hideWizard(){
-        timer=setTimeout(()=>wizard.classList.remove("show"),80);
-      }
-    })();
+      requestAnimationFrame(animate);
+    }
+    animate();
   </script>
 </body>
 </html>
