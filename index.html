@@ -192,7 +192,6 @@ footer.site-footer{
   </section>
 </div>
 
-<!-- Footer -->
 <footer class="site-footer">
   Saeed Mojtabazadeh ©
 </footer>
@@ -204,10 +203,10 @@ footer.site-footer{
 </div>
 
 <script>
-/* ===== Background waves (fixed, smooth, identical PC/mobile) ===== */
+/* ===== 3D Background waves ===== */
 (function(){
-  const canvas=document.getElementById('waveCanvas');
-  const ctx=canvas.getContext('2d');
+  const canvas = document.getElementById('waveCanvas');
+  const ctx = canvas.getContext('2d');
   let particles=[];
 
   function resize(){
@@ -223,39 +222,63 @@ footer.site-footer{
 
   function initParticles(){
     const count = 80;
-    particles=Array.from({length:count},()=>({
-      x:Math.random()*window.innerWidth,
-      y:Math.random()*window.innerHeight,
-      r:Math.random()*4+3,
-      vx:(Math.random()-0.5)*0.6,
-      vy:(Math.random()-0.5)*0.6,
-      color:`hsl(${Math.random()*50+20},70%,60%)`
-    }));
+    particles = Array.from({length:count},()=>{
+      const z = Math.random()*300; // عمق
+      return {
+        x: Math.random()*window.innerWidth,
+        y: Math.random()*window.innerHeight,
+        z: z,
+        r: 2 + (300-z)/100, // اندازه براساس عمق
+        vx: (Math.random()-0.5)*0.6,
+        vy: (Math.random()-0.5)*0.6,
+        vz: (Math.random()-0.3)*0.2,
+        color: `hsl(${Math.random()*50+20},70%,60%)`
+      }
+    });
   }
 
   function draw(){
     ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
     for(let p of particles){
-      ctx.fillStyle=p.color;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
-      p.x+=p.vx; p.y+=p.vy;
+      // اندازه و شفافیت براساس عمق
+      const scale = (300 - p.z)/300;
+      ctx.fillStyle = `hsla( ${parseInt(p.color.match(/\d+/)[0])}, 70%, 60%, ${0.4+0.6*scale} )`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r*scale, 0, Math.PI*2);
+      ctx.fill();
+
+      // حرکت سه بعدی
+      p.x += p.vx;
+      p.y += p.vy;
+      p.z += p.vz;
+
+      // بازگشت به جلوه سه بعدی
       if(p.x<0||p.x>window.innerWidth)p.vx*=-1;
       if(p.y<0||p.y>window.innerHeight)p.vy*=-1;
+      if(p.z<0||p.z>300)p.vz*=-1;
     }
+
+    // خطوط نزدیک
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
-        const a=particles[i],b=particles[j];
-        const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+        const a=particles[i], b=particles[j];
+        const dx=a.x-b.x, dy=a.y-b.y;
+        const d=Math.hypot(dx,dy);
         if(d<180){
-          ctx.strokeStyle=`rgba(255,180,120,${1-d/180})`;
-          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+          const alpha = (1 - d/180) * ( (300 - (a.z+b.z)/2)/300 );
+          ctx.strokeStyle=`rgba(255,180,120,${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y);
+          ctx.lineTo(b.x,b.y);
+          ctx.stroke();
         }
       }
     }
+
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize',resize);
+  window.addEventListener('resize', resize);
   resize();
   draw();
 })();
@@ -263,9 +286,9 @@ footer.site-footer{
 /* ===== Papers & Wizard ===== */
 (function(){
   const papers=[
-    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems. ..."},
-    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects..."},
-    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed..."},
+    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems..."},
+    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"# ,thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
     {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
   ];
   const list=document.getElementById('paperList');
@@ -274,19 +297,28 @@ footer.site-footer{
   const wBody=document.getElementById('w-body');
 
   papers.forEach(p=>{
-    const node=document.createElement('div'); node.className='paper';
+    const node=document.createElement('div'); 
+    node.className='paper';
     node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
                     <div class="meta"><div class="p-title">${p.title}</div>
                     <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
     node.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
       wBody.textContent=p.abstract;
-      positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+      positionWizard(ev.clientX+18,ev.clientY+12); 
+      wizard.classList.add('show'); 
+      wizard.setAttribute('aria-hidden','false');
     });
     node.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
-    node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+    node.addEventListener('mouseleave',()=>{
+      wizard.classList.remove('show'); 
+      wizard.setAttribute('aria-hidden','true');
+    });
     node.addEventListener('wheel',(e)=>{
-      if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+      if(wizard.classList.contains('show')){
+        e.preventDefault(); 
+        wBody.scrollTop+=e.deltaY;
+      }
     });
     list.appendChild(node);
   });
@@ -296,9 +328,11 @@ footer.site-footer{
     let nx=x,ny=y;
     if(nx+w>window.innerWidth-12) nx=window.innerWidth-w-12;
     if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
-    wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
+    wizard.style.left=nx+'px'; 
+    wizard.style.top=ny+'px';
   }
 })();
 </script>
 </body>
 </html>
+
