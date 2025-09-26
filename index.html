@@ -2,16 +2,16 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
 <title>The DASBEM Project — Researchers & Papers</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg-dark:#1a1a1a;
-  --bg-wave:#ff7e5f; /* warm gradient start */
-  --bg-wave2:#feb47b; /* warm gradient end */
+  --bg-wave:#ff7e5f;
+  --bg-wave2:#feb47b;
   --text-light:#fff;
-  --glass: rgba(255,255,255,0.12); /* کمی تاریک‌تر برای خوانایی بهتر پاپ‌آپ */
+  --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
   --muted:#ddd;
 }
@@ -104,7 +104,7 @@ header.site-header p{
 
 /* ===== Wizard popup ===== */
 .wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
-transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85); /* تیره‌تر برای خوانایی بهتر */
+transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
 border-radius:12px;padding:12px;
 box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
 .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
@@ -122,7 +122,7 @@ footer.site-footer{
 
 /* responsive */
 @media (max-width:900px){ .header{gap:18px} .researcher{width:42%} .photo-frame{width:140px;height:140px} }
-@media (max-width:640px){ .researcher{width:100%;flex-direction:row;align-items:center;padding:12px} .photo-frame{width:96px;height:96px;margin-right:12px} .name{align-items:flex-start;font-size:1rem} }
+@media (max-width:640px){ .researcher{width:100%;flex-direction:row;align-items:center;padding:12px} .photo-frame{width:96px;height:96px;margin-right:12px} .name{align-items:flex-start;font-size:1rem} .paper-list{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -211,7 +211,6 @@ footer.site-footer{
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
-    // connect close particles
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
         const a=particles[i],b=particles[j];
@@ -240,21 +239,41 @@ footer.site-footer{
   const wThumb=document.getElementById('w-thumb');
   const wBody=document.getElementById('w-body');
 
+  let lastTapTime = 0;
+  let tappedPaper = null;
+
+  function showWizard(p,x,y){
+    wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+    wBody.textContent=p.abstract;
+    positionWizard(x+18,y+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+  }
+
   papers.forEach(p=>{
     const node=document.createElement('div'); node.className='paper';
     node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
                     <div class="meta"><div class="p-title">${p.title}</div>
                     <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
+    // Mouse hover
     node.addEventListener('mouseenter',(ev)=>{
-      wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-      wBody.textContent=p.abstract;
-      positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+      if(window.innerWidth>640){
+        showWizard(p,ev.clientX,ev.clientY);
+      }
     });
-    node.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
-    node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-    // scroll abstract
-    node.addEventListener('wheel',(e)=>{
-      if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+    node.addEventListener('mousemove',(ev)=>{if(window.innerWidth>640) positionWizard(ev.clientX,ev.clientY);});
+    node.addEventListener('mouseleave',()=>{if(window.innerWidth>640){wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');}});
+
+    // Touch / Click for mobile
+    node.addEventListener('click',(ev)=>{
+      const now = Date.now();
+      if(tappedPaper===node && now - lastTapTime < 500){ // second tap -> open link
+        window.open(p.href,'_blank');
+      } else { // first tap -> show wizard
+        showWizard(p,ev.clientX,ev.clientY);
+        tappedPaper = node;
+        setTimeout(()=>{ tappedPaper = null; wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true'); }, 5000);
+      }
+      lastTapTime = now;
+      ev.stopPropagation();
     });
     list.appendChild(node);
   });
@@ -266,6 +285,9 @@ footer.site-footer{
     if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
     wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
   }
+
+  // Close wizard if clicking outside
+  document.addEventListener('click',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true'); tappedPaper=null;});
 })();
 </script>
 </body>
