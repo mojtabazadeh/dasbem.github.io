@@ -21,7 +21,14 @@
 body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
 /* ===== Background canvas ===== */
-#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+#waveCanvas{
+  position:fixed;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  pointer-events:none;
+}
 
 /* ===== Header ===== */
 header.site-header{
@@ -30,7 +37,7 @@ header.site-header{
   text-align:center;
   padding:80px 20px 60px;
   display:flex;
-  flex-direction:column; /* همیشه زیر هم */
+  flex-direction:column;
   align-items:center;
 }
 header.site-header h1{
@@ -197,33 +204,44 @@ footer.site-footer{
 </div>
 
 <script>
-/* ===== Background waves ===== */
+/* ===== Background waves (fixed, smooth, identical PC/mobile) ===== */
 (function(){
   const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
   let particles=[];
-  function resize(){canvas.width=innerWidth;canvas.height=innerHeight;initParticles();}
+
+  function resize(){
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr,dpr);
+    initParticles();
+  }
+
   function initParticles(){
-    const count = window.innerWidth < 640 ? 50 : 80;
+    const count = 80;
     particles=Array.from({length:count},()=>({
-      x:Math.random()*innerWidth,
-      y:Math.random()*innerHeight,
+      x:Math.random()*window.innerWidth,
+      y:Math.random()*window.innerHeight,
       r:Math.random()*4+3,
-      vx:(Math.random()-0.5)*(window.innerWidth < 640 ? 0.5 : 0.6),
-      vy:(Math.random()-0.5)*(window.innerWidth < 640 ? 0.5 : 0.6),
+      vx:(Math.random()-0.5)*0.6,
+      vy:(Math.random()-0.5)*0.6,
       color:`hsl(${Math.random()*50+20},70%,60%)`
     }));
   }
+
   function draw(){
-    ctx.clearRect(0,0,innerWidth,innerHeight);
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
     for(let p of particles){
       ctx.fillStyle=p.color;
       ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
-      p.x+=p.vx;p.y+=p.vy;
-      if(p.x<0||p.x>innerWidth)p.vx*=-1;
-      if(p.y<0||p.y>innerHeight)p.vy*=-1;
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>window.innerWidth)p.vx*=-1;
+      if(p.y<0||p.y>window.innerHeight)p.vy*=-1;
     }
-    // connect close particles
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
         const a=particles[i],b=particles[j];
@@ -236,13 +254,16 @@ footer.site-footer{
     }
     requestAnimationFrame(draw);
   }
-  window.addEventListener('resize',resize);resize();draw();
+
+  window.addEventListener('resize',resize);
+  resize();
+  draw();
 })();
 
 /* ===== Papers & Wizard ===== */
 (function(){
   const papers=[
-    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems. By changing the spatial variable, the time-domain half-space Green's functions were obtained in an isotropic-like analytical process by solving the singular form of the scalar wave equation. The stress-free boundary condition of the ground surface was satisfied using the wave source image theory. To include the materials damping, the Barkan approach was used in the formulation to attenuate the half-space by applying a constant logarithmic reduction into the modified boundary integral equation. The closed-form attenuated orthotropic half-space scalar kernels were obtained in the time-domain for displacement/traction fields by analytical integration of Green's functions. The method was easily implemented in a time-domain computer code to analyse the seismic homogenous orthotropic medium. To elaborate the model of the heterogeneous problems, a substructuring approach was presented to satisfy the continuity conditions at the interface depending on the position of the node and normal. Then, several seismic problems including a surface canyon, an underground cavity, a subsurface inclusion, and an alluvial valley subjected to SH wave was solved and compared with the literature to validate the surface response in the case of isotropic convergence. To evaluate the accuracy and the time of analysis for the proposed method versus the full-space boundary element models, a comparative test was carried out for two examples. A favourite agreement was testified between the responses to verify the proposed method's capability for simple modelling of the orthotropic topographic features. Finally, the ability of the method to analyse the problems with high degrees of freedom was investigated by solving a half-space model including 25 subsurface orthotropic circular inclusions."},
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems. ..."},
     {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects..."},
     {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
     {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
