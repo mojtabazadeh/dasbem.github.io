@@ -17,13 +17,16 @@
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
-/* ===== Page Loader ===== */
-#siteLoader{position:fixed;inset:0;background:var(--bg-dark);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 1s ease;}
-#siteLoader div{color:var(--accent);font-family:'Playfair Display',serif;font-size:2rem;opacity:0;animation:loaderFade 1.5s forwards;}
-@keyframes loaderFade{0%{opacity:0;transform:translateY(15px);}100%{opacity:1;transform:translateY(0);}}
-
 /* ===== Background canvas ===== */
-#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+#waveCanvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  pointer-events:none;
+  transform:translateZ(0); /* GPU acceleration */
+}
 
 /* ===== Header ===== */
 header.site-header{
@@ -55,7 +58,7 @@ header.site-header p{
 }
 
 /* ===== Researchers ===== */
-.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 18px;opacity:0; transform:translateY(20px); transition:all 0.8s ease-out;}
+.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 18px;opacity:1; transform:translateY(0);}
 .header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
 .researcher{
   position:relative;width:300px;min-width:260px;
@@ -63,8 +66,8 @@ header.site-header p{
   backdrop-filter: blur(10px);padding:18px;border-radius:20px;
   background:var(--glass);
   box-shadow:0 10px 40px rgba(0,0,0,0.55);
-  transition:transform .35s ease, box-shadow .35s ease, opacity .8s ease, filter .35s ease;
-  opacity:0; transform:translateY(20px);
+  transition:transform .6s ease, box-shadow .35s ease;
+  transform:translateY(20px);
 }
 .researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.7); }
 
@@ -97,9 +100,9 @@ header.site-header p{
 .paper{
   background: rgba(255,255,255,0.12);
   padding:12px;border-radius:12px;display:flex;flex-direction:column;
-  gap:10px;align-items:center;transition:transform .4s ease, box-shadow .4s ease, opacity .8s ease, filter .35s ease;
+  gap:10px;align-items:center;transition:transform .4s ease, box-shadow .4s ease;
   cursor:pointer;
-  opacity:0; transform:translateY(20px);
+  transform:translateY(20px);
 }
 .paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.5); }
 .paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
@@ -170,9 +173,6 @@ footer.site-footer{
 </head>
 <body>
 
-<!-- Page loader -->
-<div id="siteLoader"><div>Loading...</div></div>
-
 <canvas id="waveCanvas" aria-hidden="true"></canvas>
 
 <header class="site-header">
@@ -232,23 +232,16 @@ footer.site-footer{
 </div>
 
 <script>
-/* ===== Page Loader & fade-in ===== */
+/* ===== Fade-in کارت‌ها ===== */
 window.addEventListener('load',()=>{
-  const loader=document.getElementById('siteLoader');
-  loader.style.opacity='0';
-  setTimeout(()=>loader.remove(),1000);
-
-  const wrap=document.querySelector('.wrap');
-  wrap.style.opacity='1'; wrap.style.transform='translateY(0)';
-
   const researchers=document.querySelectorAll('.researcher');
-  researchers.forEach((el,i)=>setTimeout(()=>{el.style.opacity='1'; el.style.transform='translateY(0)';}, i*150));
+  researchers.forEach((el,i)=>setTimeout(()=>{el.style.transform='translateY(0)';}, i*150));
 
   const papers=document.querySelectorAll('.paper');
-  papers.forEach((el,i)=>setTimeout(()=>{el.style.opacity='1'; el.style.transform='translateY(0)';}, 500+i*180));
+  papers.forEach((el,i)=>setTimeout(()=>{el.style.transform='translateY(0)';}, 500+i*180));
 });
 
-/* ===== Background particles with depth & mouse interaction ===== */
+/* ===== Background particles ===== */
 (function(){
   const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
@@ -263,14 +256,14 @@ window.addEventListener('load',()=>{
   }
 
   function initParticles(){
-    const count=isMobile?50:120;
+    const count=isMobile?40:120;
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
       z:Math.random(),
       r:Math.random()*3+1,
-      vx:(Math.random()-0.5)*(isMobile?0.5:0.6),
-      vy:(Math.random()-0.5)*(isMobile?0.5:0.6)
+      vx:(Math.random()-0.5)*(isMobile?0.3:0.6),
+      vy:(Math.random()-0.5)*(isMobile?0.3:0.6)
     }));
   }
 
@@ -321,7 +314,7 @@ window.addEventListener('load',()=>{
 /* ===== Papers & Researchers Wizard + download ===== */
 (function(){
   const papers=[
-    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering. Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering."},
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"Complete formulation of attenuated orthotropic time-domain BEM for SH-wave scattering."},
     {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"Half-plane time-domain BEM for 2-D scalar wave with site effects."},
     {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"Integrated BEM–FEM framework for complex geotechnical structures."},
     {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"Evaluates passive and semi-active isolation techniques."}
@@ -335,63 +328,22 @@ window.addEventListener('load',()=>{
     const node=document.createElement('div'); node.className='paper';
     node.innerHTML=`
       <div class="thumb"><img src="${p.thumb}" alt=""></div>
-      <div class="meta"><div class="p-title">${p.title}</div>
-      <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>
-      <a href="${p.href}" target="_blank" class="download-btn">Download</a>`;
-    node.addEventListener('mouseenter',(ev)=>{
-      wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-      wBody.textContent=p.abstract;
-      positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-    });
-    node.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
-    node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-    node.addEventListener('wheel',(e)=>{
-      if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
-    });
+      <div class="meta"><div class="p-title">${p.title}</div><div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>
+    `;
+    node.addEventListener('click',()=>{ showWizard(p); });
     list.appendChild(node);
   });
 
-  const researchers=[
-    {id:'r1',thumb:'https://picsum.photos/400/400?random=5',bio:"Dr. Mehdi Panji: Associate Professor, 15+ years in structural analysis & BEM."},
-    {id:'r2',thumb:'https://picsum.photos/400/400?random=6',bio:"Dr. Saeed Mojtabazadeh: Postdoc in seismic wave propagation & hybrid BEM–FEM."}
-  ];
-
-  researchers.forEach(r=>{
-    const elem=document.getElementById(r.id);
-    const frameElem=elem.querySelector('.photo-frame');
-    frameElem.addEventListener('mouseenter',(ev)=>{
-      wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
-      wBody.textContent=r.bio;
-      positionWizard(ev.clientX+18,ev.clientY+12);
-      wizard.classList.add('show');
-      wizard.setAttribute('aria-hidden','false');
-    });
-    frameElem.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
-    frameElem.addEventListener('mouseleave',()=>{
-      wizard.classList.remove('show');
-      wizard.setAttribute('aria-hidden','true');
-    });
-    frameElem.addEventListener('click',(ev)=>{
-      if(window.innerWidth<=640){
-        wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
-        wBody.textContent=r.bio;
-        positionWizard(ev.clientX,ev.clientY);
-        wizard.classList.add('show');
-        wizard.setAttribute('aria-hidden','false');
-      }
-    });
-  });
-
-  window.addEventListener('keydown',(e)=>{if(e.key==='Escape'){wizard.classList.remove('show');wizard.setAttribute('aria-hidden','true');}});
-
-  function positionWizard(x,y){
-    const w=wizard.offsetWidth,h=wizard.offsetHeight;
-    let nx=x,ny=y;
-    if(nx+w>window.innerWidth-12) nx=window.innerWidth-w-12;
-    if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
-    wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
+  function showWizard(p){
+    wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+    wBody.textContent=p.abstract;
+    wizard.classList.add('show');
+    wizard.setAttribute('aria-hidden','false');
   }
+
+  wizard.addEventListener('click',()=>{ wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true'); });
 })();
 </script>
+
 </body>
 </html>
