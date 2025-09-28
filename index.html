@@ -108,8 +108,30 @@ header.site-header p{
 .paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
 .paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
 .paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
-.paper .download-link{margin-top:6px;font-size:0.85rem;color:var(--accent);text-decoration:none;}
-.paper .download-link:hover{text-decoration:underline;}
+
+/* ===== Download Button ===== */
+.download-btn{
+  display:inline-block;
+  padding:8px 18px;
+  font-size:0.9rem;
+  font-weight:600;
+  color:#fff;
+  background: linear-gradient(135deg,#ff7e5f,#feb47b);
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  text-decoration:none;
+  transition:all 0.3s ease;
+  box-shadow:0 4px 15px rgba(255,126,95,0.4);
+}
+.download-btn:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 8px 25px rgba(255,126,95,0.6);
+}
+.download-btn:active{
+  transform:translateY(0) scale(0.98);
+  box-shadow:0 4px 12px rgba(255,126,95,0.5);
+}
 
 /* ===== Wizard popup ===== */
 .wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
@@ -315,7 +337,7 @@ window.addEventListener('load',()=>{
       <div class="thumb"><img src="${p.thumb}" alt=""></div>
       <div class="meta"><div class="p-title">${p.title}</div>
       <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>
-      <a href="${p.href}" class="download-link" target="_blank">Download / View</a>`;
+      <a href="${p.href}" target="_blank" class="download-btn">Download</a>`;
     node.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
       wBody.textContent=p.abstract;
