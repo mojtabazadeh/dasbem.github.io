@@ -14,11 +14,10 @@
   --muted:#ddd;
 }
 
-/* ===== Reset & body ===== */
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
-/* ===== Canvas ===== */
+/* ===== Background canvas ===== */
 #waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 
 /* ===== Header ===== */
@@ -32,12 +31,22 @@ header.site-header h1{
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   text-shadow:0 0 25px rgba(255,200,150,0.35), 0 0 40px rgba(255,180,120,0.45);
   display:inline-block;
-  transition: text-shadow .3s ease, transform .35s ease;
+  animation: glow 6s ease-in-out infinite;
+  transition: transform .35s ease;
+}
+@keyframes glow{
+  0%,100%{text-shadow:0 0 20px rgba(255,200,150,0.3), 0 0 35px rgba(255,180,120,0.4);}
+  50%{text-shadow:0 0 45px rgba(255,200,150,0.6), 0 0 70px rgba(255,180,120,0.7);}
 }
 header.site-header p{
   font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;
-  text-shadow:0 0 22px rgba(0,0,0,0.25);
-  transition: font-size .25s ease;
+  text-shadow:0 0 18px rgba(255,190,130,0.4), 0 0 30px rgba(255,160,100,0.25);
+  animation: pulse 5s ease-in-out infinite alternate;
+}
+@keyframes pulse{
+  0%{opacity:0.8;transform:translateY(0);}
+  50%{opacity:1;transform:translateY(-3px);}
+  100%{opacity:0.8;transform:translateY(0);}
 }
 
 /* ===== Researchers ===== */
@@ -46,74 +55,85 @@ header.site-header p{
 .researcher{
   position:relative;width:300px;min-width:260px;
   display:flex;flex-direction:column;align-items:center;
-  backdrop-filter: blur(12px);padding:18px;border-radius:20px;
+  backdrop-filter: blur(8px);padding:18px;border-radius:20px;
   background:var(--glass);
-  box-shadow:0 12px 42px rgba(0,0,0,0.55);
+  box-shadow:0 10px 40px rgba(0,0,0,0.45);
   transition:transform .35s ease, box-shadow .35s ease;
 }
-.researcher:hover{ transform:translateY(-8px); box-shadow:0 20px 52px rgba(0,0,0,0.65); }
+.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.6); }
+
 .photo-frame{
   position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
   padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);
   display:flex;align-items:center;justify-content:center;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.55), 0 0 18px rgba(255,255,255,0.15) inset;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.15) inset;
   margin-bottom:12px;
-  border: 3px solid rgba(255,255,255,0.12);
-  transition: transform 1s ease-in-out;
+  border: 3px solid rgba(255,255,255,0.09);
+  transition: transform 1.2s ease-in-out;
 }
 .photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;transition: transform 1.2s ease-in-out;}
+
 .name{
-  font-family:"Playfair Display",serif;font-size:1.4rem;font-weight:700;color:var(--text-light);
-  letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out,text-shadow .25s ease;
+  font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;color:var(--text-light);
+  letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out;
 }
-.name .title-small{ font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;text-shadow:0 0 4px rgba(0,0,0,0.25);}
-.contact{margin-top:6px;font-size:0.95rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:2px;}
+.name .title-small{ font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+.contact{margin-top:6px;font-size:0.9rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:2px;}
 .contact a{color:var(--accent);text-decoration:none;font-weight:600;}
 .contact a:hover{text-decoration:underline;}
+.researcher:hover .photo-frame{ transform: translateY(-2px);}
+.researcher:hover .name{ transform: translateY(2px);}
 
 /* ===== Papers ===== */
-.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 14px 36px rgba(0,0,0,0.5);}
-.papers h3{ margin:0 0 12px 0;font-size:1.6rem;font-family:"Playfair Display",serif;}
+.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.4);}
+.papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
 .paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
 .paper{
-  background: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.12);
   padding:12px;border-radius:12px;display:flex;flex-direction:column;
-  gap:10px;align-items:center;transition:transform .35s ease, box-shadow .35s ease, opacity .6s ease;
-  cursor:pointer;opacity:0;transform:translateY(14px);
+  gap:10px;align-items:center;transition:transform .2s ease, box-shadow .2s ease;
+  cursor:pointer;
 }
-.paper.show{opacity:1;transform:translateY(0);}
-.paper:hover{ transform:translateY(-6px); box-shadow:0 20px 44px rgba(0,0,0,0.55); }
+.paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
 .paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
 .paper .thumb img{width:100%;height:100%;object-fit:cover;}
 .paper .meta{ flex:1; text-align:center;margin-top:6px; }
 .paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
 .paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
-.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
-.paper .download-btn{margin-top:8px;padding:6px 12px;background:var(--accent);color:#111;border-radius:6px;text-decoration:none;font-weight:600;transition:background .25s;}
-.paper .download-btn:hover{background:#ffce70;}
+.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px; }
 
 /* ===== Wizard popup ===== */
 .wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
-transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.88);
-border-radius:14px;padding:12px;
-box-shadow: 0 14px 48px rgba(0,0,0,0.85);display:flex;gap:10px;flex-direction:column;}
+transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
+border-radius:12px;padding:12px;
+box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
 .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
 .wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
 .wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.95rem; color:#fff; line-height:1.5; max-height:220px; overflow-y:auto; padding-right:6px; text-align:justify; }
+.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
 
 /* ===== Footer ===== */
-footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(--text-light);}
+footer.site-footer{
+  text-align:center;
+  font-size:0.9rem;
+  padding:14px 0;
+  color:var(--text-light);
+}
 
-/* ===== Responsive ===== */
-@media (max-width:900px){ .header{gap:18px} .researcher{width:42%} .photo-frame{width:140px;height:140px} }
+/* ===== Responsive adjustments ===== */
+@media (max-width:900px){
+  .header{gap:18px}
+  .researcher{width:42%}
+  .photo-frame{width:140px;height:140px}
+}
+
 @media (max-width:640px){
   header.site-header{padding:50px 20px 40px;}
-  header.site-header h1{font-size:3rem;}
-  header.site-header p{font-size:1.2rem;}
+  header.site-header h1{font-size:2.8rem;}
+  header.site-header p{font-size:1.1rem;}
   .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
   .photo-frame{width:96px;height:96px;margin-right:12px}
-  .name{align-items:flex-start;font-size:1.1rem}
+  .name{align-items:flex-start;font-size:1rem}
 }
 </style>
 </head>
@@ -127,6 +147,7 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
 
 <div class="wrap">
   <div class="header" aria-label="Researchers">
+    <!-- Researcher 1 -->
     <section class="researcher" id="r1" aria-labelledby="r1-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
@@ -141,6 +162,7 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
       </div>
     </section>
 
+    <!-- Researcher 2 -->
     <section class="researcher" id="r2" aria-labelledby="r2-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
@@ -156,111 +178,126 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
     </section>
   </div>
 
+  <!-- Papers Section -->
   <section class="papers" aria-label="Papers">
     <h3>Free Downloadable Papers</h3>
     <div class="paper-list" id="paperList"></div>
   </section>
 </div>
 
-<footer class="site-footer">Saeed Mojtabazadeh ©</footer>
+<!-- Footer -->
+<footer class="site-footer">
+  Saeed Mojtabazadeh ©
+</footer>
 
+<!-- Wizard popup -->
 <div id="wizard" class="wizard" role="dialog" aria-hidden="true">
   <div class="w-thumb" id="w-thumb"></div>
   <div class="w-body" id="w-body"></div>
 </div>
 
 <script>
-/* ===== Particles with depth & mouse ===== */
+/* ===== Background particles with depth & mouse interaction ===== */
 (function(){
-  const canvas=document.getElementById('waveCanvas'),ctx=canvas.getContext('2d');
-  let particles=[],trail=[];
+  const canvas=document.getElementById('waveCanvas');
+  const ctx=canvas.getContext('2d');
+  let particles=[];
   let isMobile=window.innerWidth<=640;
   const mouse={x:-999,y:-999};
 
-  function resize(){canvas.width=innerWidth;canvas.height=innerHeight;initParticles();}
+  function resize(){
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+    initParticles();
+  }
+
   function initParticles(){
-    const count=isMobile?50:130;
+    const count=isMobile?50:120;
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
       z:Math.random(),
       r:Math.random()*3+1,
-      vx:(Math.random()-0.5)*(isMobile?0.5:0.8),
-      vy:(Math.random()-0.5)*(isMobile?0.5:0.8)
+      vx:(Math.random()-0.5)*(isMobile?0.5:0.6),
+      vy:(Math.random()-0.5)*(isMobile?0.5:0.6)
     }));
   }
 
   function draw(){
     ctx.clearRect(0,0,innerWidth,innerHeight);
-    // mouse trail
-    trail.push({x:mouse.x,y:mouse.y,alpha:1});
-    if(trail.length>25) trail.shift();
-    trail.forEach(t=>{
-      ctx.fillStyle=`rgba(255,200,150,${t.alpha})`;
-      ctx.beginPath();ctx.arc(t.x,t.y,3,0,Math.PI*2);ctx.fill();
-      t.alpha-=0.04;
-    });
+    for(let p of particles){
+      // تعامل با موس
+      const dx=mouse.x-p.x, dy=mouse.y-p.y;
+      const dist=Math.hypot(dx,dy);
+      if(dist<80 && dist>0){p.x-=dx*0.003; p.y-=dy*0.003;}
 
-    particles.forEach(p=>{
-      const dx=mouse.x-p.x,dy=mouse.y-p.y,dist=Math.hypot(dx,dy);
-      if(dist<80 && dist>0){p.x-=dx*0.004;p.y-=dy*0.004;}
       const alpha = 0.2 + (1 - p.z) * 0.6;
-      const size = p.r*(1+(1-p.z)*1.5);
+      const size = p.r * (1 + (1 - p.z) * 1.5);
       ctx.fillStyle=`rgba(255,200,150,${alpha})`;
-      ctx.beginPath();ctx.arc(p.x,p.y,size,0,Math.PI*2);ctx.fill();
-      p.x+=p.vx;p.y+=p.vy;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,size,0,Math.PI*2);
+      ctx.fill();
+
+      p.x+=p.vx;
+      p.y+=p.vy;
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
-    });
+    }
 
-    // lines between particles
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
-        const a=particles[i],b=particles[j];
-        const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+        const a=particles[i], b=particles[j];
+        const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
         if(d<180){
-          ctx.strokeStyle=`rgba(255,180,120,${((1-Math.max(a.z,b.z))*0.25)*(1-d/180)})`;
-          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+          const alpha = ((1 - Math.max(a.z,b.z)) * 0.25) * (1 - d/180); 
+          ctx.strokeStyle=`rgba(255,180,120,${alpha})`;
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
         }
       }
     }
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize',()=>{isMobile=window.innerWidth<=640;resize();});
-  window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+  window.addEventListener('resize',()=>{
+    isMobile=window.innerWidth<=640;
+    resize();
+  });
+  window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;});
   window.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
-  resize(); draw();
+
+  resize();
+  draw();
 })();
 
-/* ===== Papers & Wizard with fade-in ===== */
+/* ===== Papers & Researchers Wizard ===== */
 (function(){
   const papers=[
-    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems."},
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems. In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems. In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems."},
     {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects."},
     {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures."},
     {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations."}
   ];
   const list=document.getElementById('paperList');
-  const wizard=document.getElementById('wizard'),wThumb=document.getElementById('w-thumb'),wBody=document.getElementById('w-body');
+  const wizard=document.getElementById('wizard');
+  const wThumb=document.getElementById('w-thumb');
+  const wBody=document.getElementById('w-body');
 
-  papers.forEach((p,i)=>{
+  papers.forEach(p=>{
     const node=document.createElement('div'); node.className='paper';
     node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
-      <div class="meta"><div class="p-title">${p.title}</div>
-      <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>
-      <a class="download-btn" href="${p.href}" download>Download</a>`;
-    list.appendChild(node);
-    setTimeout(()=>node.classList.add('show'),i*220);
-
-    node.addEventListener('mouseenter',ev=>{
+                    <div class="meta"><div class="p-title">${p.title}</div>
+                    <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
+    node.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
       wBody.textContent=p.abstract;
       positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
     });
-    node.addEventListener('mousemove',ev=>positionWizard(ev.clientX+18,ev.clientY+12));
+    node.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
     node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-    node.addEventListener('wheel',e=>{if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}});
+    node.addEventListener('wheel',(e)=>{
+      if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+    });
+    list.appendChild(node);
   });
 
   const researchers=[
@@ -269,26 +306,34 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
   ];
 
   researchers.forEach(r=>{
-    const elem=document.getElementById(r.id),frameElem=elem.querySelector('.photo-frame');
-    frameElem.addEventListener('mouseenter',ev=>{
+    const elem=document.getElementById(r.id);
+    const frameElem=elem.querySelector('.photo-frame');
+    frameElem.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
       wBody.textContent=r.bio;
       positionWizard(ev.clientX+18,ev.clientY+12);
-      wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+      wizard.classList.add('show');
+      wizard.setAttribute('aria-hidden','false');
     });
-    frameElem.addEventListener('mousemove',ev=>positionWizard(ev.clientX+18,ev.clientY+12));
-    frameElem.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-    frameElem.addEventListener('click',ev=>{
+    frameElem.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+    frameElem.addEventListener('mouseleave',()=>{
+      wizard.classList.remove('show');
+      wizard.setAttribute('aria-hidden','true');
+    });
+    // Mobile touch fallback
+    frameElem.addEventListener('click',(ev)=>{
       if(window.innerWidth<=640){
         wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
         wBody.textContent=r.bio;
         positionWizard(ev.clientX,ev.clientY);
-        wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+        wizard.classList.add('show');
+        wizard.setAttribute('aria-hidden','false');
       }
     });
   });
 
-  window.addEventListener('keydown',e=>{if(e.key==='Escape'){wizard.classList.remove('show');wizard.setAttribute('aria-hidden','true');}});
+  // Close wizard with ESC
+  window.addEventListener('keydown',(e)=>{if(e.key==='Escape'){wizard.classList.remove('show');wizard.setAttribute('aria-hidden','true');}});
 
   function positionWizard(x,y){
     const w=wizard.offsetWidth,h=wizard.offsetHeight;
@@ -297,20 +342,6 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
     if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
     wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
   }
-})();
-
-/* ===== Header glow with mouse ===== */
-(function(){
-  const header=document.querySelector('header.site-header h1');
-  window.addEventListener('mousemove',e=>{
-    const rect=header.getBoundingClientRect();
-    const dx=e.clientX-(rect.left+rect.width/2);
-    const dy=e.clientY-(rect.top+rect.height/2);
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    const max=300;
-    const intensity=Math.min(dist/max,1);
-    header.style.textShadow=`0 0 ${30*(1-intensity)}px rgba(255,200,150,0.6), 0 0 ${50*(1-intensity)}px rgba(255,180,120,0.7)`;
-  });
 })();
 </script>
 </body>
