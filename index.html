@@ -14,6 +14,7 @@
   --muted:#ddd;
 }
 
+/* ===== Base Styles ===== */
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
@@ -107,19 +108,22 @@ header.site-header p{
 .paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
 .paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
 
-/* ===== Download Button ===== */
-.download-btn{
+/* ===== Buttons ===== */
+.download-btn, .journal-btn{
   display:inline-block;
   padding:8px 18px;
   font-size:0.9rem;
   font-weight:600;
   color:#fff;
-  background: linear-gradient(135deg,#ff7e5f,#feb47b);
   border:none;
   border-radius:10px;
   cursor:pointer;
   text-decoration:none;
   transition:all 0.3s ease;
+  margin:4px 4px 0 0;
+}
+.download-btn{
+  background: linear-gradient(135deg,#ff7e5f,#feb47b);
   box-shadow:0 4px 15px rgba(255,126,95,0.4);
 }
 .download-btn:hover{
@@ -129,6 +133,18 @@ header.site-header p{
 .download-btn:active{
   transform:translateY(0) scale(0.98);
   box-shadow:0 4px 12px rgba(255,126,95,0.5);
+}
+.journal-btn{
+  background: linear-gradient(135deg,#6a11cb,#2575fc);
+  box-shadow:0 4px 15px rgba(106,17,203,0.4);
+}
+.journal-btn:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 8px 25px rgba(106,17,203,0.6);
+}
+.journal-btn:active{
+  transform:translateY(0) scale(0.98);
+  box-shadow:0 4px 12px rgba(106,17,203,0.5);
 }
 
 /* ===== Wizard popup ===== */
@@ -155,14 +171,14 @@ footer.site-footer{
   .researcher{width:42%}
   .photo-frame{width:140px;height:140px}
 }
-
 @media (max-width:640px){
   header.site-header{padding:50px 20px 40px;}
   header.site-header h1{font-size:2.8rem;}
   header.site-header p{font-size:1.1rem;}
   .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
-  .photo-frame{width:96px;height:96px;margin-right:12px}
+  .photo-frame{width:120px;height:120px;margin-right:12px} /* بزرگتر کردن تامنیل موبایل */
   .name{align-items:flex-start;font-size:1rem}
+  .paper .thumb{height:200px;} /* بزرگتر شدن تامنیل مقالات در موبایل */
 }
 </style>
 </head>
@@ -230,17 +246,14 @@ footer.site-footer{
 </div>
 
 <script>
-/* ===== Page Loader & fade-in ===== */
+/* ===== Page Loader ===== */
 window.addEventListener('load',()=>{
   const loader=document.getElementById('siteLoader');
   loader.style.opacity='0';
   setTimeout(()=>loader.remove(),1000);
-
-  const papers=document.querySelectorAll('.paper');
-  papers.forEach((el,i)=>setTimeout(()=>{el.style.opacity='1'; el.style.transform='translateY(0)';}, 500+i*180));
 });
 
-/* ===== Background particles with depth & mouse interaction ===== */
+/* ===== Background particles ===== */
 (function(){
   const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
@@ -248,14 +261,9 @@ window.addEventListener('load',()=>{
   let isMobile=window.innerWidth<=640;
   const mouse={x:-999,y:-999};
 
-  function resize(){
-    canvas.width=innerWidth;
-    canvas.height=innerHeight;
-    initParticles();
-  }
-
+  function resize(){canvas.width=innerWidth; canvas.height=innerHeight; initParticles();}
   function initParticles(){
-    const count=isMobile?30:120; // موبایل: کمتر
+    const count=isMobile?30:120;
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
@@ -265,58 +273,41 @@ window.addEventListener('load',()=>{
       vy:(Math.random()-0.5)*(isMobile?0.3:0.6)
     }));
   }
-
   function draw(){
     ctx.clearRect(0,0,innerWidth,innerHeight);
     for(let p of particles){
       const dx=mouse.x-p.x, dy=mouse.y-p.y;
       const dist=Math.hypot(dx,dy);
       if(dist<80 && dist>0){p.x-=dx*0.003; p.y-=dy*0.003;}
-
       const alpha = 0.2 + (1 - p.z) * 0.6;
       const size = p.r * (1 + (1 - p.z) * 1.5);
       ctx.fillStyle=`rgba(255,200,150,${alpha})`;
       ctx.beginPath();
       ctx.arc(p.x,p.y,size,0,Math.PI*2);
       ctx.fill();
-
       p.x+=p.vx; p.y+=p.vy;
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
-
-    for(let i=0;i<particles.length;i++){
-      for(let j=i+1;j<particles.length;j++){
-        const a=particles[i], b=particles[j];
-        const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
-        if(d<180){
-          const alpha = ((1 - Math.max(a.z,b.z)) * 0.25) * (1 - d/180); 
-          ctx.strokeStyle=`rgba(255,180,120,${alpha})`;
-          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-        }
-      }
-    }
     requestAnimationFrame(draw);
   }
-
   window.addEventListener('resize',()=>{
     isMobile=window.innerWidth<=640;
     resize();
   });
   window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;});
   window.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
-
   resize();
   draw();
 })();
 
-/* ===== Papers Wizard + download ===== */
+/* ===== Papers Wizard + download + journal ===== */
 (function(){
   const papers=[
-    {title:"SH-Wave Scattering by an Orthotrpic Triangular Soft Hill",authors:"M. Panji, S. Mojtabazadeh, F. Saleki",year:"2025",href:"https://ceij.ut.ac.ir/article_102916_ce8da7f17a9c6b8e26c3ac35f9c7442f.pdf",thumb:"https://bayanbox.ir/view/4346859562447649024/1.jpg",abstract:"In this paper, the SH-wave scattering by an orthotropic triangular soft hill settled on the underlying half-space was investigated using a half-space time-domain boundary element method to obtain a seismic ground response. The surface of the hill and its interface were only discretized by quadratic elements to elaborate on the computational model. First, a brief formulation of the method and the modified boundary integral equation with damping were presented. Then, the method was implemented in a developed DASBEM algorithm and analyzed as a verification example to compare with the literature and confirm the obtained results. Finally, an advanced numerical study was carried out to sensitize the key parameters of the model, including the isotropy factor, shape ratio of the hill, incident wave angle, and frequency content. The results showed that the proposed method had the powerful ability to create sharp corner features. Also, the orientation of the material texture of the triangular hill was extremely effective on the seismic ground response and changing the amplification patterns."},
-    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"Half-plane time-domain BEM for 2-D scalar wave with site effects."},
-    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"Integrated BEM–FEM framework for complex geotechnical structures."},
-    {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"Evaluates passive and semi-active isolation techniques."}
+    {title:"SH-Wave Scattering by an Orthotrpic Triangular Soft Hill",authors:"M. Panji, S. Mojtabazadeh, F. Saleki",year:"2025",href:"https://ceij.ut.ac.ir/article_102916_ce8da7f17a9c6b8e26c3ac35f9c7442f.pdf",journal:"#",thumb:"https://bayanbox.ir/view/4346859562447649024/1.jpg",abstract:"In this paper, the SH-wave scattering by an orthotropic triangular soft hill settled on the underlying half-space was investigated."},
+    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",journal:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"Half-plane time-domain BEM for 2-D scalar wave with site effects."},
+    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"Integrated BEM–FEM framework for complex geotechnical structures."},
+    {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",journal:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"Evaluates passive and semi-active isolation techniques."}
   ];
   const list=document.getElementById('paperList');
   const wizard=document.getElementById('wizard');
@@ -327,9 +318,14 @@ window.addEventListener('load',()=>{
     const node=document.createElement('div'); node.className='paper';
     node.innerHTML=`
       <div class="thumb"><img src="${p.thumb}" alt=""></div>
-      <div class="meta"><div class="p-title">${p.title}</div>
-      <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>
-      <a href="${p.href}" target="_blank" class="download-btn">Download</a>`;
+      <div class="meta">
+        <div class="p-title">${p.title}</div>
+        <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>
+      </div>
+      <div>
+        <a href="${p.href}" target="_blank" class="download-btn">Download</a>
+        <a href="${p.journal}" target="_blank" class="journal-btn">Journal</a>
+      </div>`;
 
     const thumb=node.querySelector('.thumb');
     thumb.addEventListener('mouseenter',(ev)=>{
