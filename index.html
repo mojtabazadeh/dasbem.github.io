@@ -109,9 +109,9 @@ transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
 border-radius:12px;padding:12px;
 box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
 .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-.wizard .w-thumb{ width:100%;height:150px;border-radius:8px;overflow:hidden;background:#111; }
+.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
 .wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:150px; overflow-y:auto; padding-right:6px; text-align:justify; }
+.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
 
 /* ===== Footer ===== */
 footer.site-footer{
@@ -199,7 +199,7 @@ footer.site-footer{
 </div>
 
 <script>
-/* ===== Background waves ===== */
+/* ===== Background waves with stronger lines ===== */
 (function(){
   const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
@@ -233,13 +233,13 @@ footer.site-footer{
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
-    // خطوط اتصال همیشه فعال
+    // خطوط اتصال واضح‌تر
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
         const a=particles[i],b=particles[j];
         const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
         if(d<180){
-          const alpha=isMobile?0.08:0.18;
+          const alpha=isMobile?0.15:0.35; 
           ctx.strokeStyle=`rgba(255,180,120,${alpha*(1-d/180)})`;
           ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
         }
@@ -257,13 +257,13 @@ footer.site-footer{
   draw();
 })();
 
-/* ===== Papers & Wizard ===== */
+/* ===== Papers & Researchers Wizard ===== */
 (function(){
   const papers=[
     {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems."},
-    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects..."},
-    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
-    {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
+    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects."},
+    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures."},
+    {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations."}
   ];
   const list=document.getElementById('paperList');
   const wizard=document.getElementById('wizard');
@@ -288,24 +288,26 @@ footer.site-footer{
     list.appendChild(node);
   });
 
-  /* ===== Researchers popup ===== */
   const researchers=[
-    {id:'r1',thumb:'https://picsum.photos/400/200?random=5',bio:"Dr. Mehdi Panji is an Associate Professor with over 15 years of experience in structural analysis and computational mechanics. He has published extensively in the field of BEM."},
-    {id:'r2',thumb:'https://picsum.photos/400/200?random=6',bio:"Dr. Saeed Mojtabazadeh is a Postdoctoral Fellow specializing in seismic wave propagation and hybrid BEM–FEM modeling. His research focuses on practical applications in geotechnical systems."}
+    {id:'r1',thumb:'https://picsum.photos/400/400?random=5',bio:"Dr. Mehdi Panji is an Associate Professor with over 15 years of experience in structural analysis and computational mechanics. He has published extensively in the field of BEM."},
+    {id:'r2',thumb:'https://picsum.photos/400/400?random=6',bio:"Dr. Saeed Mojtabazadeh is a Postdoctoral Fellow specializing in seismic wave propagation and hybrid BEM–FEM modeling. His research focuses on practical applications in geotechnical systems."}
   ];
 
   researchers.forEach(r=>{
     const elem=document.getElementById(r.id);
-    const nameElem=elem.querySelector('.name');
-    nameElem.addEventListener('mouseenter',(ev)=>{
+    const frameElem=elem.querySelector('.photo-frame'); // فعال کردن روی فریم
+    frameElem.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
       wBody.textContent=r.bio;
       positionWizard(ev.clientX+18,ev.clientY+12);
       wizard.classList.add('show');
       wizard.setAttribute('aria-hidden','false');
     });
-    nameElem.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
-    nameElem.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+    frameElem.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+    frameElem.addEventListener('mouseleave',()=>{
+      wizard.classList.remove('show');
+      wizard.setAttribute('aria-hidden','true');
+    });
   });
 
   function positionWizard(x,y){
