@@ -90,7 +90,8 @@ header.site-header p{
 .papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
 .paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
 .paper{
-  background:rgba(255,255,255,0.05);padding:12px;border-radius:12px;display:flex;flex-direction:column;
+  background:var(--glass); /* شفافیت مشابه محققان */
+  padding:12px;border-radius:12px;display:flex;flex-direction:column;
   gap:10px;align-items:center;transition:transform .2s ease, box-shadow .2s ease;
   cursor:pointer;
 }
@@ -110,7 +111,7 @@ box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:col
 .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
 .wizard .w-thumb{ width:100%;height:150px;border-radius:8px;overflow:hidden;background:#111; }
 .wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:150px; overflow-y:auto; padding-right:6px;}
+.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:150px; overflow-y:auto; padding-right:6px; text-align:justify; }
 
 /* ===== Footer ===== */
 footer.site-footer{
@@ -126,10 +127,13 @@ footer.site-footer{
   .researcher{width:42%}
   .photo-frame{width:140px;height:140px}
 }
+
 @media (max-width:640px){
+  /* Smaller header */
   header.site-header{padding:50px 20px 40px;}
   header.site-header h1{font-size:2.8rem;}
   header.site-header p{font-size:1.1rem;}
+
   .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
   .photo-frame{width:96px;height:96px;margin-right:12px}
   .name{align-items:flex-start;font-size:1rem}
@@ -146,6 +150,7 @@ footer.site-footer{
 
 <div class="wrap">
   <div class="header" aria-label="Researchers">
+    <!-- Researcher 1 -->
     <section class="researcher" id="r1" aria-labelledby="r1-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
@@ -159,6 +164,8 @@ footer.site-footer{
         </div>
       </div>
     </section>
+
+    <!-- Researcher 2 -->
     <section class="researcher" id="r2" aria-labelledby="r2-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
@@ -174,16 +181,19 @@ footer.site-footer{
     </section>
   </div>
 
+  <!-- Papers Section -->
   <section class="papers" aria-label="Papers">
     <h3>Free Downloadable Papers</h3>
     <div class="paper-list" id="paperList"></div>
   </section>
 </div>
 
+<!-- Footer -->
 <footer class="site-footer">
   Saeed Mojtabazadeh ©
 </footer>
 
+<!-- Wizard popup -->
 <div id="wizard" class="wizard" role="dialog" aria-hidden="true">
   <div class="w-thumb" id="w-thumb"></div>
   <div class="w-body" id="w-body"></div>
@@ -195,6 +205,7 @@ footer.site-footer{
   const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
   let particles=[];
+  let isMobile=window.innerWidth<=640;
 
   function resize(){
     canvas.width=innerWidth;
@@ -203,13 +214,13 @@ footer.site-footer{
   }
 
   function initParticles(){
-    const count=80;
+    const count=isMobile?40:80; 
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
       r:Math.random()*4+3,
-      vx:(Math.random()-0.5)*0.6,
-      vy:(Math.random()-0.5)*0.6,
+      vx:(Math.random()-0.5)*(isMobile?0.5:0.6), // کمی سریعتر روی موبایل
+      vy:(Math.random()-0.5)*(isMobile?0.5:0.6),
       color:`hsl(${Math.random()*50+20},70%,60%)`
     }));
   }
@@ -223,6 +234,8 @@ footer.site-footer{
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
+
+    // خطوط اتصال فعال روی موبایل و دسکتاپ
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
         const a=particles[i],b=particles[j];
@@ -233,10 +246,15 @@ footer.site-footer{
         }
       }
     }
+
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize',resize);
+  window.addEventListener('resize',()=>{
+    isMobile=window.innerWidth<=640;
+    resize();
+  });
+
   resize();
   draw();
 })();
@@ -270,6 +288,24 @@ footer.site-footer{
       if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
     });
     list.appendChild(node);
+  });
+
+  /* ===== Researchers popup ===== */
+  const researchers=[
+    {id:'r1',thumb:'https://picsum.photos/400/200?random=5',bio:"Dr. Mehdi Panji is an Associate Professor with over 15 years of experience in structural analysis and computational mechanics. He has published extensively in the field of BEM."},
+    {id:'r2',thumb:'https://picsum.photos/400/200?random=6',bio:"Dr. Saeed Mojtabazadeh is a Postdoctoral Fellow specializing in seismic wave propagation and hybrid BEM–FEM modeling. His research focuses on practical applications in geotechnical systems."}
+  ];
+
+  researchers.forEach(r=>{
+    const elem=document.getElementById(r.id);
+    const nameElem=elem.querySelector('.name');
+    nameElem.addEventListener('mouseenter',(ev)=>{
+      wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
+      wBody.textContent=r.bio;
+      positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+    });
+    nameElem.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+    nameElem.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
   });
 
   function positionWizard(x,y){
