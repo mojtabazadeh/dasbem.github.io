@@ -126,19 +126,13 @@ footer.site-footer{
   .researcher{width:42%}
   .photo-frame{width:140px;height:140px}
 }
-
 @media (max-width:640px){
-  /* Smaller header */
   header.site-header{padding:50px 20px 40px;}
   header.site-header h1{font-size:2.8rem;}
   header.site-header p{font-size:1.1rem;}
-
   .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
   .photo-frame{width:96px;height:96px;margin-right:12px}
   .name{align-items:flex-start;font-size:1rem}
-
-  /* Optimize background: reduce particle count and disable connections */
-  #waveCanvas{pointer-events:none;}
 }
 </style>
 </head>
@@ -152,7 +146,6 @@ footer.site-footer{
 
 <div class="wrap">
   <div class="header" aria-label="Researchers">
-    <!-- Researcher 1 -->
     <section class="researcher" id="r1" aria-labelledby="r1-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
@@ -166,8 +159,6 @@ footer.site-footer{
         </div>
       </div>
     </section>
-
-    <!-- Researcher 2 -->
     <section class="researcher" id="r2" aria-labelledby="r2-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
@@ -183,19 +174,16 @@ footer.site-footer{
     </section>
   </div>
 
-  <!-- Papers Section -->
   <section class="papers" aria-label="Papers">
     <h3>Free Downloadable Papers</h3>
     <div class="paper-list" id="paperList"></div>
   </section>
 </div>
 
-<!-- Footer -->
 <footer class="site-footer">
   Saeed Mojtabazadeh ©
 </footer>
 
-<!-- Wizard popup -->
 <div id="wizard" class="wizard" role="dialog" aria-hidden="true">
   <div class="w-thumb" id="w-thumb"></div>
   <div class="w-body" id="w-body"></div>
@@ -207,7 +195,6 @@ footer.site-footer{
   const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
   let particles=[];
-  let isMobile=window.innerWidth<=640;
 
   function resize(){
     canvas.width=innerWidth;
@@ -216,13 +203,13 @@ footer.site-footer{
   }
 
   function initParticles(){
-    const count=isMobile?40:80; // fewer particles on mobile
+    const count=80;
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
       r:Math.random()*4+3,
-      vx:(Math.random()-0.5)*(isMobile?0.3:0.6),
-      vy:(Math.random()-0.5)*(isMobile?0.3:0.6),
+      vx:(Math.random()-0.5)*0.6,
+      vy:(Math.random()-0.5)*0.6,
       color:`hsl(${Math.random()*50+20},70%,60%)`
     }));
   }
@@ -236,26 +223,20 @@ footer.site-footer{
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
-    if(!isMobile){ // disable connecting lines on mobile
-      for(let i=0;i<particles.length;i++){
-        for(let j=i+1;j<particles.length;j++){
-          const a=particles[i],b=particles[j];
-          const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
-          if(d<180){
-            ctx.strokeStyle=`rgba(255,180,120,${1-d/180})`;
-            ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-          }
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const a=particles[i],b=particles[j];
+        const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+        if(d<180){
+          ctx.strokeStyle=`rgba(255,180,120,${1-d/180})`;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
         }
       }
     }
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize',()=>{
-    isMobile=window.innerWidth<=640;
-    resize();
-  });
-
+  window.addEventListener('resize',resize);
   resize();
   draw();
 })();
