@@ -3,183 +3,270 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>The DASBEM Project — Researchers</title>
+<title>The DASBEM Project — Researchers & Papers</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:'Poppins',sans-serif;background:#000;color:#fff;overflow-x:hidden}
-
-/* ==== HEADER ==== */
-header{padding:2rem;text-align:center;position:relative;z-index:5}
-header h1{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(2rem,5vw,4rem);
-  color:#fff;
-  text-shadow:0 0 12px #0ff,0 0 24px #0ff,0 0 48px #0ff;
-  animation:flicker 3s infinite;
-}
-@keyframes flicker{
-  0%,19%,21%,23%,25%,54%,56%,100%{opacity:1;text-shadow:0 0 12px #0ff,0 0 24px #0ff,0 0 48px #0ff;}
-  20%,24%,55%{opacity:.6;text-shadow:none}
+:root{
+  --bg-dark:#1a1a1a;
+  --bg-wave:#ff7e5f; /* warm gradient start */
+  --bg-wave2:#feb47b; /* warm gradient end */
+  --text-light:#fff;
+  --glass: rgba(255,255,255,0.12); /* کمی تاریک‌تر برای خوانایی بهتر پاپ‌آپ */
+  --accent:#ffb347;
+  --muted:#ddd;
 }
 
-/* ==== BACKGROUND ==== */
-#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
-/* ==== PAPERS ==== */
-main{position:relative;z-index:2;max-width:1000px;margin:2rem auto;padding:1rem;display:grid;gap:1.5rem}
+/* ===== Background canvas ===== */
+#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* ===== Header ===== */
+header.site-header{
+  position:relative;z-index:2;text-align:center;padding:80px 20px 60px;
+}
+header.site-header h1{
+  font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;
+  margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 25px rgba(255,200,150,0.35), 0 0 40px rgba(255,180,120,0.45);
+  display:inline-block;
+  animation: glow 6s ease-in-out infinite;
+}
+@keyframes glow{
+  0%,100%{text-shadow:0 0 20px rgba(255,200,150,0.3), 0 0 35px rgba(255,180,120,0.4);}
+  50%{text-shadow:0 0 45px rgba(255,200,150,0.6), 0 0 70px rgba(255,180,120,0.7);}
+}
+header.site-header p{
+  font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;
+  text-shadow:0 0 18px rgba(255,190,130,0.4), 0 0 30px rgba(255,160,100,0.25);
+  animation: pulse 5s ease-in-out infinite alternate;
+}
+@keyframes pulse{
+  0%{opacity:0.8;transform:translateY(0);}
+  50%{opacity:1;transform:translateY(-3px);}
+  100%{opacity:0.8;transform:translateY(0);}
+}
+
+/* ===== Researchers ===== */
+.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 18px;}
+.header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.researcher{
+  position:relative;width:300px;min-width:260px;
+  display:flex;flex-direction:column;align-items:center;
+  backdrop-filter: blur(8px);padding:18px;border-radius:20px;
+  background:var(--glass);
+  box-shadow:0 10px 40px rgba(0,0,0,0.45);
+  transition:transform .35s ease, box-shadow .35s ease;
+}
+.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.6); }
+
+.photo-frame{
+  position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
+  padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.15) inset;
+  margin-bottom:12px;
+  border: 3px solid rgba(255,255,255,0.09);
+  transition: transform 1.2s ease-in-out;
+}
+.photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;transition: transform 1.2s ease-in-out;}
+
+.name{
+  font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;color:var(--text-light);
+  letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out;
+}
+.name .title-small{ font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+.contact{margin-top:6px;font-size:0.9rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:2px;}
+.contact a{color:var(--accent);text-decoration:none;font-weight:600;}
+.contact a:hover{text-decoration:underline;}
+.researcher:hover .photo-frame{ transform: translateY(-2px);}
+.researcher:hover .name{ transform: translateY(2px);}
+
+/* ===== Papers ===== */
+.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.4);}
+.papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
+.paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
 .paper{
-  background:rgba(255,255,255,.08);
-  border-radius:12px;
-  padding:1rem;
-  display:flex;
-  gap:1rem;
+  background:rgba(255,255,255,0.05);padding:12px;border-radius:12px;display:flex;flex-direction:column;
+  gap:10px;align-items:center;transition:transform .2s ease, box-shadow .2s ease;
   cursor:pointer;
-  transition:background .3s;
 }
-.paper:hover{background:rgba(255,255,255,.15)}
-.thumb img{width:120px;height:80px;object-fit:cover;border-radius:8px}
-.meta{flex:1}
-.p-title{font-size:1.1rem;font-weight:600}
-.p-auth{font-size:.9rem;color:#ccc}
-.year{font-size:.85rem;color:#aaa;margin-left:.5rem}
+.paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.45); }
+.paper .thumb{ width:100%;height:160px;border-radius:8px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
+.paper .thumb img{width:100%;height:100%;object-fit:cover;}
+.paper .meta{ flex:1; text-align:center;margin-top:6px; }
+.paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
+.paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
+.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px; }
 
-/* ==== WIZARD ==== */
-#wizard{
-  position:fixed;top:0;left:0;min-width:240px;max-width:340px;
-  background:rgba(20,20,20,.9);backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,.2);border-radius:10px;
-  padding:1rem;box-shadow:0 0 12px rgba(0,255,255,.5);
-  opacity:0;pointer-events:none;transition:opacity .2s ease;
-  z-index:999;
-}
-#wizard.show{opacity:1}
-#w-thumb img{width:100%;border-radius:6px;margin-bottom:.5rem}
-#w-body{max-height:200px;overflow:auto;font-size:.85rem;color:#ddd}
+/* ===== Wizard popup ===== */
+.wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
+transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85); /* تیره‌تر برای خوانایی بهتر */
+border-radius:12px;padding:12px;
+box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
+.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+.wizard .w-thumb{ width:100%;height:150px;border-radius:8px;overflow:hidden;background:#111; }
+.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
+.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:150px; overflow-y:auto; padding-right:6px;}
 
-/* ==== FOOTER ==== */
-footer{
+/* ===== Footer ===== */
+footer.site-footer{
   text-align:center;
-  padding:1.5rem;
-  margin-top:2rem;
-  background:rgba(255,255,255,.05);
-  font-size:.85rem;
-  color:#aaa;
-  z-index:5;
-  position:relative;
-  border-top:1px solid rgba(255,255,255,.1);
+  font-size:0.9rem;
+  padding:14px 0;
+  color:var(--text-light);
 }
 
-/* ==== MOBILE ==== */
-@media(max-width:768px){
-  /* بک‌گراند موبایل: گرادیانت متحرک */
-  #bg-canvas{display:none}
-  body::before{
-    content:"";position:fixed;top:0;left:0;width:100%;height:100%;
-    background:linear-gradient(-45deg,#111,#222,#111);
-    background-size:400% 400%;
-    animation:grad 15s ease infinite;
-    z-index:0;
-  }
-  @keyframes grad{
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
-  }
-}
+/* responsive */
+@media (max-width:900px){ .header{gap:18px} .researcher{width:42%} .photo-frame{width:140px;height:140px} }
+@media (max-width:640px){ .researcher{width:100%;flex-direction:row;align-items:center;padding:12px} .photo-frame{width:96px;height:96px;margin-right:12px} .name{align-items:flex-start;font-size:1rem} }
 </style>
 </head>
 <body>
-<canvas id="bg-canvas"></canvas>
+<canvas id="waveCanvas" aria-hidden="true"></canvas>
 
-<header>
-  <h1>The DASBEM Project — Researchers</h1>
+<header class="site-header">
+  <h1>The DASBEM Project</h1>
+  <p>Dynamic Analysis of Structures by Boundary Element Method</p>
 </header>
 
-<main id="paperList"></main>
-<div id="wizard" role="dialog" aria-hidden="true">
-  <div id="w-thumb"></div>
-  <div id="w-body"></div>
+<div class="wrap">
+  <div class="header" aria-label="Researchers">
+    <!-- Researcher 1 -->
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+      </div>
+      <div class="name" id="r1-name">
+        <span>Dr. Mehdi Panji</span>
+        <span class="title-small">Associate Professor</span>
+        <div class="contact">
+          <a href="mailto:m.panji@iauz.ac.ir">m.panji@iauz.ac.ir</a>
+          <a href="https://www.panji.ir">www.panji.ir</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Researcher 2 -->
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+      </div>
+      <div class="name" id="r2-name">
+        <span>Dr. Saeed Mojtabazadeh</span>
+        <span class="title-small">Postdoctoral Fellow</span>
+        <div class="contact">
+          <a href="mailto:saeed.@mojtabazadeh.ir">saeed.@mojtabazadeh.ir</a>
+          <a href="https://www.mojtabazadeh.ir">www.mojtabazadeh.ir</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Papers Section -->
+  <section class="papers" aria-label="Papers">
+    <h3>Free Downloadable Papers</h3>
+    <div class="paper-list" id="paperList"></div>
+  </section>
 </div>
 
-<footer>
-  © 2025 Saeed Mojtabazadeh. All rights reserved.
+<!-- Footer -->
+<footer class="site-footer">
+  Saeed Mojtabazadeh ©
 </footer>
 
+<!-- Wizard popup -->
+<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+  <div class="w-thumb" id="w-thumb"></div>
+  <div class="w-body" id="w-body"></div>
+</div>
+
 <script>
-// ===== BACKGROUND =====
-if(window.innerWidth>768){
-  const canvas=document.getElementById('bg-canvas');
-  const gl=canvas.getContext('webgl',{antialias:true});
-  function resize(){canvas.width=innerWidth;canvas.height=innerHeight;gl.viewport(0,0,gl.canvas.width,gl.canvas.height)}
-  resize();window.addEventListener('resize',resize);
-
-  const vs=`attribute vec3 p;void main(){gl_PointSize=2.0;gl_Position=vec4(p,1.0);}`;
-  const fs=`void main(){gl_FragColor=vec4(0.0,1.0,1.0,0.9);}`;
-  function compile(t,s){const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh;}
-  const prog=gl.createProgram();gl.attachShader(prog,compile(gl.VERTEX_SHADER,vs));gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);
-
-  const COUNT=400;
-  const data=new Float32Array(COUNT*3);
-  for(let i=0;i<COUNT*3;i++)data[i]=Math.random()*2-1;
-  const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW);
-  const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
-
-  function animate(){
-    for(let i=0;i<COUNT*3;i+=3){
-      data[i+1]-=0.002;
-      if(data[i+1]<-1)data[i+1]=1;
-    }
-    gl.bufferSubData(gl.ARRAY_BUFFER,0,data);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.POINTS,0,COUNT);
-    requestAnimationFrame(animate);
+/* ===== Background waves ===== */
+(function(){
+  const canvas=document.getElementById('waveCanvas');
+  const ctx=canvas.getContext('2d');
+  let particles=[];
+  function resize(){canvas.width=innerWidth;canvas.height=innerHeight;initParticles();}
+  function initParticles(){
+    const count=80;
+    particles=Array.from({length:count},()=>({
+      x:Math.random()*innerWidth,
+      y:Math.random()*innerHeight,
+      r:Math.random()*4+3,
+      vx:(Math.random()-0.5)*0.6,
+      vy:(Math.random()-0.5)*0.6,
+      color:`hsl(${Math.random()*50+20},70%,60%)`
+    }));
   }
-  animate();
-}
+  function draw(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for(let p of particles){
+      ctx.fillStyle=p.color;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>innerWidth)p.vx*=-1;
+      if(p.y<0||p.y>innerHeight)p.vy*=-1;
+    }
+    // connect close particles
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const a=particles[i],b=particles[j];
+        const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+        if(d<180){
+          ctx.strokeStyle=`rgba(255,180,120,${1-d/180})`;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);resize();draw();
+})();
 
-// ===== PAPERS =====
-const papers=[
-  {title:"Dynamic Analysis of Soil–Structure Interaction",authors:"S. Mojtabazadeh, M. Panji",year:"2023",thumb:"https://picsum.photos/300/160?random=1",abstract:"Full abstract of paper 1 ..."},
-  {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",thumb:"https://picsum.photos/300/160?random=2",abstract:"Full abstract of paper 2 ..."},
-  {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",thumb:"https://picsum.photos/300/160?random=3",abstract:"Full abstract of paper 3 ..."},
-  {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",thumb:"https://picsum.photos/300/160?random=4",abstract:"Full abstract of paper 4 ..."}
-];
-const list=document.getElementById('paperList');
-const wizard=document.getElementById('wizard');
-const wThumb=document.getElementById('w-thumb');
-const wBody=document.getElementById('w-body');
+/* ===== Papers & Wizard ===== */
+(function(){
+  const papers=[
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems. By changing the spatial variable, the time-domain half-space Green's functions were obtained in an isotropic-like analytical process by solving the singular form of the scalar wave equation. The stress-free boundary condition of the ground surface was satisfied using the wave source image theory. To include the materials damping, the Barkan approach was used in the formulation to attenuate the half-space by applying a constant logarithmic reduction into the modified boundary integral equation. The closed-form attenuated orthotropic half-space scalar kernels were obtained in the time-domain for displacement/traction fields by analytical integration of Green's functions. The method was easily implemented in a time-domain computer code to analyse the seismic homogenous orthotropic medium. To elaborate the model of the heterogeneous problems, a substructuring approach was presented to satisfy the continuity conditions at the interface depending on the position of the node and normal. Then, several seismic problems including a surface canyon, an underground cavity, a subsurface inclusion, and an alluvial valley subjected to SH wave was solved and compared with the literature to validate the surface response in the case of isotropic convergence. To evaluate the accuracy and the time of analysis for the proposed method versus the full-space boundary element models, a comparative test was carried out for two examples. A favourite agreement was testified between the responses to verify the proposed method's capability for simple modelling of the orthotropic topographic features. Finally, the ability of the method to analyse the problems with high degrees of freedom was investigated by solving a half-space model including 25 subsurface orthotropic circular inclusions."},
+    {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects..."},
+    {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
+    {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
+  ];
+  const list=document.getElementById('paperList');
+  const wizard=document.getElementById('wizard');
+  const wThumb=document.getElementById('w-thumb');
+  const wBody=document.getElementById('w-body');
 
-papers.forEach(p=>{
-  const node=document.createElement('div'); node.className='paper';
-  node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
-                  <div class="meta"><div class="p-title">${p.title}</div>
-                  <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
-  node.addEventListener('mouseenter',(ev)=>{
-    wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-    wBody.textContent=p.abstract;
-    pos(ev.clientX+18,ev.clientY+12);
-    wizard.classList.add('show');
-    wizard.setAttribute('aria-hidden','false');
+  papers.forEach(p=>{
+    const node=document.createElement('div'); node.className='paper';
+    node.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt=""></div>
+                    <div class="meta"><div class="p-title">${p.title}</div>
+                    <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
+    node.addEventListener('mouseenter',(ev)=>{
+      wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+      wBody.textContent=p.abstract;
+      positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+    });
+    node.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+    node.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+    // scroll abstract
+    node.addEventListener('wheel',(e)=>{
+      if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+    });
+    list.appendChild(node);
   });
-  node.addEventListener('mousemove',(ev)=>pos(ev.clientX+18,ev.clientY+12));
-  node.addEventListener('mouseleave',()=>{
-    wizard.classList.remove('show');
-    wizard.setAttribute('aria-hidden','true');
-  });
-  node.addEventListener('wheel',(e)=>{
-    if(wizard.classList.contains('show')){e.preventDefault();wBody.scrollTop+=e.deltaY;}
-  });
-  list.appendChild(node);
-});
 
-function pos(x,y){
-  const w=wizard.offsetWidth,h=wizard.offsetHeight;
-  let nx=x,ny=y;
-  if(nx+w>innerWidth-12)nx=innerWidth-w-12;
-  if(ny+h>innerHeight-12)ny=innerHeight-h-12;
-  wizard.style.left=nx+'px';wizard.style.top=ny+'px';
-}
+  function positionWizard(x,y){
+    const w=wizard.offsetWidth,h=wizard.offsetHeight;
+    let nx=x,ny=y;
+    if(nx+w>window.innerWidth-12) nx=window.innerWidth-w-12;
+    if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
+    wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
+  }
+})();
 </script>
 </body>
 </html>
