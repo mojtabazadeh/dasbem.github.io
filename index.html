@@ -90,7 +90,7 @@ header.site-header p{
 .papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
 .paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
 .paper{
-  background:var(--glass); /* شفافیت مشابه محققان */
+  background: rgba(255,255,255,0.12); /* مشابه کارت محققان */
   padding:12px;border-radius:12px;display:flex;flex-direction:column;
   gap:10px;align-items:center;transition:transform .2s ease, box-shadow .2s ease;
   cursor:pointer;
@@ -129,7 +129,6 @@ footer.site-footer{
 }
 
 @media (max-width:640px){
-  /* Smaller header */
   header.site-header{padding:50px 20px 40px;}
   header.site-header h1{font-size:2.8rem;}
   header.site-header p{font-size:1.1rem;}
@@ -214,12 +213,12 @@ footer.site-footer{
   }
 
   function initParticles(){
-    const count=isMobile?40:80; 
+    const count=isMobile?50:80;
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
       r:Math.random()*4+3,
-      vx:(Math.random()-0.5)*(isMobile?0.5:0.6), // کمی سریعتر روی موبایل
+      vx:(Math.random()-0.5)*(isMobile?0.5:0.6),
       vy:(Math.random()-0.5)*(isMobile?0.5:0.6),
       color:`hsl(${Math.random()*50+20},70%,60%)`
     }));
@@ -234,19 +233,18 @@ footer.site-footer{
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
-
-    // خطوط اتصال فعال روی موبایل و دسکتاپ
+    // خطوط اتصال همیشه فعال
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
         const a=particles[i],b=particles[j];
         const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
         if(d<180){
-          ctx.strokeStyle=`rgba(255,180,120,${1-d/180})`;
+          const alpha=isMobile?0.08:0.18;
+          ctx.strokeStyle=`rgba(255,180,120,${alpha*(1-d/180)})`;
           ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
         }
       }
     }
-
     requestAnimationFrame(draw);
   }
 
@@ -262,7 +260,7 @@ footer.site-footer{
 /* ===== Papers & Wizard ===== */
 (function(){
   const papers=[
-    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems.In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems.In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems.In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems."},
+    {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems."},
     {title:"Topographic Effects on Seismic Response",authors:"S. Mojtabazadeh",year:"2022",href:"#",thumb:"https://picsum.photos/300/160?random=2",abstract:"In this paper, a half-plane time-domain boundary element method (BEM) was presented for analysing 2-D scalar wave problems with emphasis on site effects..."},
     {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures..."},
     {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations..."}
@@ -302,7 +300,9 @@ footer.site-footer{
     nameElem.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
       wBody.textContent=r.bio;
-      positionWizard(ev.clientX+18,ev.clientY+12); wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+      positionWizard(ev.clientX+18,ev.clientY+12);
+      wizard.classList.add('show');
+      wizard.setAttribute('aria-hidden','false');
     });
     nameElem.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
     nameElem.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
