@@ -8,8 +8,6 @@
 <style>
 :root{
   --bg-dark:#1a1a1a;
-  --bg-wave:#ff7e5f;
-  --bg-wave2:#feb47b;
   --text-light:#fff;
   --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
@@ -64,7 +62,7 @@ header.site-header p{
 .researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.6); }
 
 .photo-frame{
-  position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
+  position:relative;width:168px;height:168px;border-radius:12px;overflow:hidden;
   padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);
   display:flex;align-items:center;justify-content:center;
   box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.15) inset;
@@ -72,7 +70,7 @@ header.site-header p{
   border: 3px solid rgba(255,255,255,0.09);
   transition: transform 1.2s ease-in-out;
 }
-.photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;transition: transform 1.2s ease-in-out;}
+.photo-frame img{width:100%;height:100%;border-radius:12px;object-fit:cover;transition: transform 1.2s ease-in-out;}
 
 .name{
   font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;color:var(--text-light);
@@ -90,7 +88,7 @@ header.site-header p{
 .papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
 .paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
 .paper{
-  background: rgba(255,255,255,0.12); /* مشابه کارت محققان */
+  background: rgba(255,255,255,0.12);
   padding:12px;border-radius:12px;display:flex;flex-direction:column;
   gap:10px;align-items:center;transition:transform .2s ease, box-shadow .2s ease;
   cursor:pointer;
@@ -132,7 +130,6 @@ footer.site-footer{
   header.site-header{padding:50px 20px 40px;}
   header.site-header h1{font-size:2.8rem;}
   header.site-header p{font-size:1.1rem;}
-
   .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
   .photo-frame{width:96px;height:96px;margin-right:12px}
   .name{align-items:flex-start;font-size:1rem}
@@ -199,7 +196,7 @@ footer.site-footer{
 </div>
 
 <script>
-/* ===== Background waves with stronger lines ===== */
+/* ===== Background particles with depth ===== */
 (function(){
   const canvas=document.getElementById('waveCanvas');
   const ctx=canvas.getContext('2d');
@@ -213,38 +210,46 @@ footer.site-footer{
   }
 
   function initParticles(){
-    const count=isMobile?50:80;
+    const count=isMobile?50:120;
     particles=Array.from({length:count},()=>({
       x:Math.random()*innerWidth,
       y:Math.random()*innerHeight,
-      r:Math.random()*4+3,
+      z:Math.random(),          // عمق بین 0 (نزدیک) تا 1 (دور)
+      r:Math.random()*3+1,
       vx:(Math.random()-0.5)*(isMobile?0.5:0.6),
-      vy:(Math.random()-0.5)*(isMobile?0.5:0.6),
-      color:`hsl(${Math.random()*50+20},70%,60%)`
+      vy:(Math.random()-0.5)*(isMobile?0.5:0.6)
     }));
   }
 
   function draw(){
     ctx.clearRect(0,0,innerWidth,innerHeight);
     for(let p of particles){
-      ctx.fillStyle=p.color;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
-      p.x+=p.vx;p.y+=p.vy;
+      const alpha = 0.2 + (1 - p.z) * 0.6; // نزدیک‌ها شفاف‌تر
+      const size = p.r * (1 + (1 - p.z) * 1.5); // نزدیک‌ها بزرگ‌تر
+      ctx.fillStyle=`rgba(255,200,150,${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,size,0,Math.PI*2);
+      ctx.fill();
+
+      p.x+=p.vx;
+      p.y+=p.vy;
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
     }
-    // خطوط اتصال واضح‌تر
+
+    // خطوط متصل بر اساس فاصله و عمق
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
-        const a=particles[i],b=particles[j];
-        const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+        const a=particles[i], b=particles[j];
+        const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
         if(d<180){
-          const alpha=isMobile?0.15:0.35; 
-          ctx.strokeStyle=`rgba(255,180,120,${alpha*(1-d/180)})`;
-          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+          const alpha = ((1 - Math.max(a.z,b.z)) * 0.25) * (1 - d/180); 
+          ctx.strokeStyle=`rgba(255,180,120,${alpha})`;
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
         }
       }
     }
+
     requestAnimationFrame(draw);
   }
 
@@ -295,7 +300,7 @@ footer.site-footer{
 
   researchers.forEach(r=>{
     const elem=document.getElementById(r.id);
-    const frameElem=elem.querySelector('.photo-frame'); // فعال کردن روی فریم
+    const frameElem=elem.querySelector('.photo-frame');
     frameElem.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${r.thumb}" alt="">`;
       wBody.textContent=r.bio;
