@@ -9,10 +9,12 @@
 :root{
   --bg-dark:#1a1a1a;
   --text-light:#fff;
-  --glass: rgba(255,255,255,0.18);
+  --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
   --muted:#ddd;
 }
+
+/* ===== Reset & body ===== */
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
@@ -168,48 +170,58 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
 </div>
 
 <script>
-/* ===== Particle system with depth, mouse & trail ===== */
+/* ===== Particles with depth & mouse ===== */
 (function(){
   const canvas=document.getElementById('waveCanvas'),ctx=canvas.getContext('2d');
   let particles=[],trail=[];
   let isMobile=window.innerWidth<=640;
   const mouse={x:-999,y:-999};
 
-  function resize(){canvas.width=innerWidth; canvas.height=innerHeight; initParticles();}
+  function resize(){canvas.width=innerWidth;canvas.height=innerHeight;initParticles();}
   function initParticles(){
-    const count=isMobile?50:120;
+    const count=isMobile?50:130;
     particles=Array.from({length:count},()=>({
-      x:Math.random()*innerWidth,y:Math.random()*innerHeight,
-      z:Math.random(),r:Math.random()*3+1,
-      vx:(Math.random()-0.5)*(isMobile?0.5:0.6),
-      vy:(Math.random()-0.5)*(isMobile?0.5:0.6)
+      x:Math.random()*innerWidth,
+      y:Math.random()*innerHeight,
+      z:Math.random(),
+      r:Math.random()*3+1,
+      vx:(Math.random()-0.5)*(isMobile?0.5:0.8),
+      vy:(Math.random()-0.5)*(isMobile?0.5:0.8)
     }));
   }
 
   function draw(){
     ctx.clearRect(0,0,innerWidth,innerHeight);
-    // trail
+    // mouse trail
     trail.push({x:mouse.x,y:mouse.y,alpha:1});
     if(trail.length>25) trail.shift();
-    for(const t of trail){ctx.fillStyle=`rgba(255,200,150,${t.alpha})`;ctx.beginPath();ctx.arc(t.x,t.y,3,0,Math.PI*2);ctx.fill();t.alpha-=0.04;}
-    
-    for(let p of particles){
+    trail.forEach(t=>{
+      ctx.fillStyle=`rgba(255,200,150,${t.alpha})`;
+      ctx.beginPath();ctx.arc(t.x,t.y,3,0,Math.PI*2);ctx.fill();
+      t.alpha-=0.04;
+    });
+
+    particles.forEach(p=>{
       const dx=mouse.x-p.x,dy=mouse.y-p.y,dist=Math.hypot(dx,dy);
-      if(dist<80 && dist>0){p.x-=dx*0.003;p.y-=dy*0.003;}
+      if(dist<80 && dist>0){p.x-=dx*0.004;p.y-=dy*0.004;}
       const alpha = 0.2 + (1 - p.z) * 0.6;
-      const size = p.r * (1 + (1 - p.z) * 1.5);
+      const size = p.r*(1+(1-p.z)*1.5);
       ctx.fillStyle=`rgba(255,200,150,${alpha})`;
-      ctx.beginPath(); ctx.arc(p.x,p.y,size,0,Math.PI*2); ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,size,0,Math.PI*2);ctx.fill();
       p.x+=p.vx;p.y+=p.vy;
       if(p.x<0||p.x>innerWidth)p.vx*=-1;
       if(p.y<0||p.y>innerHeight)p.vy*=-1;
-    }
+    });
 
+    // lines between particles
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
-        const a=particles[i],b=particles[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
-        if(d<180){ctx.strokeStyle=`rgba(255,180,120,${((1-Math.max(a.z,b.z))*0.25)*(1-d/180)})`;
-        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+        const a=particles[i],b=particles[j];
+        const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+        if(d<180){
+          ctx.strokeStyle=`rgba(255,180,120,${((1-Math.max(a.z,b.z))*0.25)*(1-d/180)})`;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+        }
       }
     }
     requestAnimationFrame(draw);
@@ -221,7 +233,7 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
   resize(); draw();
 })();
 
-/* ===== Papers & Wizard ===== */
+/* ===== Papers & Wizard with fade-in ===== */
 (function(){
   const papers=[
     {title:"Wave Propagation in Orthotropic Media",authors:"M. Panji, S. Mojtabazadeh",year:"2023",href:"#",thumb:"https://picsum.photos/300/160?random=1",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems."},
@@ -229,7 +241,6 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
     {title:"Hybrid BEM–FEM Modeling for Geo-Seismic Systems",authors:"M. Panji",year:"2021",href:"#",thumb:"https://picsum.photos/300/160?random=3",abstract:"An integrated BEM–FEM framework is developed to model wave interaction with complex geotechnical structures."},
     {title:"Isolation Systems for Seismic Mitigation",authors:"S. Mojtabazadeh, M. Panji",year:"2020",href:"#",thumb:"https://picsum.photos/300/160?random=4",abstract:"This study evaluates passive and semi-active isolation techniques for foundations under seismic excitations."}
   ];
-
   const list=document.getElementById('paperList');
   const wizard=document.getElementById('wizard'),wThumb=document.getElementById('w-thumb'),wBody=document.getElementById('w-body');
 
@@ -240,7 +251,8 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
       <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>
       <a class="download-btn" href="${p.href}" download>Download</a>`;
     list.appendChild(node);
-    setTimeout(()=>node.classList.add('show'),i*180); // fade-in stagger
+    setTimeout(()=>node.classList.add('show'),i*220);
+
     node.addEventListener('mouseenter',ev=>{
       wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
       wBody.textContent=p.abstract;
@@ -287,7 +299,7 @@ footer.site-footer{text-align:center;font-size:0.95rem;padding:14px 0;color:var(
   }
 })();
 
-/* ===== Dynamic header glow with mouse ===== */
+/* ===== Header glow with mouse ===== */
 (function(){
   const header=document.querySelector('header.site-header h1');
   window.addEventListener('mousemove',e=>{
