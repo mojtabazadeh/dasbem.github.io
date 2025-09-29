@@ -103,7 +103,7 @@ header.site-header p{
 }
 .paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.5); }
 .paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
-/* ===== New: Blur placeholder ===== */
+/* ===== Blur placeholder ===== */
 .paper .thumb img {
   filter: blur(8px);
   transition: filter 0.4s ease-out, transform 0.4s ease-out;
@@ -160,10 +160,22 @@ header.site-header p{
 }
 
 /* ===== Wizard popup ===== */
-.wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
-transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
-border-radius:12px;padding:12px;
-box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
+.wizard{
+  position:fixed;
+  z-index:9999;
+  pointer-events:none;
+  opacity:0;
+  transform:scale(.95);
+  transition:all .16s ease;
+  max-width:380px;
+  background: rgba(0,0,0,0.85);
+  border-radius:12px;
+  padding:12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+  display:flex;
+  gap:10px;
+  flex-direction:column;
+}
 .wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
 .wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
 .wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
@@ -349,12 +361,22 @@ window.addEventListener('load',()=>{
   const wThumb=document.getElementById('w-thumb');
   const wBody=document.getElementById('w-body');
 
+  const isMobile = window.innerWidth <= 640;
+
   function positionWizard(x,y){
     const wRect=wizard.getBoundingClientRect();
-    let left=x+18, top=y+12;
-    if(left+wRect.width>window.innerWidth) left=x-wRect.width-18;
-    if(top+wRect.height>window.innerHeight) top=y-wRect.height-18;
-    wizard.style.left=left+'px'; wizard.style.top=top+'px';
+    let left=x+10, top=y+10;
+
+    // محدود کردن در موبایل
+    if(isMobile){
+      left = 10; // همیشه از سمت چپ فاصله کمی داشته باشد
+      top = window.scrollY + 50; // پایین هدر موبایل
+    } else {
+      if(left+wRect.width>window.innerWidth) left=x-wRect.width-10;
+      if(top+wRect.height>window.innerHeight) top=y-wRect.height-10;
+    }
+    wizard.style.left=left+'px';
+    wizard.style.top=top+'px';
   }
 
   papers.forEach(p=>{
@@ -372,21 +394,39 @@ window.addEventListener('load',()=>{
 
     const thumb=node.querySelector('.thumb');
     const img = thumb.querySelector('img');
-
-    // ===== New: Blur placeholder =====
     img.addEventListener('load',()=> img.classList.add('loaded'));
 
-    thumb.addEventListener('mouseenter',(ev)=>{
-      wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-      wBody.textContent=p.abstract;
-      positionWizard(ev.clientX+18,ev.clientY+12);
-      wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-    });
-    thumb.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
-    thumb.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-    thumb.addEventListener('wheel',(e)=>{
-      if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
-    });
+    if(isMobile){
+      // ===== موبایل: یک بار لمس =====
+      thumb.addEventListener('click',(ev)=>{
+        wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+        wBody.textContent=p.abstract;
+        positionWizard(ev.clientX,ev.clientY);
+        wizard.classList.add('show'); 
+        wizard.setAttribute('aria-hidden','false');
+      });
+      // لمس بیرون برای بستن
+      document.addEventListener('click', (e)=>{
+        if(!thumb.contains(e.target) && !wizard.contains(e.target)){
+          wizard.classList.remove('show'); 
+          wizard.setAttribute('aria-hidden','true');
+        }
+      });
+    } else {
+      // ===== دسکتاپ: هاور =====
+      thumb.addEventListener('mouseenter',(ev)=>{
+        wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+        wBody.textContent=p.abstract;
+        positionWizard(ev.clientX+18,ev.clientY+12);
+        wizard.classList.add('show'); 
+        wizard.setAttribute('aria-hidden','false');
+      });
+      thumb.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+      thumb.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+      thumb.addEventListener('wheel',(e)=>{
+        if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+      });
+    }
 
     list.appendChild(node);
   });
