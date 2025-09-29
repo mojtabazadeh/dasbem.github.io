@@ -103,7 +103,6 @@ header.site-header p{
 }
 .paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.5); }
 .paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
-
 /* ===== New: Blur placeholder ===== */
 .paper .thumb img {
   filter: blur(8px);
@@ -170,17 +169,6 @@ box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:col
 .wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
 .wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
 
-/* ===== Researcher Popup ===== */
-.researcher-popup{position:fixed;z-index:9999;opacity:0;pointer-events:none;
-width:220px;height:220px;background: rgba(0,0,0,0.85);
-border-radius:12px;padding:10px;
-display:flex;flex-direction:column;align-items:center;justify-content:center;
-color:#fff;text-align:center;
-transition:all 0.15s ease;}
-.researcher-popup.show{opacity:1;pointer-events:auto;}
-.researcher-popup img{width:100%;height:100%;object-fit:cover;border-radius:6px;margin-bottom:8px;}
-.researcher-popup .desc{font-size:0.85rem;overflow-y:auto;max-height:60px;text-align:center;padding:0 4px;}
-
 /* ===== Footer ===== */
 footer.site-footer{
   text-align:center;
@@ -221,7 +209,7 @@ footer.site-footer{
 <div class="wrap">
   <div class="header" aria-label="Researchers">
     <!-- Researcher 1 -->
-    <section class="researcher" id="r1" aria-labelledby="r1-name" data-desc="Dr. Mehdi Panji is an Associate Professor specializing in structural dynamics and numerical modeling.">
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
       </div>
@@ -236,7 +224,7 @@ footer.site-footer{
     </section>
 
     <!-- Researcher 2 -->
-    <section class="researcher" id="r2" aria-labelledby="r2-name" data-desc="Dr. Saeed Mojtabazadeh is a Postdoctoral Fellow with expertise in piezoelectric materials and boundary element methods.">
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbemproject.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.png?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
       </div>
@@ -267,12 +255,6 @@ footer.site-footer{
 <div id="wizard" class="wizard" role="dialog" aria-hidden="true">
   <div class="w-thumb" id="w-thumb"></div>
   <div class="w-body" id="w-body"></div>
-</div>
-
-<!-- Researcher popup -->
-<div id="researcherPopup" class="researcher-popup" role="dialog" aria-hidden="true">
-  <img id="popupImg" src="" alt="">
-  <div class="desc" id="popupDesc"></div>
 </div>
 
 <script>
@@ -334,9 +316,32 @@ window.addEventListener('load',()=>{
 /* ===== Papers Wizard + download + journal ===== */
 (function(){
   const papers=[
-    {title:"SH-Wave Scattering by an Orthotrpic Triangular Soft Hill",authors:"Mehdi Panji, Saeed Mojtabazadeh & Farinaz Saleki",year:"2025",href:"https://bayanbox.ir/download/7281427747269149039/28.pdf",journal:"https://ceij.ut.ac.ir/article_102916.html",thumb:"https://bayanbox.ir/view/4214250098465250760/28.jpg",abstract:"In this paper, a novel ..."},
-    {title:"Dynamic Analysis of Layered Piezoelectric Substrate",authors:"Saeed Mojtabazadeh, Mehdi Panji",year:"2024",href:"https://bayanbox.ir/download/1763126549633742722/27.pdf",journal:"https://ceij.ut.ac.ir/article_100201.html",thumb:"https://bayanbox.ir/view/1974928572035729956/27.jpg",abstract:"We investigate..."},
-    {title:"3D Boundary Element Modelling for Soil-Structure Interaction",authors:"Mehdi Panji et al.",year:"2023",href:"https://bayanbox.ir/download/2738549378573498573/26.pdf",journal:"https://ceij.ut.ac.ir/article_99850.html",thumb:"https://bayanbox.ir/view/4298141928375148592/26.jpg",abstract:"A comprehensive BEM ..."}
+    {title:"SH-Wave Scattering by an Orthotrpic Triangular Soft Hill",authors:"Mehdi Panji, Saeed Mojtabazadeh & Farinaz Saleki",year:"2025",href:"https://bayanbox.ir/download/7281427747269149039/28.pdf",journal:"https://ceij.ut.ac.ir/article_102916.html",thumb:"https://bayanbox.ir/view/4214250098465250760/28.jpg",abstract:"In this paper, the SH-wave scattering by an orthotropic triangular soft hill settled on the underlying half-space was investigated using a half-space time-domain boundary element method to obtain a seismic ground response. The surface of the hill and its interface were only discretized by quadratic elements to elaborate on the computational model. First, a brief formulation of the method and the modified boundary integral equation with damping were presented. Then, the method was implemented in a developed DASBEM algorithm and analyzed as a verification example to compare with the literature and confirm the obtained results. Finally, an advanced numerical study was carried out to sensitize the key parameters of the model, including the isotropy factor, shape ratio of the hill, incident wave angle, and frequency content. The results showed that the proposed method had the powerful ability to create sharp corner features. Also, the orientation of the material texture of the triangular hill was extremely effective on the seismic ground response and changing the amplification patterns."},
+    {title:"The Orthotropy Effect of Underground Inclusion on the Seismic Response of Ground Surface",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2024",href:"https://bayanbox.ir/view/7765349511351506314/27.pdf",journal:"https://sjce.journals.sharif.edu/article_23630.html?lang=en",thumb:"https://bayanbox.ir/view/5154196375924709012/27.jpg",abstract:"This paper presents a formulation of the attenuated orthotropic time-domain half-space boundary element method for analyzing the orthotropic effect of underground inclusions subjected to transient SH-waves. The stress-free boundary condition at the ground surface is satisfied using wave source image theory. To account for material damping, the Barkan approach is employed to attenuate the half-space by introducing a constant logarithmic reduction into the modified boundary integral equation. This method is easily implemented in a time-domain computer code for analyzing seismic homogeneous orthotropic mediums. To model underground inclusions, a sub-structuring approach is introduced to ensure continuity conditions at interfaces based on node position and normal direction. Several practical examples involving SH-waves are solved and compared with existing literature to validate surface response, particularly focusing on isotropic convergence. A favorable agreement is found between responses, confirming the capability of the proposed method for simple modeling of orthotropic subsurface features. Finally, in the form of an advanced numerical study, the surface motions of orthotropic models, including an underground inclusion embedded in a linear elastic half-space were successfully obtained under transient SH-wave propagation. Utilizing the time-domain boundary element approach, a simple model was developed only by discretizing the boundaries/interfaces. To illustrate responses in the time/frequency-domain, a comprehensive sensitivity analysis is performed considering parameters such as frequency, shape ratio, and isotropy factor, visualized through snapshots, seismograms, and amplification patterns. Results demonstrate that orthotropic anisotropy significantly influences seismic patterns of ground surfaces, highlighting the impact of mentioned parameter variations."},
+    {title:"26",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/2445473100347626734/26.jpg",abstract:"#"},
+    {title:"25",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/5355156485572317503/25.jpg",abstract:"#"},
+    {title:"24",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/6758900697719127128/24.jpg",abstract:"#"},
+    {title:"23",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/228467197696099370/23.jpg",abstract:"#"},
+    {title:"22",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/4405294226514817992/22.jpg",abstract:"#"},
+    {title:"21",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/5024991772697586097/21.jpg",abstract:"#"},
+    {title:"20",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/4452589848164309334/20.jpg",abstract:"#"},
+    {title:"19",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/6197836250209469848/19.jpg",abstract:"#"},
+    {title:"18",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/1815906665122404040/18.jpg",abstract:"#"},
+    {title:"17",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/6419292832514727100/17.jpg",abstract:"#"},
+    {title:"16",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/8647492134183397413/16.jpg",abstract:"#"},
+    {title:"15",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/1701924337595460178/15.jpg",abstract:"#"},
+    {title:"14",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/8467349527077166675/14.jpg",abstract:"#"},
+    {title:"13",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/8734725462663568532/13.jpg",abstract:"#"},
+    {title:"12",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/589751004582268423/12.jpg",abstract:"#"},
+    {title:"11",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/7880816896032681431/11.jpg",abstract:"#"},
+    {title:"10",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/7000384748214894742/10.jpg",abstract:"#"},
+    {title:"9",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/6663159587069915831/9.jpg",abstract:"#"},
+    {title:"8",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/4646249185543564520/8.jpg",abstract:"#"},
+    {title:"7",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/1631301330230573384/7.jpg",abstract:"#"},
+    {title:"6",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/3140408388919363256/6.jpg",abstract:"#"},
+    {title:"5",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/3218021891454769572/5.jpg",abstract:"#"},
+    {title:"4",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/2507880171317549300/4.jpg",abstract:"#"},
+    {title:"3",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/8045563318987990212/3.jpg",abstract:"#"}
   ];
 
   const list=document.getElementById('paperList');
@@ -384,30 +389,6 @@ window.addEventListener('load',()=>{
     });
 
     list.appendChild(node);
-  });
-})();
-
-/* ===== Researcher popup ===== */
-(function(){
-  const popup=document.getElementById('researcherPopup');
-  const popupImg=document.getElementById('popupImg');
-  const popupDesc=document.getElementById('popupDesc');
-
-  document.querySelectorAll('.researcher').forEach(res=>{
-    const img=res.querySelector('img');
-    img.addEventListener('mouseenter',(ev)=>{
-      popupImg.src=img.src;
-      popupDesc.textContent=res.dataset.desc;
-      const rect=img.getBoundingClientRect();
-      let left=rect.left + window.scrollX;
-      let top=rect.top + window.scrollY;
-      if(left+220>window.innerWidth) left=window.innerWidth-220-12;
-      if(top+220>window.innerHeight) top=window.innerHeight-220-12;
-      popup.style.left=left+'px';
-      popup.style.top=top+'px';
-      popup.classList.add('show'); popup.setAttribute('aria-hidden','false');
-    });
-    img.addEventListener('mouseleave',()=>{popup.classList.remove('show'); popup.setAttribute('aria-hidden','true');});
   });
 })();
 </script>
