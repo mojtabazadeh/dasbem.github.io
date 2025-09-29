@@ -103,6 +103,17 @@ header.site-header p{
 }
 .paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.5); }
 .paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
+/* ===== New: Blur placeholder ===== */
+.paper .thumb img {
+  filter: blur(8px);
+  transition: filter 0.4s ease-out, transform 0.4s ease-out;
+  transform: scale(1.05);
+}
+.paper .thumb img.loaded {
+  filter: blur(0);
+  transform: scale(1);
+}
+
 .paper .thumb img{width:100%;height:100%;object-fit:cover;}
 .paper .meta{ flex:1; text-align:center;margin-top:6px; }
 .paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
@@ -177,9 +188,9 @@ footer.site-footer{
   header.site-header h1{font-size:2.8rem;}
   header.site-header p{font-size:1.1rem;}
   .researcher{width:100%;flex-direction:row;align-items:center;padding:12px}
-  .photo-frame{width:120px;height:120px;margin-right:12px} /* بزرگتر کردن تامنیل موبایل */
+  .photo-frame{width:120px;height:120px;margin-right:12px}
   .name{align-items:flex-start;font-size:1rem}
-  .paper .thumb{height:200px;} /* بزرگتر شدن تامنیل مقالات در موبایل */
+  .paper .thumb{height:200px;}
 }
 </style>
 </head>
@@ -332,10 +343,19 @@ window.addEventListener('load',()=>{
     {title:"4",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/2507880171317549300/4.jpg",abstract:"#"},
     {title:"3",authors:"M. Panji",year:"2021",href:"#",journal:"#",thumb:"https://bayanbox.ir/view/8045563318987990212/3.jpg",abstract:"#"}
   ];
+
   const list=document.getElementById('paperList');
   const wizard=document.getElementById('wizard');
   const wThumb=document.getElementById('w-thumb');
   const wBody=document.getElementById('w-body');
+
+  function positionWizard(x,y){
+    const wRect=wizard.getBoundingClientRect();
+    let left=x+18, top=y+12;
+    if(left+wRect.width>window.innerWidth) left=x-wRect.width-18;
+    if(top+wRect.height>window.innerHeight) top=y-wRect.height-18;
+    wizard.style.left=left+'px'; wizard.style.top=top+'px';
+  }
 
   papers.forEach(p=>{
     const node=document.createElement('div'); node.className='paper';
@@ -351,6 +371,11 @@ window.addEventListener('load',()=>{
       </div>`;
 
     const thumb=node.querySelector('.thumb');
+    const img = thumb.querySelector('img');
+
+    // ===== New: Blur placeholder =====
+    img.addEventListener('load',()=> img.classList.add('loaded'));
+
     thumb.addEventListener('mouseenter',(ev)=>{
       wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
       wBody.textContent=p.abstract;
@@ -365,17 +390,8 @@ window.addEventListener('load',()=>{
 
     list.appendChild(node);
   });
-
-  window.addEventListener('keydown',(e)=>{if(e.key==='Escape'){wizard.classList.remove('show');wizard.setAttribute('aria-hidden','true');}});
-
-  function positionWizard(x,y){
-    const w=wizard.offsetWidth,h=wizard.offsetHeight;
-    let nx=x,ny=y;
-    if(nx+w>window.innerWidth-12) nx=window.innerWidth-w-12;
-    if(ny+h>window.innerHeight-12) ny=window.innerHeight-h-12;
-    wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
-  }
 })();
 </script>
+
 </body>
 </html>
