@@ -134,15 +134,7 @@ header.site-header p{
 .journal-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(106,17,203,0.6);}
 .journal-btn:active{transform:translateY(0) scale(0.98);box-shadow:0 4px 12px rgba(106,17,203,0.5);}
 
-/* ===== Overlay & Wizard popup ===== */
-#overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.55);
-  backdrop-filter: blur(6px);
-  z-index:9998;opacity:0;pointer-events:none;
-  transition:opacity .2s ease;
-}
-#overlay.show{opacity:1;pointer-events:auto;}
-
+/* ===== Wizard popup ===== */
 .wizard{
   position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
   transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
@@ -166,8 +158,6 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
   .photo-frame{width:120px;height:120px;margin-right:12px;}
   .name{align-items:flex-start;font-size:1rem;}
   .paper .thumb{height:180px;}
-  .wizard{left:50%!important;top:50%!important;transform:translate(-50%,-50%) scale(.95);}
-  .wizard.show{transform:translate(-50%,-50%) scale(1);}
 }
 </style>
 </head>
@@ -225,7 +215,6 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
   Panji & Mojtabazadeh ©
 </footer>
 
-<div id="overlay"></div>
 <div id="wizard" class="wizard" role="dialog" aria-hidden="true">
   <div class="w-thumb" id="w-thumb"></div>
   <div class="w-body" id="w-body"></div>
@@ -317,79 +306,75 @@ window.addEventListener('load',()=>{
 
   const list=document.getElementById('paperList');
   const wizard=document.getElementById('wizard');
-  const overlay=document.getElementById('overlay');
   const wThumb=document.getElementById('w-thumb');
   const wBody=document.getElementById('w-body');
   const isMobile=window.innerWidth<=640;
 
   function positionWizard(x,y){
-    const w=wizard.offsetWidth,h=wizard.offsetHeight;
-    let nx=x+20, ny=y-10;
-    if(nx+w>window.innerWidth-10)nx=window.innerWidth-w-10;
-    if(ny+h>window.innerHeight-10)ny=window.innerHeight-h-10;
-    wizard.style.left=nx+'px'; wizard.style.top=ny+'px';
-  }
-
-  function showWizard(p,rect){
-    wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-    wBody.textContent=p.abstract;
-    wBody.scrollTop=0;
+    const wRect=wizard.getBoundingClientRect();
+    let left=x, top=y;
     if(isMobile){
-      wizard.style.left='50%'; wizard.style.top='50%';
+      // همیشه داخل صفحه
+      left=Math.min(Math.max(10,left),window.innerWidth - wRect.width - 10);
+      top=Math.min(Math.max(50,top),window.innerHeight - wRect.height - 10);
     } else {
-      positionWizard(rect.left, rect.top + window.scrollY);
+      if(left+wRect.width>window.innerWidth) left=x-wRect.width-10;
+      if(top+wRect.height>window.innerHeight) top=y-wRect.height-10;
     }
-    wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-    overlay.classList.add('show');
+    wizard.style.left=left+'px';
+    wizard.style.top=top+'px';
   }
 
-  function hideWizard(){
-    wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
-    overlay.classList.remove('show');
-  }
+  papers.forEach(p=>{
+    const node=document.createElement('div'); node.className='paper';
+    node.innerHTML=`
+      <div class="thumb"><img src="${p.thumb}" alt=""></div>
+      <div class="meta">
+        <div class="p-title">${p.title}</div>
+        <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>
+      </div>
+      <div>
+        <a href="${p.href}" target="_blank" class="download-btn">📥 Download</a>
+        <a href="${p.journal}" target="_blank" class="journal-btn">🌐 Link</a>
+      </div>`;
 
-  papers.forEach((p)=>{
-    const div=document.createElement('div'); div.className='paper';
-    const thumb=document.createElement('div'); thumb.className='thumb';
-    const img=document.createElement('img'); img.src=p.thumb; img.alt=p.title;
-    img.onload=()=>img.classList.add("loaded");
-    thumb.appendChild(img);
-    div.appendChild(thumb);
-
-    const meta=document.createElement('div'); meta.className='meta';
-    meta.innerHTML=`<div class="p-title">${p.title}</div><div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>`;
-    div.appendChild(meta);
-
-    const dl=document.createElement('a'); dl.href=p.href; dl.className="download-btn"; dl.textContent="Download";
-    dl.target="_blank"; div.appendChild(dl);
-    const jl=document.createElement('a'); jl.href=p.journal; jl.className="journal-btn"; jl.textContent="Journal";
-    jl.target="_blank"; div.appendChild(jl);
-
-    list.appendChild(div);
+    const thumb=node.querySelector('.thumb');
+    const img = thumb.querySelector('img');
+    img.addEventListener('load',()=> img.classList.add('loaded'));
 
     if(isMobile){
-      thumb.addEventListener('click',()=>{
+      thumb.addEventListener('click',(ev)=>{
         if(wizard.classList.contains('show')){
-          hideWizard();
+          wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
         } else {
+          wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+          wBody.textContent=p.abstract;
           const rect=thumb.getBoundingClientRect();
-          showWizard(p,rect);
+          positionWizard(rect.left, rect.top + window.scrollY);
+          wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
         }
+      });
+      wizard.addEventListener('click',()=>{
+        wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
       });
     } else {
       thumb.addEventListener('mouseenter',(ev)=>{
-        const rect=thumb.getBoundingClientRect();
-        showWizard(p,rect);
+        wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+        wBody.textContent=p.abstract;
+        positionWizard(ev.clientX+18,ev.clientY+12);
+        wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
       });
-      thumb.addEventListener('mousemove',(ev)=>{
-        positionWizard(ev.clientX+window.scrollX, ev.clientY+window.scrollY);
+      thumb.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+      thumb.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+      thumb.addEventListener('wheel',(e)=>{
+        if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
       });
-      thumb.addEventListener('mouseleave',()=>{ hideWizard(); });
     }
-  });
 
-  overlay.addEventListener('click',hideWizard);
+    list.appendChild(node);
+  });
 })();
 </script>
+
 </body>
 </html>
