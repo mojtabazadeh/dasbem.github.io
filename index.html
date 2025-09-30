@@ -314,7 +314,6 @@ window.addEventListener('load',()=>{
     const wRect=wizard.getBoundingClientRect();
     let left=x, top=y;
     if(isMobile){
-      // همیشه داخل صفحه
       left=Math.min(Math.max(10,left),window.innerWidth - wRect.width - 10);
       top=Math.min(Math.max(50,top),window.innerHeight - wRect.height - 10);
     } else {
@@ -349,6 +348,7 @@ window.addEventListener('load',()=>{
         } else {
           wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
           wBody.textContent=p.abstract;
+          wBody.scrollTop = 0; // اسکرول همیشه از ابتدا
           const rect=thumb.getBoundingClientRect();
           positionWizard(rect.left, rect.top + window.scrollY);
           wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
@@ -361,6 +361,7 @@ window.addEventListener('load',()=>{
       thumb.addEventListener('mouseenter',(ev)=>{
         wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
         wBody.textContent=p.abstract;
+        wBody.scrollTop = 0; // اسکرول همیشه از ابتدا
         positionWizard(ev.clientX+18,ev.clientY+12);
         wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
       });
