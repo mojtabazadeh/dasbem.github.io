@@ -1,150 +1,488 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DASBEM Loader</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DASBEM — Realistic Loader (Seismic Grid)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0d0d0d;
-  --text:#33ff33;
-  --highlight:#ffff66;
-  --accent:#ffaa33;
-}
-body,html{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Share Tech Mono', monospace;
-  overflow:hidden;
-}
-#loaderContainer{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  padding:20px;
-  box-sizing:border-box;
-}
-#header{
-  font-size:1.6rem;
-  font-weight:bold;
-  color:var(--accent);
-  margin-bottom:20px;
-}
-#log{
-  flex:1;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-.logLine{
-  white-space:pre;
-  opacity:0;
-}
-.progressBarContainer{
-  width:100%;
-  height:20px;
-  background:rgba(255,255,255,0.1);
-  border-radius:6px;
-  margin-top:20px;
-  overflow:hidden;
-}
-.progressBar{
-  width:0%;
-  height:100%;
-  background:var(--accent);
-  transition:width 0.2s ease;
-}
+  :root{
+    --bg:#06080a;
+    --panel:#071018;
+    --accent:#ffb347;
+    --muted:#9fb0b6;
+    --ok:#9ff2b7;
+    --warn:#ffdba0;
+    --err:#ff9b9b;
+    --log-text:#dff3ea;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);font-family:"Fira Code",monospace;color:var(--log-text);-webkit-font-smoothing:antialiased}
+  /* Overlay */
+  #loader{
+    position:fixed;inset:0;z-index:9999;
+    display:flex;align-items:center;justify-content:center;padding:18px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.65));
+    overflow:hidden;
+  }
 
-/* Mobile responsiveness */
-@media (max-width:640px){
-  #header{font-size:1.3rem;}
-  .progressBarContainer{height:16px;}
-}
+  /* seismic grid canvas sits under panel */
+  #gridCanvas{
+    position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
+  }
+
+  /* main panel */
+  .panel{
+    position:relative; z-index:2;
+    width:100%;max-width:1200px;height:78vh;min-height:460px;border-radius:12px;
+    background:linear-gradient(180deg, rgba(8,10,12,0.96), rgba(12,14,16,0.96));
+    box-shadow:0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+    display:flex;gap:14px;overflow:hidden;
+  }
+
+  /* panel header (special) */
+  .panel-header{
+    position:absolute;left:18px;top:14px;right:18px;z-index:3;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .title{
+    font-size:18px;color:var(--accent);font-weight:700;letter-spacing:0.6px;
+    text-shadow:0 0 18px rgba(255,180,120,0.12);
+  }
+  .subtitle{
+    font-size:12px;color:var(--muted);
+  }
+
+  /* left: terminal/log */
+  .terminal{
+    flex:1.4;padding:22px 18px 14px;border-right:1px solid rgba(255,255,255,0.02);
+    display:flex;flex-direction:column;gap:12px;height:100%;
+    min-width:300px;background:transparent;
+  }
+
+  .log{
+    flex:1;border-radius:8px;padding:10px 12px;background:linear-gradient(180deg, rgba(0,0,0,0.03), rgba(255,255,255,0.001));
+    overflow:auto; /* allow scroll on small screens */
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width: thin;
+  }
+  /* hide default scrollbar but still allow scroll on mobile/desktop */
+  .log::-webkit-scrollbar{width:8px;height:8px}
+  .log::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.04);border-radius:8px}
+
+  .line{font-size:13px;color:var(--log-text);white-space:pre;opacity:0;transform:translateX(-6px);transition:opacity .14s linear, transform .14s linear}
+  .line.show{opacity:1;transform:translateX(0)}
+  .ts{color:#bfcbd0;display:inline-block;min-width:120px;font-weight:700}
+  .msg{color:var(--log-text)}
+  .tag{color:var(--accent);min-width:140px;display:inline-block;font-weight:700}
+  .ok{color:var(--ok)}
+  .warn{color:var(--warn)}
+  .err{color:var(--err)}
+
+  /* right: file list + status */
+  .side{
+    width:360px;min-width:220px;padding:18px;display:flex;flex-direction:column;gap:12px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.005), transparent);
+  }
+  .status{
+    height:140px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;
+  }
+  .orb{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--accent);font-size:16px;
+    box-shadow:0 0 40px rgba(255,179,71,0.06), inset 0 0 18px rgba(255,179,71,0.03)}
+  .meta{font-size:12px;color:var(--muted);text-align:center}
+
+  .file-list{flex:1;overflow:auto;padding:6px;border-radius:8px;background:rgba(0,0,0,0.02)}
+  .file-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px}
+  .file-name{flex:1;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .file-bar{width:130px;height:8px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+  .file-fill{height:100%;width:0;background:linear-gradient(90deg, rgba(255,179,71,0.18), var(--accent));transition:width 120ms linear}
+
+  /* overall progress bottom */
+  .bottom{
+    padding:12px;border-top:1px solid rgba(255,255,255,0.02);display:flex;gap:12px;align-items:center;
+  }
+  .overall{flex:1;height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+  .overall .fill{height:100%;width:0;background:linear-gradient(90deg, rgba(255,179,71,0.16), var(--accent));box-shadow:0 6px 30px rgba(255,179,71,0.06);transition:width 120ms linear}
+  .pct{min-width:56px;text-align:right;color:var(--muted);font-family:"Fira Code",monospace;font-size:13px}
+
+  /* hide loader */
+  .hide{opacity:0;visibility:hidden;transition:opacity .6s ease, visibility .6s ease}
+
+  /* main reveal */
+  #mainApp{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--log-text);opacity:0;visibility:hidden;transition:opacity .6s}
+  #mainApp.show{opacity:1;visibility:visible}
+
+  /* responsive */
+  @media (max-width:920px){
+    .panel{flex-direction:column;height:84vh}
+    .terminal{padding:14px;border-right:none;border-bottom:1px solid rgba(255,255,255,0.02)}
+    .side{width:100%;min-width:unset;padding:12px}
+    .file-list{max-height:120px}
+  }
 </style>
 </head>
 <body>
-<div id="loaderContainer">
-  <div id="header">Initializing The DASBEM Project.</div>
-  <div id="log"></div>
-  <div class="progressBarContainer"><div class="progressBar" id="progressBar"></div></div>
+
+<div id="loader" role="dialog" aria-label="DASBEM boot loader">
+  <canvas id="gridCanvas" aria-hidden="true"></canvas>
+
+  <div class="panel" role="document" aria-hidden="false">
+    <div class="panel-header">
+      <div class="title">Initializing The DASBEM Project.</div>
+      <div class="subtitle" id="subtitle">Loading system modules — <span id="timeNow">--:--:--</span></div>
+    </div>
+
+    <div class="terminal" aria-live="polite">
+      <div class="log" id="log" aria-atomic="false" aria-live="polite">
+        <div id="logInner"></div>
+      </div>
+
+      <div class="bottom">
+        <div class="overall" aria-hidden="true"><div class="fill" id="overallFill"></div></div>
+        <div class="pct" id="overallPct">0%</div>
+      </div>
+    </div>
+
+    <div class="side" aria-hidden="true">
+      <div class="status" role="status" aria-live="polite">
+        <div class="orb" id="orb">BEM</div>
+        <div class="meta" id="meta">Kernel: boundary-solver · Mode: time-domain</div>
+      </div>
+
+      <div class="file-list" id="fileList" aria-live="polite"></div>
+    </div>
+  </div>
 </div>
 
-<script>
-// ======== Utility: Tehran Time ========
-function tehranTime(){
-  const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  const tehranOffset = 3.5 * 60 * 60 * 1000; // UTC+3:30
-  return new Date(utc + tehranOffset);
-}
-function timeStamp(){ 
-  const t = tehranTime();
-  const hh=('0'+t.getHours()).slice(-2);
-  const mm=('0'+t.getMinutes()).slice(-2);
-  const ss=('0'+t.getSeconds()).slice(-2);
-  return `[${hh}:${mm}:${ss}]`;
-}
+<main id="mainApp" role="main" aria-hidden="true">
+  <div>
+    <h1 style="font-family:'Fira Code',monospace">The DASBEM Project</h1>
+    <p style="color:var(--muted)">صفحهٔ اصلی — لودر به پایان رسید.</p>
+  </div>
+</main>
 
-// ======== Files / Log Simulation ========
-const files=[
-  "boundary_element.cpp","mesh_generator.h","solver.cpp","output_writer.py",
-  "topography_data.csv","material_library.json","visualization.js",
-  "postprocess.m","eigen_solver.cpp","damping_module.py"
+<script>
+/* ========== Config ========== */
+const TOTAL_MS = 5000; // total loader time
+const logInner = document.getElementById('logInner');
+const overallFill = document.getElementById('overallFill');
+const overallPct = document.getElementById('overallPct');
+const fileListEl = document.getElementById('fileList');
+const orb = document.getElementById('orb');
+const meta = document.getElementById('meta');
+const subtitleTime = document.getElementById('timeNow');
+const loader = document.getElementById('loader');
+const mainApp = document.getElementById('mainApp');
+
+/* ========== Tehran time helper ========== */
+function iranNowParts(){
+  // use Intl to get Tehran time parts robustly
+  try{
+    const dtf = new Intl.DateTimeFormat('en-GB', {timeZone:'Asia/Tehran', hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit', year:'numeric', month:'2-digit', day:'2-digit'});
+    const parts = dtf.formatToParts(new Date());
+    const get = (type)=> parts.find(p=>p.type===type)?.value || '00';
+    return {
+      Y:get('year'), M:get('month'), D:get('day'),
+      hh:get('hour'), mm:get('minute'), ss:get('second')
+    };
+  }catch(e){
+    const d = new Date();
+    const pad=(n)=>String(n).padStart(2,'0');
+    return {Y:d.getFullYear(),M:pad(d.getMonth()+1),D:pad(d.getDate()),hh:pad(d.getHours()),mm:pad(d.getMinutes()),ss:pad(d.getSeconds())};
+  }
+}
+function iranStamp(){
+  const p = iranNowParts();
+  return `${p.hh}:${p.mm}:${p.ss}`;
+}
+function updateSubtitleTime(){ subtitleTime.textContent = iranStamp(); }
+setInterval(updateSubtitleTime,1000); updateSubtitleTime();
+
+/* ========== File definitions (weights) ========== */
+const files = [
+  {name:"mesh/semicircle.nod", weight:12},
+  {name:"mesh/elements.dat", weight:12},
+  {name:"kernels/bem_kern.bin", weight:18},
+  {name:"matrices/influence.mtx", weight:20},
+  {name:"params/runconfig.json", weight:4},
+  {name:"io/input_wave.srf", weight:14},
+  {name:"cache/precond.chk", weight:8},
+  {name:"viz/colormap.cfg", weight:2}
+];
+const totalWeight = files.reduce((s,f)=>s+f.weight,0);
+
+/* render file entries (L->R progress) */
+files.forEach(f=>{
+  const el = document.createElement('div'); el.className='file-item';
+  el.innerHTML = `<div class="file-name">${f.name}</div><div class="file-bar"><div class="file-fill"></div></div>`;
+  fileListEl.appendChild(el);
+  f._el = el; f._fill = el.querySelector('.file-fill'); f._progress = 0;
+  f._speed = 0.6 + Math.random()*1.8;
+});
+
+/* realistic log templates */
+const LOG_TEMPLATES = [
+  "Performing power-on self test",
+  "Initializing boundary-engine modules",
+  "Opening data store: /var/dasbem/data",
+  "Loading node coordinates ({N} nodes)",
+  "Loading element connectivity ({E} elems)",
+  "Validating kernel signatures",
+  "Restoring preconditioner blocks ({B} bytes)",
+  "Assembling influence matrix",
+  "Factorizing block row {r}/{R}",
+  "Spawning solver workers (threads={T})",
+  "CFL/stability checks passed",
+  "Streaming input waveform frames",
+  "License handshake completed",
+  "Module {M} ready"
 ];
 
-const stages=["Reading Header...","Parsing Data...","Initializing Module...","Applying Boundary Conditions...","Calculating Response...","Done"];
-
-const logEl = document.getElementById('log');
-const progressEl = document.getElementById('progressBar');
-
-let totalSteps = files.length * stages.length;
-let currentStep = 0;
-
-// ======== Log typing ========
-function appendLog(text,color){
-  const line = document.createElement('div');
-  line.className='logLine';
-  line.textContent = text;
-  if(color) line.style.color=color;
-  logEl.appendChild(line);
-  logEl.scrollTop = logEl.scrollHeight;
-  fadeIn(line);
-}
-function fadeIn(el){
-  let op=0;
-  const interval = setInterval(()=>{
-    op +=0.05;
-    el.style.opacity=op;
-    if(op>=1) clearInterval(interval);
-  },15);
+/* random helpers */
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const choose=(arr)=>arr[Math.floor(Math.random()*arr.length)];
+function craftLog(){
+  let t = choose(LOG_TEMPLATES);
+  t = t.replace("{N}", rnd(1200,8192));
+  t = t.replace("{E}", rnd(600,4096));
+  t = t.replace("{B}", rnd(1024,65536));
+  t = t.replace("{r}", rnd(1,9999));
+  t = t.replace("{R}", rnd(1000,9999));
+  t = t.replace("{T}", rnd(4,16));
+  t = t.replace("{M}", choose(["influence","mesh","io","parallel","precond"]));
+  return t;
 }
 
-// ======== Loader Simulation ========
-function startLoader(){
-  files.forEach((file,i)=>{
-    stages.forEach((stage,j)=>{
-      const delay = (i*stages.length + j)*200; // 200ms per step
-      setTimeout(()=>{
-        let color = "var(--text)";
-        if(stage==="Done") color = "#ffff66";
-        appendLog(`${timeStamp()} ${stage} ${file}`, color);
-        currentStep++;
-        let percent = Math.floor((currentStep/totalSteps)*100);
-        progressEl.style.width = percent + "%";
-      },delay);
-    });
+/* append log line with iran timestamp */
+function appendLog(text, cls){
+  const d = document.createElement('div');
+  d.className='line';
+  const ts = iranNowParts();
+  const stamp = `${ts.Y}-${ts.M}-${ts.D} ${ts.hh}:${ts.mm}:${ts.ss}`;
+  d.innerHTML = `<span class="ts">${stamp}</span> <span class="tag">${escapeHtml(text)}</span>`;
+  logInner.appendChild(d);
+  // keep DOM size bounded
+  while(logInner.children.length > 900) logInner.removeChild(logInner.firstChild);
+  // show with small stagger
+  requestAnimationFrame(()=> d.classList.add('show'));
+  // autoscroll to bottom smoothly on supported browsers
+  const parent = logInner.parentElement;
+  parent.scrollTo({top: parent.scrollHeight, behavior: 'smooth'});
+}
+
+/* small typed command to feel real */
+function typedCommand(text, delay=10){
+  return new Promise(resolve=>{
+    const d = document.createElement('div'); d.className='line';
+    const ts = iranNowParts(); const stamp = `${ts.Y}-${ts.M}-${ts.D} ${ts.hh}:${ts.mm}:${ts.ss}`;
+    d.innerHTML = `<span class="ts">${stamp}</span> <span class="tag">[EXEC]</span> <span class="typed"></span><span class="cursor">▌</span>`;
+    logInner.appendChild(d);
+    const typed = d.querySelector('.typed');
+    let i=0;
+    (function step(){
+      if(i<=text.length){
+        typed.textContent = text.slice(0,i);
+        i++;
+        logInner.parentElement.scrollTop = logInner.parentElement.scrollHeight;
+        setTimeout(step, delay + Math.random()*8);
+      } else {
+        d.querySelector('.cursor').remove();
+        d.innerHTML = `<span class="ts">${stamp}</span> <span class="tag">[EXEC]</span> ${escapeHtml(text)} <span class="ok"> · done</span>`;
+        requestAnimationFrame(()=> d.classList.add('show'));
+        resolve();
+      }
+    })();
   });
 }
-startLoader();
+
+/* escape */
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* orchestrate realistic fast loading (TOTAL_MS) */
+function runLoader(totalMs){
+  const start = performance.now();
+  const end = start + totalMs;
+
+  // initial lines
+  appendLog("Power check · PASS");
+  appendLog("Detecting CPU cores: " + (navigator.hardwareConcurrency || "unknown"));
+  appendLog("Mounting data store");
+
+  // typed command
+  setTimeout(()=> typedCommand("dasbem --init --mode=time-domain --threads=8", 8), 120);
+
+  // main tick: update file progresses and flood logs
+  function tick(){
+    const now = performance.now();
+    const elapsed = now - start;
+    const ratio = Math.min(1, elapsed/totalMs);
+
+    // update each file progress toward completion
+    files.forEach((f, idx)=>{
+      const target = Math.min(100, Math.round(ratio * 100 * (f.weight / (totalWeight/1.5)) * f._speed));
+      f._progress = Math.max(f._progress, Math.min(100, Math.round(target - idx*1 + Math.sin(elapsed/150 + idx)*3)));
+      f._fill.style.width = Math.max(0, Math.min(100,f._progress)) + '%';
+    });
+
+    // compute weighted overall
+    const weighted = files.reduce((s,f)=> s + (Math.min(100,f._progress) * f.weight), 0) / totalWeight;
+    const overall = Math.min(100, Math.round(weighted * 0.97 + ratio*3));
+    overallFill.style.width = overall + '%';
+    overallPct.textContent = overall + '%';
+
+    // orb evolves
+    orb.textContent = 1200 + Math.round((overall/100)*7000);
+
+    // produce logs: lots quickly to feel busy (bursting)
+    const burst = Math.max(1, Math.round( 3 + (1 - ratio) * 10 + Math.random()*6 ));
+    for(let i=0;i<burst;i++){
+      if(Math.random() < 0.10) appendLog(craftLog());
+      else appendLog(choose([
+        "IO: read " + rnd(1024,65536) + " bytes from /data/waves.bin",
+        "MESH: loaded node block " + rnd(1,13) + "/13",
+        "SOLVER: factorizing block " + rnd(1,24) + "/24",
+        "CACHE: preconditioner warm-up " + rnd(10,99) + "%",
+        "PAR: worker wt-" + rnd(1,12) + " heartbeat OK",
+        "IO: flushed buffer to disk"
+      ]));
+      if(logInner.children.length > 1200) break;
+    }
+
+    // schedule next
+    if(now < end - 140){
+      setTimeout(tick, Math.max(8, 28 - Math.round(ratio*16)));
+    } else {
+      // finalize quickly
+      files.forEach(f=>{ f._progress = 100; f._fill.style.width = '100%'; });
+      overallFill.style.width = '100%'; overallPct.textContent = '100%';
+      appendLog("[FINALIZE] flushing buffers · ok");
+      appendLog("[STATUS] System ONLINE");
+      setTimeout(()=> finishLoader(), 260);
+    }
+  }
+
+  // small warm-up burst
+  setTimeout(()=> { for(let k=0;k<5;k++) appendLog(craftLog()); }, 60);
+
+  tick();
+}
+
+/* finish and reveal main */
+function finishLoader(){
+  loader.classList.add('hide');
+  setTimeout(()=> { loader.remove(); document.getElementById('mainApp').classList.add('show'); }, 720);
+}
+
+/* kick off */
+setTimeout(()=> runLoader(TOTAL_MS), 80);
+
+/* ========== GRID (seismic) canvas implementation ========== */
+(function(){
+  const canvas = document.getElementById('gridCanvas');
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = innerWidth;
+  let H = canvas.height = innerHeight;
+  window.addEventListener('resize', ()=>{ W = canvas.width = innerWidth; H = canvas.height = innerHeight; });
+
+  // grid parameters
+  const cols = Math.max(12, Math.floor(W/60));
+  const rows = Math.max(8, Math.floor(H/60));
+  const spacingX = W / cols;
+  const spacingY = H / rows;
+
+  // create grid points
+  const points = [];
+  for(let r=0;r<=rows;r++){
+    for(let c=0;c<=cols;c++){
+      points.push({
+        x: c * spacingX,
+        y: r * spacingY,
+        ox: c * spacingX,
+        oy: r * spacingY,
+        amp: Math.random()*6 + 2,
+        phase: Math.random()*Math.PI*2
+      });
+    }
+  }
+
+  // wavefront parameters
+  const startTime = performance.now();
+  function draw(t){
+    const tt = (t - startTime)/1000; // seconds
+    ctx.clearRect(0,0,W,H);
+
+    // faint background
+    ctx.fillStyle = "rgba(0,0,0,0)";
+    ctx.fillRect(0,0,W,H);
+
+    // compute wave center (bottom-left-ish)
+    const cx = W * 0.32;
+    const cy = H * 0.78;
+
+    // draw deformed grid (as smooth curves)
+    ctx.lineWidth = 1;
+    for(let r=0;r<=rows;r++){
+      ctx.beginPath();
+      for(let c=0;c<=cols;c++){
+        const idx = r*(cols+1)+c;
+        const p = points[idx];
+        // distance to wavefront origin
+        const dx = p.ox - cx;
+        const dy = p.oy - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        // wave moves upward -> phase depends on time and vertical offset
+        const speed = 120; // px/sec apparent propagation
+        const wavePos = (tt*speed);
+        // compute displacement: when wave passes a point, it bulges
+        const d = Math.abs(dist - wavePos);
+        // gaussian-like impact
+        const impact = Math.exp(- (d*d) / (2 * (80 + (r*2)) * (80 + (r*2))));
+        const offset = Math.sin(tt*4 + p.phase) * p.amp * impact * (1 + r*0.02);
+        const x = p.ox + (dx/dist) * offset * 0.15; // small lateral movement
+        const y = p.oy - offset; // lift upwards
+        if(c===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "rgba(255,179,71,0.035)";
+      ctx.stroke();
+    }
+
+    // vertical lines
+    for(let c=0;c<=cols;c++){
+      ctx.beginPath();
+      for(let r=0;r<=rows;r++){
+        const idx = r*(cols+1)+c; const p = points[idx];
+        const dx = p.ox - cx; const dy = p.oy - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const speed = 120; const wavePos = (tt*speed);
+        const d = Math.abs(dist - wavePos);
+        const impact = Math.exp(- (d*d) / (2 * (80 + (c*2)) * (80 + (c*2))));
+        const offset = Math.sin(tt*4 + p.phase) * p.amp * impact * (1 + c*0.02);
+        const x = p.ox + (dx/dist) * offset * 0.15;
+        const y = p.oy - offset;
+        if(r===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "rgba(255,179,71,0.028)";
+      ctx.stroke();
+    }
+
+    // small particles/ripple highlights (represent IO events)
+    const overallPct = parseInt(overallPct.textContent) || 0;
+    const particleCount = 30 + Math.round((100 - overallPct) * 0.6);
+    for(let i=0;i<particleCount;i++){
+      const rx = Math.random() * W * 0.9 + W*0.05;
+      const ry = Math.random() * H * 0.6 + H*0.2;
+      const a = 0.01 + Math.random()*0.045;
+      ctx.beginPath(); ctx.arc(rx + Math.sin(tt*(0.3+i%5))*6, ry + Math.cos(tt*(0.4+i%6))*4, Math.random()*1.3, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,170,80,${a})`; ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
 </script>
 </body>
 </html>
