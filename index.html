@@ -10,7 +10,6 @@
   --bg:#0d0d0d;
   --text:#33ff33;
   --highlight:#ffff66;
-  --alert:#ff5555;
   --accent:#ffaa33;
 }
 body,html{
@@ -135,9 +134,9 @@ function startLoader(){
     stages.forEach((stage,j)=>{
       const delay = (i*stages.length + j)*200; // 200ms per step
       setTimeout(()=>{
-        let color=var(--text);
-        if(stage==="Done") color = var(--highlight);
-        appendLog(`${timeStamp()} ${stage} ${file}`);
+        let color = "var(--text)";
+        if(stage==="Done") color = "#ffff66";
+        appendLog(`${timeStamp()} ${stage} ${file}`, color);
         currentStep++;
         let percent = Math.floor((currentStep/totalSteps)*100);
         progressEl.style.width = percent + "%";
