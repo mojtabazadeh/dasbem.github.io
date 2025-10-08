@@ -45,12 +45,15 @@
   color: var(--text-light);
   display: flex;
   align-items: center;
+  flex-direction: column;
+  text-align: left;
 }
 
 #siteLoader .prompt {
   color: var(--accent);
   margin-right: 8px;
   text-shadow: 0 0 8px rgba(255,180,120,0.6);
+  animation: pulsePrompt 1s infinite alternate;
 }
 
 #siteLoader .cursor {
@@ -64,9 +67,18 @@
   box-shadow: 0 0 6px rgba(255,180,120,0.5);
 }
 
+#siteLoader .text span {
+  transition: all 0.5s ease;
+}
+
 @keyframes blink {
   0% {opacity:1;}
   100% {opacity:0.2;}
+}
+
+@keyframes pulsePrompt {
+  0% {opacity:1; text-shadow: 0 0 8px rgba(255,180,120,0.6);}
+  100% {opacity:0.4; text-shadow: 0 0 20px rgba(255,180,120,0.9);}
 }
 </style>
 
@@ -74,16 +86,36 @@
 // ===== Typing Terminal Text =====
 document.addEventListener('DOMContentLoaded', () => {
   const textElement = document.getElementById('loaderText');
-  const message = 'Initializing DASBEM Project... Solving BEM Equations...';
-  let i = 0;
-  function type() {
-    if (i < message.length) {
-      textElement.textContent += message.charAt(i);
-      i++;
-      setTimeout(type, 50); // سرعت تایپ
+  const messages = [
+    'Initializing DASBEM Project...',
+    'Loading Boundary Element Method modules...',
+    'Computing SH-Wave Propagation...',
+    'Finalizing Simulation Environment...'
+  ];
+  
+  let line = 0, charIndex = 0;
+  
+  function typeLine() {
+    if(line < messages.length){
+      const current = messages[line];
+      if(charIndex < current.length){
+        const span = document.createElement('span');
+        span.textContent = current.charAt(charIndex);
+        span.style.color = '#ffb347';
+        span.style.textShadow = '0 0 8px rgba(255,180,120,0.8)';
+        textElement.appendChild(span);
+        charIndex++;
+        setTimeout(typeLine, 40);
+      } else {
+        textElement.appendChild(document.createElement('br'));
+        line++;
+        charIndex = 0;
+        setTimeout(typeLine, 300);
+      }
     }
   }
-  type();
+  
+  typeLine();
 });
 
 // ===== BEM + Seismic Grid Canvas =====
@@ -93,8 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let width = canvas.width = window.innerWidth;
   let height = canvas.height = window.innerHeight;
 
-  // Grid setup
-  const gridSize = 40; // فاصله خطوط شبکه
+  const gridSize = 40;
   const points = [];
   for(let y=0; y<=height; y+=gridSize){
     for(let x=0; x<=width; x+=gridSize){
@@ -102,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Wave variables
   let waves = [];
 
   function createWave(){
@@ -118,11 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function drawGrid(){
     ctx.clearRect(0,0,width,height);
-    
-    // Draw grid lines
+
+    // Grid lines
     ctx.strokeStyle = 'rgba(255,179,71,0.25)';
     ctx.lineWidth = 1;
-    
+
     for(let y=0; y<=height; y+=gridSize){
       ctx.beginPath();
       for(let x=0; x<=width; x+=gridSize){
@@ -142,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.stroke();
     }
 
-    // Draw waves
+    // Waves
     waves.forEach((w, idx)=>{
       ctx.beginPath();
       ctx.arc(w.x, w.y, w.radius, 0, Math.PI*2);
@@ -150,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Affect nearby points (shake)
       points.forEach(p=>{
         let dx = p.x - w.x;
         let dy = p.y - w.y;
@@ -164,14 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
       w.radius += w.speed;
       if(w.radius > w.maxRadius) waves.splice(idx,1);
     });
-    
+
     requestAnimationFrame(drawGrid);
   }
 
-  // Periodically add waves
   setInterval(createWave, 800);
 
-  // Resize handler
   window.addEventListener('resize', ()=>{
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
@@ -193,6 +220,6 @@ window.addEventListener('load', () => {
     loader.style.transition = 'opacity 1s ease';
     loader.style.opacity = '0';
     setTimeout(()=>loader.remove(),1000);
-  }, 5000); // 5 ثانیه لودر
+  }, 5000); // نمایش 5 ثانیه
 });
 </script>
