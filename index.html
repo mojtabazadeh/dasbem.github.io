@@ -3,415 +3,441 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>DASBEM — Fast Boot Loader (BEM / Seismic vibe)</title>
+<title>DASBEM — Realistic Fast Boot Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#07090b;
-  --panel:#0b0f12;
+  --bg:#050608;
+  --panel:#091014;
   --accent:#ffb347; /* نارنجی برند */
-  --muted:#9aa6ad;
-  --text:#dfe9e6;
+  --muted:#9fb0b6;
+  --text:#dfeef0;
 }
 
 /* reset */
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);font-family:"Fira Code",monospace;color:var(--text);overflow:hidden}
 
-/* Loader wrapper */
+/* loader overlay */
 #loader{
   position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg, rgba(3,4,5,0.9), rgba(6,8,10,0.92));
+  background:linear-gradient(180deg, rgba(2,3,4,0.92), rgba(6,8,10,0.92));
 }
 
-/* background canvas (waves + particles) */
-#bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+/* background canvas */
+#bgCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
-/* terminal card */
-.card{
-  position:relative;z-index:2;width:92%;max-width:1200px;height:70vh;min-height:420px;border-radius:12px;overflow:hidden;
-  background:linear-gradient(180deg, rgba(6,8,10,0.92), rgba(8,10,12,0.88));
-  box-shadow: 0 30px 90px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-  display:flex;gap:14px;padding:18px;
+/* main panel */
+.panel{
+  position:relative;z-index:2;width:92%;max-width:1200px;height:70vh;min-height:480px;border-radius:12px;overflow:hidden;
+  display:flex;gap:16px;padding:18px;
+  background:linear-gradient(180deg, rgba(8,10,12,0.98), rgba(12,14,16,0.95));
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
 }
 
-/* left: big terminal log (simulate CMD) */
+/* Left: big terminal (LTR!) */
 .terminal{
-  flex:1.25;min-width:520px;background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent);border-radius:8px;padding:12px;display:flex;flex-direction:column;
+  flex:1.4;background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent);border-radius:8px;padding:12px;display:flex;flex-direction:column;
   border-right:1px solid rgba(255,255,255,0.02);
 }
-.term-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.window-dots{display:flex;gap:8px}
+.term-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dots{display:flex;gap:8px}
 .dot{width:12px;height:12px;border-radius:50%}
 .dot.r{background:#ff5f56}.dot.y{background:#ffbd2e}.dot.g{background:#27c93f}
 .title{margin-left:auto;color:var(--muted);font-size:13px}
 
-/* the log area - left-aligned like cmd */
+/* Log area: important -> left-to-right text */
 .log{
-  background:rgba(0,0,0,0.03);flex:1;border-radius:6px;padding:12px;overflow:hidden;position:relative;
+  flex:1;border-radius:6px;padding:12px;overflow:hidden;position:relative;background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(255,255,255,0.01));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.01);
-  direction:ltr; text-align:left; /* key: make content LTR/left aligned */
-  font-size:13px;line-height:1.45;color:var(--muted);
+  direction:ltr;text-align:left;font-size:13px;line-height:1.45;color:var(--muted);
 }
 .log-inner{position:absolute;left:12px;right:12px;top:12px}
 
-/* lines */
-.line{white-space:pre-wrap;margin:2px 0;opacity:0;transform:translateY(8px);transition:opacity 160ms linear, transform 160ms linear}
-.line.show{opacity:1;transform:translateY(0)}
-.tag{color:var(--accent);display:inline-block;min-width:110px;font-weight:700}
+/* each line */
+.line{white-space:pre-wrap;margin:3px 0;opacity:0;transform:translateX(-8px);transition:opacity 160ms linear, transform 160ms linear}
+.line.visible{opacity:1;transform:translateX(0)}
+.ts{color:#bfcbd0;display:inline-block;min-width:130px;font-weight:600} /* timestamp */
+.tag{color:var(--accent);display:inline-block;min-width:120px;font-weight:700}
 .ok{color:#9ff2b7}
 .warn{color:#ffdba0}
 .err{color:#ff9b9b}
 
-/* jitter/flicker for hacker vibe */
-@keyframes flicker {
-  0% {opacity:0.98}
-  50% {opacity:0.85}
-  100% {opacity:0.98}
+/* right: status + filelist (LTR too) */
+.side{width:340px;min-width:240px;display:flex;flex-direction:column;gap:12px;padding:4px}
+.status{
+  height:160px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;
 }
-.log .line:nth-child(odd){animation: flicker 1600ms ease-in-out infinite}
+.orb{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--accent);font-size:18px;box-shadow:0 0 40px rgba(255,179,71,0.06), inset 0 0 18px rgba(255,179,71,0.03)}
+.meta{font-size:12px;color:var(--muted);font-family:"Fira Code",monospace;text-align:center}
 
-/* small transient typing highlight */
-.typing {color:var(--accent);font-weight:700}
-.cursor {display:inline-block;animation:blink 900ms steps(2,end) infinite;margin-left:6px}
-@keyframes blink{50%{opacity:0}}
-
-/* right: status + mini-filelist */
-.side{
-  width:360px;min-width:260px;padding:12px;display:flex;flex-direction:column;gap:12px;align-items:stretch;
-}
-.pulse{
-  height:140px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
-  box-shadow: inset 0 0 40px rgba(255,179,71,0.02);
-}
-.pulse .orb{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--accent);font-size:18px;
-  box-shadow:0 0 40px rgba(255,179,71,0.06), inset 0 0 18px rgba(255,179,71,0.03)}
-.meta{font-size:13px;color:var(--muted);font-family:"Fira Code",monospace;text-align:center}
-
-/* mini file list */
-.file-list{background:rgba(0,0,0,0.03);padding:10px;border-radius:8px;overflow:hidden;flex:1}
+/* filelist */
+.file-list{background:rgba(0,0,0,0.03);padding:8px;border-radius:8px;overflow:hidden;flex:1;direction:ltr}
 .file-item{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:6px}
 .file-name{flex:1;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file-progress{width:90px;height:8px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-.file-progress .f{height:100%;width:0;background:linear-gradient(90deg, rgba(255,179,71,0.2), var(--accent));transition:width 120ms linear}
+.file-progress{width:120px;height:8px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+.file-progress .bar{height:100%;width:0;background:linear-gradient(90deg, rgba(255,179,71,0.18), var(--accent));transition:width 120ms linear}
 
-/* bottom overall progress */
-.footer{display:flex;align-items:center;gap:10px;margin-top:6px}
-.progress{flex:1;height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-.progress .fill{height:100%;width:0;background:linear-gradient(90deg, rgba(255,179,71,0.16), var(--accent));box-shadow:0 6px 30px rgba(255,179,71,0.06);transition:width 120ms linear}
-.percent{min-width:48px;text-align:right;color:var(--muted);font-family:"Fira Code",monospace;font-size:13px}
+/* bottom overall progress (LTR visually) */
+.bottom-row{display:flex;align-items:center;gap:12px;margin-top:8px}
+.overall{flex:1;height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+.overall .bar{height:100%;width:0;background:linear-gradient(90deg, rgba(255,179,71,0.16), var(--accent));box-shadow:0 6px 30px rgba(255,179,71,0.06);transition:width 120ms linear}
+.overall-pct{min-width:56px;text-align:right;color:var(--muted);font-family:"Fira Code",monospace;font-size:13px}
 
-/* fade out */
-.loader-hide{opacity:0;visibility:hidden;transition:opacity 700ms ease, visibility 700ms ease}
+/* fade out / hide */
+.hide{opacity:0;visibility:hidden;transition:opacity 700ms ease, visibility 700ms ease}
 
-/* main reveal */
-#main{position:relative;z-index:1;opacity:0;visibility:hidden;transition:opacity 600ms ease;min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--text);}
-#main.show{opacity:1;visibility:visible}
+/* main content */
+#mainApp{position:relative;z-index:1;opacity:0;visibility:hidden;transition:opacity 600ms ease;min-height:100vh;display:flex;align-items:center;justify-content:center}
+#mainApp.show{opacity:1;visibility:visible}
 
 /* responsive */
 @media (max-width:980px){
   .side{display:none}
-  .card{padding:12px}
+  .panel{flex-direction:column}
   .terminal{min-width:unset}
 }
 </style>
 </head>
 <body>
 
-<div id="loader">
-  <canvas id="bg"></canvas>
+<!-- Loader -->
+<div id="loader" role="dialog" aria-label="DASBEM boot loader">
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
 
-  <div class="card" role="dialog" aria-label="DASBEM fast boot loader">
-    <div class="terminal" aria-hidden="false">
+  <div class="panel">
+    <div class="terminal" aria-live="polite">
       <div class="term-top">
-        <div class="window-dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
-        <div class="title">DASBEM · boot sequence</div>
+        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+        <div class="title">DASBEM · boot</div>
       </div>
 
-      <div class="log" id="log">
-        <div class="log-inner" id="logInner"></div>
-      </div>
+      <div class="log" id="log"><div class="log-inner" id="logInner"></div></div>
 
-      <div class="footer" style="margin-top:8px;">
-        <div class="progress"><div class="fill" id="mainFill"></div></div>
-        <div class="percent" id="mainPct">0%</div>
+      <div class="bottom-row" style="margin-top:8px">
+        <div class="overall" aria-hidden="true"><div class="bar" id="overallBar"></div></div>
+        <div class="overall-pct" id="overallPct">0%</div>
       </div>
     </div>
 
     <div class="side" aria-hidden="true">
-      <div class="pulse">
-        <div class="orb" id="orbTxt">BEM</div>
+      <div class="status">
+        <div class="orb" id="orb">BEM</div>
+        <div class="meta" id="metaLine">Kernel: boundary-solver · Mode: time-domain</div>
       </div>
-      <div class="meta">Kernel: boundary-solver · Mode: time-domain · Threads: 8</div>
 
-      <div class="file-list" id="fileList" aria-hidden="true">
-        <!-- generated small file-progress lines -->
-      </div>
+      <div class="file-list" id="fileList"></div>
     </div>
   </div>
 </div>
 
-<main id="main">
+<!-- Main app (hidden until loader finish) -->
+<main id="mainApp">
   <div style="text-align:center">
     <h1 style="font-family:'Fira Code',monospace">The DASBEM Project</h1>
-    <p style="color:var(--muted)">صفحهٔ اصلی — لودر کامل شد.</p>
+    <p style="color:var(--muted)">صفحهٔ اصلی — خوش آمدی</p>
   </div>
 </main>
 
 <script>
 /* ================= CONFIG ================= */
-const TOTAL_DURATION = 5000; // ms
+const TOTAL_MS = 5000; // total loader time
 const logInner = document.getElementById('logInner');
-const mainFill = document.getElementById('mainFill');
-const mainPct = document.getElementById('mainPct');
+const overallBar = document.getElementById('overallBar');
+const overallPct = document.getElementById('overallPct');
 const fileList = document.getElementById('fileList');
-const orbTxt = document.getElementById('orbTxt');
+const orb = document.getElementById('orb');
+const metaLine = document.getElementById('metaLine');
 const loader = document.getElementById('loader');
-const main = document.getElementById('main');
-const bgCanvas = document.getElementById('bg');
+const mainApp = document.getElementById('mainApp');
+const bgCanvas = document.getElementById('bgCanvas');
 const ctx = bgCanvas.getContext('2d');
 
-/* ====== utility ====== */
-const rnd = (min,max)=> Math.floor(Math.random()*(max-min+1))+min;
-const choose = arr => arr[Math.floor(Math.random()*arr.length)];
-const nowStr = ()=> new Date().toISOString().replace('T',' ').split('.')[0];
-
-/* ====== prepare simulated file list (for side panel) ====== */
-const sampleFiles = [
-  "mesh/semicircle.nod", "mesh/elements.dat", "kernels/bem_kern.bin",
-  "matrices/influence.mtx","params/runconfig.json","io/input_wave.srf",
-  "cache/precond.chk","workers/solver_thread_01","workers/solver_thread_02",
-  "viz/colormap.cfg","logs/session.log","api/remote_cfg"
-];
-for(let i=0;i<Math.min(8,sampleFiles.length);i++){
-  const f = document.createElement('div'); f.className='file-item';
-  f.innerHTML = `<div class="file-name">${sampleFiles[i]}</div><div class="file-progress"><div class="f" style="width:0%"></div></div>`;
-  fileList.appendChild(f);
+/* ===== Helper (Iran timezone timestamp) ===== */
+function iranTimestamp(){
+  // ISO-like but localized to Asia/Tehran (24h)
+  const now = new Date();
+  const parts = now.toLocaleString('en-GB', { timeZone: 'Asia/Tehran' }); // e.g. "08/10/2025, 23:48:01"
+  // Normalize to "YYYY-MM-DD HH:MM:SS" using Tehran timezone by constructing from toLocaleString may be easier to present as bracketed time
+  const d = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tehran' }));
+  // We will format with zero padding
+  const pad=(n)=>String(n).padStart(2,'0');
+  const Y = d.getFullYear(), M = pad(d.getMonth()+1), D = pad(d.getDate());
+  const hh = pad(d.getHours()), mm = pad(d.getMinutes()), ss = pad(d.getSeconds());
+  return `${Y}-${M}-${D} ${hh}:${mm}:${ss}`;
 }
 
-/* ====== dynamic log generation (fast, dense) ====== */
+/* ===== Prepare realistic file list (weights sum to 100) ===== */
+const files = [
+  {name:"mesh/semicircle.nod", size: 4200, weight:12},
+  {name:"mesh/elements.dat", size: 13800, weight:12},
+  {name:"kernels/bem_kern.bin", size: 38400, weight:18},
+  {name:"matrices/influence.mtx", size: 128000, weight:20},
+  {name:"params/runconfig.json", size: 1200, weight:4},
+  {name:"io/input_wave.srf", size: 25600, weight:14},
+  {name:"cache/precond.chk", size: 8200, weight:8},
+  {name:"viz/colormap.cfg", size: 900, weight:2}
+];
+// compute total weight
+const totalWeight = files.reduce((s,f)=>s+f.weight,0);
+
+// render file list items (LTR)
+files.forEach(f=>{
+  const el = document.createElement('div'); el.className='file-item';
+  el.innerHTML = `<div class="file-name">${f.name}</div><div class="file-progress"><div class="bar" style="width:0%"></div></div>`;
+  fileList.appendChild(el);
+  f._el = el;
+  f._bar = el.querySelector('.bar');
+  // simulate different speeds via speed factor
+  f._speed = 0.6 + Math.random()*1.8; // higher -> faster
+  f._progress = 0;
+});
+
+/* ===== realistic log templates (more technical) ===== */
 const LOG_TEMPLATES = [
-  "[BOOT] power-check · ok",
-  "[BOOT] CPU cores: {C}",
-  "[CORE] loading library {L}",
-  "[IO] read {B} bytes from {F}",
-  "[MESH] nodes={N} elements={E}",
-  "[SOLVER] assembling row {r}/{R}",
-  "[SOLVER] apply BC on boundary segment {s}",
-  "[PAR] worker {w} started",
-  "[CACHE] warming cache, hit ~{H}%",
-  "[CHK] stability: {v}",
-  "[ANL] modal estimate f={f}Hz",
-  "[NET] handshake with license server",
-  "[DSP] convolving response kernel",
-  "[IO] flushed buffer to disk",
-  "[DONE] module {M} ready"
+  "[BOOT] Performing power-on self test",
+  "[CORE] Initializing boundary-engine modules",
+  "[IO] Opening data repository: /var/dasbem/data",
+  "[MESH] Loading node coordinates ({N} nodes)",
+  "[MESH] Loading element connectivity ({E} elems)",
+  "[KERN] Validating kernel signatures",
+  "[CACHE] Restoring preconditioner blocks ({B} bytes)",
+  "[SOLVER] Assembling influence matrix (this may take time)",
+  "[SOLVER] Factorizing block row {r}/{R}",
+  "[PAR] Spawning solver workers (threads={T})",
+  "[CHK] CFL/stability checks passed",
+  "[ANL] Estimating modal frequencies...",
+  "[IO] Streaming input waveform frames",
+  "[NET] License handshake completed",
+  "[DONE] Module {M} ready"
 ];
 
-function craftLine(){
+/* small helpers */
+const rnd = (min,max)=> Math.floor(Math.random()*(max-min+1))+min;
+const choose = arr => arr[Math.floor(Math.random()*arr.length)];
+function craftLog(){
   let t = choose(LOG_TEMPLATES);
-  t = t.replace("{C}", rnd(4,16));
-  t = t.replace("{L}", choose(["bnd_kern.so","timeconv.dll","meshgen.ax","precond.lib"]));
-  t = t.replace("{B}", (rnd(1024,65536)).toString());
-  t = t.replace("{F}", choose(["/data/waves.bin","/mesh/semicircle.nod","/cache/precond.chk"]));
   t = t.replace("{N}", rnd(1200,8192));
   t = t.replace("{E}", rnd(600,4096));
+  t = t.replace("{B}", rnd(1024,65536));
   t = t.replace("{r}", rnd(1,9999));
   t = t.replace("{R}", rnd(1000,9999));
-  t = t.replace("{s}", rnd(1,48));
-  t = t.replace("{w}", "wt-"+rnd(1,12));
-  t = t.replace("{H}", rnd(72,99));
-  t = t.replace("{v}", choose(["OK","stable","marginal"]));
-  t = t.replace("{f}", (rnd(1,24)+Math.random().toFixed(2)));
-  t = t.replace("{M}", choose(["influence","mesh","io","parallel"]));
+  t = t.replace("{T}", rnd(4,16));
+  t = t.replace("{M}", choose(["influence","mesh","io","parallel","precond"]));
   return t;
 }
 
-/* append line and auto-scroll (fast) */
-function pushLine(txt, cls){
+/* append log with iran timestamp */
+function appendLog(text, level="info"){
   const d = document.createElement('div');
   d.className = 'line';
-  d.innerHTML = `<span class="tag">${nowStr()}</span> ${escapeHtml(txt)}`;
+  const ts = iranTimestamp();
+  d.innerHTML = `<span class="ts">${ts}</span> <span class="tag">${escapeHtml(text)}</span>`;
   logInner.appendChild(d);
-  // keep DOM bounded
-  while(logInner.children.length > 450) logInner.removeChild(logInner.firstChild);
-  // show with tiny stagger for "noisy" effect
-  requestAnimationFrame(()=> d.classList.add('show'));
-  // scroll parent
+  // bound DOM size
+  while(logInner.children.length > 800) logInner.removeChild(logInner.firstChild);
+  // show
+  requestAnimationFrame(()=> d.classList.add('visible'));
+  // auto-scroll
   const parent = logInner.parentElement;
   parent.scrollTop = parent.scrollHeight;
 }
 
-/* escape */
-function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-
-/* ====== animate file progress in side panel ====== */
-function stepFileProgress(overallPct){
-  const items = Array.from(document.querySelectorAll('.file-item'));
-  items.forEach((it,index)=>{
-    const fEl = it.querySelector('.f');
-    // staggered pseudo progress based on overallPct + random jitter
-    const base = overallPct + index * 4 - rnd(0,10);
-    const val = Math.max(0, Math.min(100, Math.round(base + Math.sin(overallPct/7 + index)*6)));
-    fEl.style.width = val + '%';
+/* typed line (simulate real console typing for important command) */
+function typedCommand(text, delayPerChar=10){
+  return new Promise(resolve=>{
+    const d = document.createElement('div'); d.className='line';
+    const ts = iranTimestamp();
+    d.innerHTML = `<span class="ts">${ts}</span> <span class="tag">[EXEC]</span> <span class="typed"></span><span class="cursor">▌</span>`;
+    logInner.appendChild(d);
+    const typed = d.querySelector('.typed');
+    let i=0;
+    function step(){
+      if(i<=text.length){
+        typed.textContent = text.slice(0,i);
+        i++;
+        // scroll
+        const parent = logInner.parentElement;
+        parent.scrollTop = parent.scrollHeight;
+        setTimeout(step, delayPerChar + Math.random()*8);
+      } else {
+        d.querySelector('.cursor').remove();
+        d.innerHTML = `<span class="ts">${ts}</span> <span class="tag">[EXEC]</span> ${escapeHtml(text)} <span class="ok"> · done</span>`;
+        requestAnimationFrame(()=> d.classList.add('visible'));
+        resolve();
+      }
+    }
+    step();
   });
 }
 
-/* ====== orchestrate fast flood of logs over TOTAL_DURATION ====== */
-function runFastLoader(totalMs){
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ===== orchestrate loader realistically ===== */
+function startLoader(totalMs){
   const start = performance.now();
   const end = start + totalMs;
-  // we will produce many lines per second (dense) to create busy-hacker vibe
-  const targetLines = Math.round( (totalMs/1000) * rnd(70,120) ); // 70-120 lines per second scaled
-  let produced = 0;
 
+  // schedule a few deterministic high-level events at realistic times (fractions)
+  const events = [
+    {at: 0.04, fn: ()=> appendLog("Performing power-on self test")},
+    {at: 0.10, fn: ()=> appendLog("Detecting CPU & memory modules")},
+    {at: 0.15, fn: ()=> appendLog("Mounting dataset repository")},
+    {at: 0.22, fn: ()=> appendLog("Reading mesh headers")},
+    {at: 0.30, fn: ()=> appendLog("Loading kernel modules")},
+    {at: 0.46, fn: ()=> appendLog("Initializing parallel workers")},
+    {at: 0.60, fn: ()=> appendLog("Assembling influence operators")},
+    {at: 0.75, fn: ()=> appendLog("Finalizing solver pipeline")},
+    {at: 0.90, fn: ()=> appendLog("Launching web interface")}
+  ];
+
+  // typed command early to feel realistic
+  setTimeout(()=> typedCommand("dasbem --init --mode=time-domain --threads=8"), 140);
+
+  // dynamic loop: update file progresses & flood logs, heavier earlier
   function tick(){
     const t = performance.now();
     const elapsed = t - start;
-    const progress = Math.min(100, Math.floor((elapsed / totalMs) * 100));
-    mainFill.style.width = progress + '%';
-    mainPct.textContent = progress + '%';
-    // update orb text intensity (simulate wave calc)
-    orbTxt.textContent = `${rnd(800,8192)}`;
-    // step file progress
-    stepFileProgress(progress);
+    const pct = Math.min(100, Math.floor((elapsed/totalMs)*100));
+    // update file progresses based on their speed and weight
+    files.forEach((f, idx)=>{
+      // each file completes at a ratio proportional to its weight and individual speed
+      const target = Math.min(100, Math.round( (elapsed/totalMs) * 100 * (f.weight/ (totalWeight / 1.6)) * f._speed ));
+      // jitter & smoothing
+      f._progress = Math.max(f._progress, Math.min(100, Math.round(target - (idx*2) + (Math.sin(elapsed/150 + idx)*4))));
+      f._bar.style.width = (Math.max(0, Math.min(100,f._progress))) + '%';
+    });
 
-    // produce a burst of lines proportional to remaining time (more lines early)
-    const remaining = Math.max(1, end - t);
-    // adaptive burst size: more dense initially, taper a bit
-    const burst = Math.max(1, Math.floor( ( (end - t) / totalMs ) * rnd(6,14) ));
+    // compute weighted overall progress
+    const weighted = files.reduce((s,f)=> s + (Math.min(100,f._progress) * f.weight), 0) / totalWeight;
+    const overall = Math.min(100, Math.round(weighted * 0.98 + pct*0.02)); // blend to ensure timely finish
+    overallBar.style.width = overall + '%';
+    overallPct.textContent = overall + '%';
+
+    // orb shows nodes processed approximate
+    const nodes = 1200 + Math.round((overall/100) * 7000);
+    orb.textContent = nodes;
+
+    // generate logs: denser early, smaller burst near end
+    const timeRatio = elapsed / totalMs;
+    const burst = Math.max(1, Math.round( 2 + (1 - timeRatio) * 12 + Math.random()*6 ));
     for(let i=0;i<burst;i++){
-      pushLine(craftLine());
-      produced++;
-      if(produced % 8 === 0 && Math.random() < 0.22){
-        // occasionally small "typed" exec lines for flavor
-        pushTyped("processing time-step " + rnd(1,1200) + "/" + rnd(1200,2400));
+      // sometimes craft detailed logs, sometimes quick short lines
+      if(Math.random() < 0.12){
+        appendLog(craftLog());
+      } else if(Math.random() < 0.08){
+        // occasional err/warn (but fixed)
+        appendLog("Disk I/O latency spike detected · retrying", "warn");
+      } else {
+        appendLog(choose([
+          "IO: read " + rnd(1024,65536) + " bytes from /data/waves.bin",
+          "MESH: loaded node block " + rnd(1,13) + "/13",
+          "SOLVER: factorizing block " + rnd(1,24) + "/24",
+          "CACHE: preconditioner warm-up " + rnd(10,98) + "%",
+          "PAR: worker wt-" + rnd(1,12) + " heartbeat OK"
+        ]));
       }
+      // limit growth
+      if(logInner.children.length > 1200) break;
     }
 
-    if(t < end - 180){
-      // schedule next tick soon (fast)
-      setTimeout(tick, rnd(18,50));
+    // continue until end
+    if(t < end - 120){
+      // dynamic interval to feel bursty
+      setTimeout(tick, Math.max(10, 30 - Math.round(timeRatio*18)));
     } else {
-      // finalization: push finishing messages quickly
-      for(let f=0; f<30; f++){
-        pushLine("[FINALIZE] flushing buffers · ok");
-      }
-      mainFill.style.width = "100%";
-      mainPct.textContent = "100%";
-      // small pause then fade out
-      setTimeout(()=> finishLoader(), 260);
+      // finishing: ensure files reach 100 quickly
+      files.forEach((f, idx)=> { f._progress = 100; f._bar.style.width = '100%'; });
+      overallBar.style.width = '100%'; overallPct.textContent = '100%';
+      appendLog("[FINALIZE] flushing buffers · ok");
+      appendLog("[STATUS] System ONLINE");
+      // small pause then hide
+      setTimeout(()=> finish(), 260);
     }
   }
+
+  // kick off a little burst at start
+  setTimeout(()=> {
+    for(let i=0;i<6;i++) appendLog(craftLog());
+  }, 60);
+
   tick();
 }
 
-/* small typed effect line (ephemeral) */
-function pushTyped(txt){
-  const d = document.createElement('div');
-  d.className = 'line typing';
-  d.innerHTML = `<span class="tag">${nowStr()}</span> <span class="typed"></span><span class="cursor">▌</span>`;
-  logInner.appendChild(d);
-  const typed = d.querySelector('.typed');
-  let i = 0;
-  function step(){
-    if(i <= txt.length){
-      typed.textContent = txt.slice(0,i);
-      i++;
-      // scroll
-      const parent = logInner.parentElement;
-      parent.scrollTop = parent.scrollHeight;
-      setTimeout(step, rnd(6,18));
-    } else {
-      // finalize
-      d.querySelector('.cursor').remove();
-      d.classList.remove('typing');
-      d.innerHTML = `<span class="tag">${nowStr()}</span> ${escapeHtml(txt)} <span class="ok"> · done</span>`;
-      // keep DOM size
-      while(logInner.children.length > 450) logInner.removeChild(logInner.firstChild);
-    }
-  }
-  step();
-}
-
-/* finish loader: fade out and reveal main */
-function finishLoader(){
-  // subtle delay so user sees 100%
-  loader.style.transition = "opacity 700ms ease, visibility 700ms ease";
-  loader.style.opacity = "0";
-  setTimeout(()=>{
+/* finish loader */
+function finish(){
+  loader.classList.add('hide');
+  setTimeout(()=> {
     loader.remove();
-    main.classList.add('show');
-  }, 720);
+    mainApp.classList.add('show');
+  }, 700);
 }
 
-/* ====== background seismic / wave animation ====== */
+/* ========== background canvas: seismic/wavefield visualization ========== */
 (function(){
   const dpr = window.devicePixelRatio || 1;
-  function resize(){
-    bgCanvas.width = innerWidth * dpr;
-    bgCanvas.height = innerHeight * dpr;
-    bgCanvas.style.width = innerWidth + "px";
-    bgCanvas.style.height = innerHeight + "px";
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  resize();
-  window.addEventListener('resize', resize);
+  function resize(){ bgCanvas.width = innerWidth * dpr; bgCanvas.height = innerHeight * dpr; bgCanvas.style.width = innerWidth + 'px'; bgCanvas.style.height = innerHeight + 'px'; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  resize(); window.addEventListener('resize', resize);
 
-  let t0 = performance.now();
-  function draw(time){
-    const t = (time - t0)/1000;
+  let start = performance.now();
+  function draw(now){
+    const t = (now - start)/1000;
     ctx.clearRect(0,0,innerWidth,innerHeight);
 
-    // subtle radial haze (center-left)
-    const grd = ctx.createRadialGradient(innerWidth*0.28, innerHeight*0.35, 40, innerWidth*0.28, innerHeight*0.35, Math.max(innerWidth,innerHeight));
-    grd.addColorStop(0, `rgba(255,179,71,${0.015 + 0.02*Math.sin(t*1.4)})`);
-    grd.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = grd;
-    ctx.fillRect(0,0,innerWidth,innerHeight);
+    // soft radial ambient from left-bottom (simulates source)
+    const gx = ctx.createRadialGradient(innerWidth*0.35, innerHeight*0.72, 20, innerWidth*0.35, innerHeight*0.72, Math.max(innerWidth,innerHeight));
+    const baseAlpha = 0.012 + 0.02*Math.sin(t*1.4);
+    gx.addColorStop(0, `rgba(255,179,71,${baseAlpha})`);
+    gx.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gx; ctx.fillRect(0,0,innerWidth,innerHeight);
 
-    // moving particles (tiny sparks)
-    for(let i=0;i<120;i++){
-      const angle = (i/120)*Math.PI*2 + t*0.2*(i%2?1:-1);
-      const rad = 20 + (i%7)*6 + Math.sin(t*(0.5 + i%3))*6;
-      const x = innerWidth*0.5 + Math.cos(angle)*rad*8;
-      const y = innerHeight*0.45 + Math.sin(angle)*rad*2;
+    // concentric semicircular waves (sync intensity with overall progress)
+    const overallPct = parseInt(overallPctElemSafe());
+    const maxR = Math.min(innerWidth, innerHeight) * 0.9;
+    const waves = 6;
+    for(let w=0; w<waves; w++){
+      const phase = t*1.8 - w*0.35;
+      const r = ( (phase % 3) / 3 ) * maxR * (0.2 + w*0.12);
       ctx.beginPath();
-      ctx.fillStyle = `rgba(255,170,80,${0.02 + ((i%5)/80)})`;
-      ctx.arc(x,y, (i%6===0?1.6:0.9), 0, Math.PI*2);
-      ctx.fill();
+      ctx.arc(innerWidth*0.35, innerHeight*0.72, Math.abs(r), Math.PI, 2*Math.PI);
+      const alpha = 0.01 + Math.max(0, (overallPct/100) * 0.08 * (1 - w/waves));
+      ctx.strokeStyle = `rgba(255,179,71,${alpha})`;
+      ctx.lineWidth = 1 + (1 - w/waves)*2;
+      ctx.stroke();
     }
 
-    // concentric wavefronts from center-bottom-left-ish (simulate seismic waves)
-    const cx = innerWidth*0.45;
-    const cy = innerHeight*0.68;
-    const maxR = Math.min(innerWidth, innerHeight) * 0.9;
-    const waveCount = 6;
-    for(let w=0; w<waveCount; w++){
-      const phase = (t*1.6 + w*0.9) % (waveCount*2);
-      const r = Math.abs(((phase % 4) - 2)) / 2 * maxR * 0.7;
+    // small particles representing IO / compute events — density scaled by (100-overall)
+    const density = 40 + Math.round((100 - (overallPct || 0)) * 0.8);
+    for(let i=0;i<density; i++){
+      const x = innerWidth * (0.2 + Math.random()*0.6);
+      const y = innerHeight * (0.3 + Math.random()*0.5);
       ctx.beginPath();
-      ctx.arc(cx, cy, r, Math.PI, 2*Math.PI);
-      ctx.strokeStyle = `rgba(255,179,71,${0.02 + 0.06*(1 - w/waveCount) * Math.max(0, 1 - Math.abs((r/maxR)-0.2))})`;
-      ctx.lineWidth = 1 + (1 - w/waveCount)*2;
-      ctx.stroke();
+      ctx.fillStyle = `rgba(255,170,80,${0.01 + Math.random()*0.04})`;
+      ctx.arc(x + Math.sin(t* (0.3 + i%5))*8, y + Math.cos(t*(0.4 + i%7))*6, Math.random()*1.6, 0, Math.PI*2);
+      ctx.fill();
     }
 
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
+
+  // helper to safely read overallPct text (DOM sync)
+  function overallPctElemSafe(){
+    try { return document.getElementById('overallPct').textContent.replace('%','') } catch(e){ return '0' }
+  }
 })();
 
-/* ====== start loader ====== */
+/* ===== start everything ===== */
 setTimeout(()=> {
-  // seed some immediate lines
-  pushLine("[BOOT] Power check · PASS");
-  pushLine("[BOOT] Initializing boundary-engine");
-  pushLine("[CORE] Loading modules...");
-  // run fast-run for TOTAL_DURATION
-  runFastLoader(TOTAL_DURATION);
-}, 80);
+  // seed logs and then realistic run
+  appendLog("Power check · PASS");
+  appendLog("Detecting CPU cores: " + (navigator.hardwareConcurrency || "unknown"));
+  appendLog("Mounting data store");
+  // start realistic loader for TOTAL_MS
+  startLoader(TOTAL_MS);
+}, 60);
 </script>
+
 </body>
 </html>
