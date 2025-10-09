@@ -2,113 +2,73 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DASBEM Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #050505;
-  --text: #33ff33;
-  --highlight: #ffff66;
-  --accent: #ffaa33;
+:root{
+  --bg:#0b0c0e;
+  --text:#33ff33;
+  --accent:#ffaa33;
+  --highlight:#ffff66;
 }
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Share Tech Mono', monospace;
-  overflow: hidden;
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Share Tech Mono', monospace;
+  overflow:hidden;
 }
-
-/* ==== Grid Background with Seismic Motion ==== */
-body::before {
-  content: "";
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background-image: 
-    linear-gradient(transparent 97%, rgba(0,255,0,0.1) 98%),
-    linear-gradient(90deg, transparent 97%, rgba(0,255,0,0.1) 98%);
-  background-size: 40px 40px;
-  animation: gridMove 6s infinite linear;
-  z-index: 0;
-  opacity: 0.25;
-  transform-origin: center;
+#loaderContainer{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  padding:20px;
+  box-sizing:border-box;
 }
-@keyframes gridMove {
-  0% { transform: translateY(0) scale(1.02); }
-  50% { transform: translateY(-15px) scale(1.05); }
-  100% { transform: translateY(0) scale(1.02); }
+#header{
+  font-size:1.6rem;
+  font-weight:bold;
+  color:var(--accent);
+  margin-bottom:20px;
+  letter-spacing:1px;
 }
-
-/* ==== Loader Container ==== */
-#loaderContainer {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: 100%;
-  padding: 24px;
-  box-sizing: border-box;
+#log{
+  flex:1;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  font-size:0.95rem;
 }
-
-/* ==== Header ==== */
-#header {
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
-  color: var(--accent);
-  margin-bottom: 20px;
-  text-shadow: 0 0 8px rgba(255,170,51,0.6);
+.logLine{
+  white-space:pre;
+  opacity:0;
 }
-
-/* ==== Log Console ==== */
-#log {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  scroll-behavior: smooth;
-  font-size: clamp(0.8rem, 1.6vw, 1rem);
+.progressBarContainer{
+  width:100%;
+  height:20px;
+  background:rgba(255,255,255,0.1);
+  border-radius:6px;
+  margin-top:20px;
+  overflow:hidden;
 }
-.logLine {
-  white-space: pre;
-  opacity: 0;
-  transform: translateY(5px);
+.progressBar{
+  width:0%;
+  height:100%;
+  background:var(--accent);
+  transition:width 0.15s linear;
 }
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ==== Progress Bar ==== */
-.progressBarContainer {
-  width: 100%;
-  height: 18px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 6px;
-  margin-top: 20px;
-  overflow: hidden;
-  box-shadow: 0 0 6px rgba(255,170,51,0.4) inset;
-}
-.progressBar {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--highlight));
-  transition: width 0.25s ease;
-  box-shadow: 0 0 15px var(--accent);
-}
-
-/* ==== Responsive ==== */
-@media (max-width: 640px) {
-  #loaderContainer { padding: 14px; }
-  #header { font-size: 1.2rem; }
-  .progressBarContainer { height: 14px; }
+@media (max-width:640px){
+  #header{font-size:1.3rem;}
+  .progressBarContainer{height:16px;}
+  #log{font-size:0.8rem;}
 }
 </style>
 </head>
@@ -116,80 +76,85 @@ body::before {
 <div id="loaderContainer">
   <div id="header">Initializing The DASBEM Project...</div>
   <div id="log"></div>
-  <div class="progressBarContainer">
-    <div class="progressBar" id="progressBar"></div>
-  </div>
+  <div class="progressBarContainer"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
 <script>
-// ======== Tehran Time ========
 function tehranTime(){
   const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset()*60000;
-  const tehranOffset = 3.5*60*60*1000;
-  return new Date(utc + tehranOffset);
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  return new Date(utc + 3.5 * 60 * 60 * 1000);
 }
-function timeStamp(){ 
+function timeStamp(){
   const t = tehranTime();
-  return `[${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}:${t.getSeconds().toString().padStart(2,'0')}]`;
+  const hh=('0'+t.getHours()).slice(-2);
+  const mm=('0'+t.getMinutes()).slice(-2);
+  const ss=('0'+t.getSeconds()).slice(-2);
+  return `[${hh}:${mm}:${ss}]`;
 }
 
-// ======== Loader Simulation ========
-const stages = [
+const logEl = document.getElementById('log');
+const progressEl = document.getElementById('progressBar');
+
+// --- مراحل تخصصی DASBEM ---
+const logLines = [
   "Loading boundary element matrices...",
   "Initializing SH-wave solver...",
   "Applying topography parameters...",
   "Computing half-plane responses...",
-  "Assembling modified BIEs...",
+  "Assembling modified boundary integrals...",
+  "Generating influence coefficient matrices...",
+  "Formulating time-domain convolution kernels...",
+  "Constructing global dynamic stiffness matrix...",
   "Solving step-by-step in time domain...",
-  "Calculating amplification patterns...",
-  "Generating output files...",
-  "Updating GUI modules...",
-  "Finalizing DASBEM Project..."
+  "Extracting nodal displacement vectors...",
+  "Computing surface amplification ratios...",
+  "Mapping ground motion amplification contours...",
+  "Storing response history arrays...",
+  "Updating numerical integration modules...",
+  "Normalizing boundary condition sets...",
+  "Optimizing matrix decomposition routines...",
+  "Generating output data files...",
+  "Synchronizing visualization renderer...",
+  "Finalizing DASBEM computational sequence...",
+  "System Ready."
 ];
 
-// تولید فایل‌های زیاد برای حس “سیستم سنگین”
-const extensions = [".cpp",".h",".py",".m",".json",".csv",".js",".dat",".bin",".mod"];
-const files = Array.from({length: 150}, (_,i)=>{
-  const prefix = ["module","solver","boundary","matrix","wave","output","geom","mesh","amp","core"][i%10];
-  const ext = extensions[Math.floor(Math.random()*extensions.length)];
-  return `${prefix}_${(1000+i).toString()}` + ext;
-});
-
-const logEl = document.getElementById("log");
-const progressEl = document.getElementById("progressBar");
-let totalSteps = files.length * stages.length;
+// ---- کنترل مدت زمان کل: 5 ثانیه ----
+const totalDuration = 5000; // ms
+const stepTime = totalDuration / logLines.length;
 let currentStep = 0;
 
 function appendLog(text,color){
-  const line = document.createElement("div");
-  line.className = "logLine";
-  line.textContent = text;
-  if(color) line.style.color = color;
+  const line = document.createElement('div');
+  line.className='logLine';
+  line.textContent = `${timeStamp()} ${text}`;
+  if(color) line.style.color=color;
   logEl.appendChild(line);
-  line.style.animation = "fadeSlideIn 0.25s forwards";
   logEl.scrollTop = logEl.scrollHeight;
+  fadeIn(line);
+}
+
+function fadeIn(el){
+  let op=0;
+  const interval = setInterval(()=>{
+    op+=0.1;
+    el.style.opacity=op;
+    if(op>=1) clearInterval(interval);
+  },30);
 }
 
 function startLoader(){
-  let stepTime = 90; // سرعت هر مرحله
-  files.forEach((file,i)=>{
-    const stage = stages[i % stages.length];
-    const delay = i * stepTime;
+  logLines.forEach((line,i)=>{
     setTimeout(()=>{
       let color = "var(--text)";
-      if(stage.includes("Finalizing")) color = "var(--highlight)";
-      appendLog(`${timeStamp()} ${stage} (${file})`, color);
+      if(line.includes("Ready")) color = "var(--highlight)";
+      appendLog(line,color);
       currentStep++;
-      const percent = Math.floor((currentStep / files.length) * 100);
-      progressEl.style.width = percent + "%";
-      if(percent === 100){
-        setTimeout(()=>appendLog(`${timeStamp()} System Ready. Launching DASBEM Interface...`, "#66ffcc"),500);
-      }
-    }, delay);
+      progressEl.style.width = Math.floor((currentStep/logLines.length)*100)+"%";
+    }, i*stepTime);
   });
 }
-
 startLoader();
 </script>
 </body>
