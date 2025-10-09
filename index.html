@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DASBEM Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -13,107 +13,97 @@
   --highlight:#ffcc33;
   --muted:rgba(255,255,255,0.08);
 }
-html,body{margin:0;padding:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow:hidden;}
-#loaderApp{position:relative;width:100%;height:100%;padding:20px;display:flex;flex-direction:column;gap:12px;}
-#header{font-size:18px;color:var(--accent);letter-spacing:1px;user-select:none;white-space:nowrap;overflow:hidden;}
-.viewport{flex:1;overflow-y:auto;padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:8px;border:1px solid var(--muted);}
+body, html{
+  margin:0;padding:0;width:100%;height:100%;background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono', monospace;overflow:hidden;
+}
+#loaderApp{
+  position:relative;width:100%;height:100%;display:flex;flex-direction:column;padding:20px;
+}
+#header{
+  font-size:18px;color:var(--accent);letter-spacing:1px;user-select:none;
+  margin-bottom:12px;
+}
+.viewport{
+  flex:1;overflow-y:auto;padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-radius:8px;border:1px solid var(--muted);
+}
 .logLine{font-size:13px;line-height:1.25;margin:6px 0;opacity:0;transform:translateY(4px);transition:opacity .12s linear, transform .12s linear;white-space:pre-wrap;}
 .logLine.visible{opacity:1;transform:translateY(0);}
 .finalLine{color:var(--highlight);font-weight:700;font-size:15px;text-shadow:0 0 6px rgba(255,204,51,0.14);margin-top:8px;padding:6px 8px;border-radius:6px;background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);}
-.progressWrap{height:16px;background:var(--muted);border-radius:10px;overflow:hidden;border:1px solid var(--muted);}
+.progressWrap{height:16px;background:var(--muted);border-radius:10px;overflow:hidden;border:1px solid var(--muted);margin-top:10px;}
 .progressBar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--highlight));transition:width 80ms linear;}
-.grid{pointer-events:none;position:fixed;inset:0;z-index:0;background-image:
-linear-gradient(rgba(255,180,100,0.06) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255,200,80,0.05) 1px, transparent 1px);background-size:18px 18px;mix-blend-mode:overlay;opacity:0.65;}
-.glow{pointer-events:none;position:fixed;left:50%;transform:translateX(-50%);bottom:-40%;width:160%;height:160%;background:radial-gradient(circle at 50% 120%, rgba(255,180,50,0.12), transparent 60%);z-index:0;opacity:0.9;}
-.glitch{animation:glitchShift 80ms linear;}
-@keyframes glitchShift {0% { transform: translateX(0) skewX(0deg); opacity:1; }50% { transform: translateX(-6px) skewX(-2deg); opacity:0.95; }100% { transform: translateX(3px) skewX(1deg); opacity:1; }}
-.glitchStrip::before{content:"";position:absolute;left:0;right:0;top:0;height:30%;transform:translateY(0);background:linear-gradient(90deg, rgba(255,200,80,0.06), rgba(255,120,30,0.04));mix-blend-mode:screen;pointer-events:none;clip-path: inset(0 0 70% 0);animation:stripShift 90ms linear;}
-@keyframes stripShift {0% { transform: translateX(0); opacity:0.98; }50% { transform: translateX(-10px); opacity:0.9; }100% { transform: translateX(6px); opacity:0.98; }}
-@media (max-width:640px){#loaderApp{padding:12px}#header{font-size:16px}.logLine{font-size:12px;margin:6px 0}.progressWrap{height:14px}}
 </style>
 </head>
 <body>
-<div class="grid" aria-hidden="true"></div>
-<div class="glow" aria-hidden="true"></div>
-<div id="loaderApp" role="main" aria-live="polite">
+<div id="loaderApp">
   <div id="header">Initializing DASBEM Core...</div>
-  <div class="viewport" id="viewport" role="region" aria-label="Loader log"></div>
-  <div class="progressWrap" aria-hidden="false" aria-label="Loading progress">
+  <div class="viewport" id="viewport"></div>
+  <div class="progressWrap">
     <div class="progressBar" id="progressBar"></div>
   </div>
 </div>
 <script>
-const TOTAL_DURATION = 3000;
-const TOTAL_LINES = 250;
-const REDIRECT = "index.html";
 const viewport = document.getElementById('viewport');
 const progressBar = document.getElementById('progressBar');
 const header = document.getElementById('header');
 
 const templates = [
-"Loading boundary element kernel '{mod}'...",
-"Allocating computational buffer #{buf}...",
-"Processing SH-wave convolution frame {frm}...",
-"Synchronizing solver thread {th}...",
-"Updating displacement vector (DOF={dof})...",
-"Applying non-reflective boundary matrix at edge {edge}...",
-"Integrating fundamental solution with Gaussian points={gq}...",
-"Storing temporary output to /tmp/res_{idx}.bin...",
-"Validating half-space radiation condition...",
-"Optimizing recursive convolution window (win={win}ms)...",
-"Finalizing domain decomposition pass {pass}..."
+  "Loading boundary element kernel '{mod}'...",
+  "Allocating computational buffer #{buf}...",
+  "Processing SH-wave frame {frm}...",
+  "Synchronizing solver thread {th}...",
+  "Updating displacement vector DOF={dof}...",
+  "Applying boundary matrix at edge {edge}...",
+  "Integrating fundamental solution with GQ={gq}...",
+  "Storing temporary output /tmp/res_{idx}.bin...",
+  "Validating half-space radiation...",
+  "Optimizing convolution window (win={win}ms)..."
 ];
 
-function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
 function makeLine(i){
-  const tpl=pick(templates);
-  return tpl.replace(/\{([^\}]+)\}/g,(_,t)=>{switch(t){
-    case 'mod': return pick(['core','conv','solver','post']);
-    case 'buf': return rnd(1,9999);
-    case 'frm': return rnd(0,99999);
-    case 'th': return rnd(1,16);
-    case 'dof': return rnd(1,6)+'-'+rnd(1,999);
-    case 'edge': return rnd(0,7);
-    case 'gq': return rnd(8,48);
-    case 'win': return rnd(10,800);
-    case 'idx': return rnd(100000,999999);
-    case 'pass': return rnd(1,12);
-    default: return rnd(0,9999);
-  })+`  /* line ${i} */`;
+  const tpl = pick(templates);
+  return tpl.replace(/\{([^\}]+)\}/g,(_,t)=>{
+    switch(t){
+      case 'mod': return pick(['core','conv','solver','post']);
+      case 'buf': return rnd(1,9999);
+      case 'frm': return rnd(0,99999);
+      case 'th': return rnd(1,16);
+      case 'dof': return rnd(1,6)+'-'+rnd(1,999);
+      case 'edge': return rnd(0,7);
+      case 'gq': return rnd(8,48);
+      case 'win': return rnd(10,800);
+      case 'idx': return rnd(100000,999999);
+      default: return rnd(0,9999);
+  }})+` /* line ${i} */`;
 }
-const timestamps=(function(){const arr=[];for(let i=0;i<TOTAL_LINES;i++){
-  const base=(i/TOTAL_LINES)*TOTAL_DURATION; const jitter=(1-i/TOTAL_LINES)*20; arr.push(Math.max(0,Math.round(base+(Math.random()*2-1)*jitter)));
-} arr[TOTAL_LINES-1]=TOTAL_DURATION-80; return arr;})();
 
-let startedAt=performance.now();
-function updateProgress(){const elapsed=performance.now()-startedAt;const pct=Math.min(100,Math.round((elapsed/TOTAL_DURATION)*100));progressBar.style.width=pct+'%';}
-function pushLine(text,important=false){
-  const el=document.createElement('div');
-  el.className='logLine'; el.textContent=(important?'>>> ':new Date().toLocaleTimeString()+' ')+text;
-  viewport.appendChild(el);
-  while(viewport.children.length>220)viewport.removeChild(viewport.children[0]);
-  requestAnimationFrame(()=>el.classList.add('visible'));
-  viewport.scrollTop=viewport.scrollHeight;
-  return el;
+let lineIndex = 0;
+const totalLines = 100;
+function emitLine(){
+  if(lineIndex >= totalLines){
+    const final = document.createElement('div');
+    final.className='logLine finalLine visible';
+    final.textContent = "DASBEM protocol engaged.";
+    viewport.appendChild(final);
+    progressBar.style.width = '100%';
+    viewport.scrollTop = viewport.scrollHeight;
+    return;
+  }
+  const line = document.createElement('div');
+  line.className = 'logLine';
+  line.textContent = makeLine(lineIndex+1);
+  viewport.appendChild(line);
+  requestAnimationFrame(()=>line.classList.add('visible'));
+  lineIndex++;
+  progressBar.style.width = `${Math.floor((lineIndex/totalLines)*100)}%`;
+  viewport.scrollTop = viewport.scrollHeight;
+  setTimeout(emitLine, rnd(15,40));
 }
-function doVisualGlitch(){
-  const targetIsHeader=Math.random()<0.1;
-  if(targetIsHeader){header.classList.add('glitch'); if(Math.random()<0.35) header.classList.add('glitchStrip'); setTimeout(()=>{header.classList.remove('glitch');header.classList.remove('glitchStrip');},40+Math.random()*140);} 
-  else{const lines=Array.from(viewport.children).slice(-8); if(lines.length===0) return; const L=lines[Math.floor(Math.random()*lines.length)]; L.classList.add('glitch'); if(Math.random()<0.28) L.classList.add('glitchStrip'); setTimeout(()=>{L.classList.remove('glitch');L.classList.remove('glitchStrip');},40+Math.random()*140);}
-}
-setInterval(()=>{if(Math.random()<0.36)doVisualGlitch();},90+Math.random()*70);
 
-function startEmission(){
-  startedAt=performance.now(); updateProgress();
-  for(let i=0;i<TOTAL_LINES;i++){const t=timestamps[i]; setTimeout((idx=>function(){pushLine(makeLine(idx+1)); if(Math.random()<0.015){const imp=pushLine("Finalizing checkpoint & flushing I/O buffers...",true);imp.style.background='linear-gradient(90deg, rgba(255,204,51,0.04), rgba(255,153,0,0.02))';}})(i),t);}
-  setTimeout(()=>{const finalEl=pushLine("DASBEM protocol engaged.",true); finalEl.classList.add('finalLine');},Math.max(TOTAL_DURATION-450,timestamps[TOTAL_LINES-1]));
-  const progressTicker=setInterval(()=>{updateProgress();},20);
-  setTimeout(()=>{clearInterval(progressTicker); progressBar.style.width='100%'; setTimeout(()=>{try{window.location.href=REDIRECT;}catch(e){}} ,420);},TOTAL_DURATION+220);
-}
-startEmission();
-header.addEventListener('click',()=>{pushLine("User skip requested — entering Main Interface.",true).classList.add('finalLine');progressBar.style.width='100%';});
+emitLine();
 </script>
 </body>
 </html>
