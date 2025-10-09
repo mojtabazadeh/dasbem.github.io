@@ -6,431 +6,83 @@
 <title>DASBEM Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#050505;
-    --text:#39ff14;
-    --accent:#ff9900;    /* header color */
-    --gold:#ffcc33;      /* final success color */
-    --muted: rgba(255,255,255,0.06);
-  }
-
-  /* reset + layout */
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden}
-  #app{position:relative;height:100%;width:100%;padding:18px;display:flex;flex-direction:column;gap:12px}
-
-  /* header */
-  #header{
-    font-size:17px;
-    color:var(--accent);
-    letter-spacing:1px;
-    user-select:none;
-    -webkit-user-select:none;
-    max-width:100%;
-    overflow:hidden;
-    white-space:nowrap;
-  }
-
-  /* container for logs */
-  .viewport{
-    flex:1;
-    min-height:120px;
-    max-height:calc(100% - 140px);
-    overflow-y:auto;
-    padding:10px 12px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,0.03);
-  }
-
-  .logLine{
-    font-size:13px;
-    line-height:1.25;
-    margin:6px 0;
-    opacity:0;
-    transform:translateY(4px);
-    transition:opacity .12s linear, transform .12s linear;
-    max-width:100%;
-    word-break:break-word;
-    white-space:pre-wrap;
-    display:block;
-    position:relative;
-    padding-right:6px;
-  }
-  .logLine.visible{opacity:1; transform:translateY(0);}
-
-  /* final line */
-  .finalLine{
-    color:var(--gold);
-    font-weight:700;
-    font-size:15px;
-    text-shadow:0 0 6px rgba(255,204,51,0.14);
-    margin-top:8px;
-    padding:6px 8px;
-    border-radius:6px;
-    background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
-  }
-
-  /* progress */
-  .progressWrap{height:16px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
-  .progressBar{height:100%;width:0;background:linear-gradient(90deg,#ff9900,#ffcc33);transition:width 80ms linear}
-
-  /* background grid and glow (subtle) */
-  .grid{
-    pointer-events:none;
-    position:fixed;inset:0;z-index:0;
-    background-image:
-      linear-gradient(rgba(255,153,0,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,204,51,0.05) 1px, transparent 1px);
-    background-size:18px 18px;
-    mix-blend-mode:overlay;
-    opacity:0.65;
-  }
-  .glow{
-    pointer-events:none;
-    position:fixed;left:50%;transform:translateX(-50%);bottom:-40%;
-    width:160%;height:160%;
-    background:radial-gradient(circle at 50% 120%, rgba(255,153,0,0.12), transparent 60%);
-    z-index:0;opacity:0.9;
-  }
-
-  /* glitch visual class (NO character changes) */
-  .glitch {
-    /* create slice + translate + skew effect */
-    animation:glitchShift 80ms linear;
-    /* small overlay to make it feel corrupted */
-  }
-  @keyframes glitchShift {
-    0% { transform: translateX(0) skewX(0deg); opacity:1; }
-    50% { transform: translateX(-6px) skewX(-2deg); opacity:0.95; }
-    100% { transform: translateX(3px) skewX(1deg); opacity:1; }
-  }
-
-  /* narrow glitch strip (clip + translate) */
-  .glitchStrip::before{
-    content:"";
-    position:absolute;
-    left:0;right:0;top:0;
-    height:30%;
-    transform:translateY(0);
-    background:linear-gradient(90deg, rgba(255,200,80,0.06), rgba(255,120,30,0.04));
-    mix-blend-mode:screen;
-    pointer-events:none;
-    clip-path: inset(0 0 70% 0);
-    animation:stripShift 90ms linear;
-  }
-  @keyframes stripShift {
-    0% { transform: translateX(0); opacity:0.98; }
-    50% { transform: translateX(-10px); opacity:0.9; }
-    100% { transform: translateX(6px); opacity:0.98; }
-  }
-
-  /* small responsive tweaks */
-  @media (max-width:640px){
-    #app{padding:12px}
-    #header{font-size:15px}
-    .logLine{font-size:12px;margin:8px 0}
-    .progressWrap{height:14px}
-  }
+:root{
+  --bg:#050505;
+  --text:#39ff14;
+  --accent:#ff9900;
+  --gold:#ffcc33;
+  --muted: rgba(255,255,255,0.06);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow:hidden}
+#app{position:relative;height:100%;width:100%;padding:18px;display:flex;flex-direction:column;gap:12px}
+#header{font-size:17px;color:var(--accent);letter-spacing:1px;user-select:none;max-width:100%;overflow:hidden;white-space:nowrap}
+.viewport{flex:1;min-height:120px;overflow-y:auto;padding:10px 12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
+.logLine{font-size:13px;line-height:1.25;margin:6px 0;opacity:0;transform:translateY(4px);transition:opacity .12s linear, transform .12s linear;max-width:100%;word-break:break-word;white-space:pre-wrap;display:block;position:relative;padding-right:6px}
+.logLine.visible{opacity:1; transform:translateY(0);}
+.finalLine{color:var(--gold);font-weight:700;font-size:15px;text-shadow:0 0 6px rgba(255,204,51,0.14);margin-top:8px;padding:6px 8px;border-radius:6px;background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);}
+.progressWrap{height:16px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+.progressBar{height:100%;width:0;background:linear-gradient(90deg,#ff9900,#ffcc33);transition:width 80ms linear}
+.grid{pointer-events:none;position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,153,0,0.06) 1px, transparent),linear-gradient(90deg, rgba(255,204,51,0.05) 1px, transparent 1px);background-size:18px 18px;mix-blend-mode:overlay;opacity:0.65}
+.glow{pointer-events:none;position:fixed;left:50%;transform:translateX(-50%);bottom:-40%;width:160%;height:160%;background:radial-gradient(circle at 50% 120%, rgba(255,153,0,0.12), transparent 60%);z-index:0;opacity:0.9}
+.glitch{animation:glitchShift 80ms linear;}
+@keyframes glitchShift {0% {transform:translateX(0) skewX(0deg);opacity:1;}50% {transform:translateX(-6px) skewX(-2deg);opacity:0.95;}100% {transform:translateX(3px) skewX(1deg);opacity:1;}}
+.glitchStrip::before{content:"";position:absolute;left:0;right:0;top:0;height:30%;transform:translateY(0);background:linear-gradient(90deg, rgba(255,200,80,0.06), rgba(255,120,30,0.04));mix-blend-mode:screen;pointer-events:none;clip-path: inset(0 0 70% 0);animation:stripShift 90ms linear;}
+@keyframes stripShift {0% {transform:translateX(0);opacity:0.98;}50% {transform:translateX(-10px);opacity:0.9;}100% {transform:translateX(6px);opacity:0.98;}}
+@media (max-width:640px){#app{padding:12px}#header{font-size:15px}.logLine{font-size:12px;margin:8px 0}.progressWrap{height:14px}}
 </style>
 </head>
 <body>
-  <div class="grid" aria-hidden="true"></div>
-  <div class="glow" aria-hidden="true"></div>
-
-  <div id="app" role="main" aria-live="polite">
-    <div id="header" aria-hidden="false">Initializing The DASBEM Project Core...</div>
-
-    <div class="viewport" id="viewport" role="region" aria-label="Loader log">
-      <!-- logs injected here -->
-    </div>
-
-    <div class="progressWrap" aria-hidden="false" aria-label="Loading progress">
-      <div class="progressBar" id="progressBar"></div>
-    </div>
+<div class="grid" aria-hidden="true"></div>
+<div class="glow" aria-hidden="true"></div>
+<div id="app" role="main" aria-live="polite">
+  <div id="header" aria-hidden="false">Initializing The DASBEM Project Core...</div>
+  <div class="viewport" id="viewport" role="region" aria-label="Loader log"></div>
+  <div class="progressWrap" aria-hidden="false" aria-label="Loading progress">
+    <div class="progressBar" id="progressBar"></div>
   </div>
+</div>
 
 <script>
-/* --------------------------
-   Settings
-   -------------------------- */
-const TOTAL_DURATION = 3000; // ms total
-const TOTAL_LINES = 300;     // generate many unique lines (300)
-const REDIRECT = "index.html";
+const TOTAL_DURATION=3000, TOTAL_LINES=300, REDIRECT="index.html";
+const viewport=document.getElementById('viewport'), progressBar=document.getElementById('progressBar'), header=document.getElementById('header');
+function localTimeString(){const now=new Date();const utc=now.getTime()+now.getTimezoneOffset()*60000;const t=new Date(utc+3.5*3600*1000);return `[${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}]`;}
 
-/* --------------------------
-   Time utilities (Asia/Baku / Tehran as before)
-   -------------------------- */
-function localTimeString(){
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset()*60000;
-  // Baku UTC+4 — user earlier used Tehran; keep Tehran+3.5? We'll use Baku/Tehran? Use +4? 
-  // To be consistent with earlier, use Tehran +3.5 (user in Azerbaijan earlier but okay).
-  const t = new Date(utc + 3.5*3600*1000);
-  return `[${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}]`;
-}
-
-/* --------------------------
-   DOM refs
-   -------------------------- */
-const viewport = document.getElementById('viewport');
-const progressBar = document.getElementById('progressBar');
-const header = document.getElementById('header');
-
-/* --------------------------
-   Phrase-generation: create many unique, very plausible HSTD-BEM / DASBEM lines.
-   We'll use templates + random numeric params so lines look non-repeating even in screenshots.
-   -------------------------- */
-const templates = [
-  "Allocating half-space Green's functions kernel for element {eid}...",
-  "Assembling time-domain BIE coefficients (node {nid} → block {bid})...",
-  "Computing transient SH-wave convolution (t-step {ts})...",
-  "Applying free-surface boundary condition at patch {pid}...",
-  "Evaluating elastodynamic influence matrix row {rid}...",
-  "Performing LU factorization on influence block {bid}...",
-  "Optimizing recursive convolution window (window={win}ms)...",
-  "Integrating fundamental solution with Gaussian points={gq}...",
-  "Synchronizing subdomain solvers (threads={th})...",
-  "Updating displacement vector for DOF {dof}...",
-  "Transforming boundary coordinates (rot={rot} deg)...",
-  "Validating half-space radiation condition (tol={tol})...",
-  "Performing domain decomposition: subdomain {sd} of {sdn}...",
-  "Generating stiffness submatrix K_{i}{j} (nnz={nnz})...",
-  "Applying DASBEM recursive time-step solver (dt={dt}ms)...",
-  "Calculating amplification factor at station {st}...",
-  "Evaluating convolution memory usage ({mem} MB)...",
-  "Storing response snapshot idx {idx} to /output/resp_{idx}.bin...",
-  "Post-processing spectral amplification (freq={f}Hz)...",
-  "Exporting motion history segment {seg} (len={len} samples)...",
-  "Initializing numerical kernel module '{mod}'...",
-  "Loading modified boundary element matrix '{mat}'...",
-  "Updating convolution integrals chunk #{chunk}...",
-  "Optimizing matrix-vector product for band={band}...",
-  "Applying non-reflective boundary matrix at edge {edge}...",
-  "Finalizing recursive time-domain calculation cycle {cycle}...",
-  "Assembling half-space influence matrices for patch {pid}...",
-  "Calculating displacement & stress response at node {nid}...",
-  "Synchronizing global time-stepping (step {s} of {S})...",
-  "Generating output file /output/DASBEM_run_{run}.dat...",
-  "Validating time-domain solver stability (CFL={cfl})...",
-  "Performing high-order quadrature integration (order={ord})...",
-  "Computing time-dependent boundary cond (profile={prof})...",
-  "Transforming results to local coordinate system '{sys}'...",
-  "Validating HSTD-BEM solution residual (res={res})...",
-  "Performing boundary kernel update (alpha={a})...",
-  "Evaluating dynamic equilibrium at DOF {dof} (err={err})...",
-  "Optimizing solver memory allocation (heap={heap}MB)...",
-  "Post-processing amplification map tile {tx},{ty}...",
-  "Storing SH-wave field history frame {frm}...",
-  "Applying domain-specific boundary constraints set {set}...",
-  "Computing influence coefficients for node range {r0}-{r1}...",
-  "Finalizing DASBEM computational kernel pass {pass}..."
+// templates for realistic module/file loading lines
+const templates=[
+"Loading module '{mod}'...",
+"Initializing subroutine '{mod}'...",
+"Fetching resource '{res}'...",
+"Allocating memory for object '{obj}'...",
+"Parsing input data '{data}'...",
+"Computing convolution block {blk}...",
+"Synchronizing solver threads ({th})...",
+"Applying boundary conditions ({bc})...",
+"Finalizing module '{mod}'...",
+"Storing output to '{file}'..."
 ];
 
-function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(a){return a[rnd(0,a.length-1)];}
+function makeLine(){return pick(templates).replace(/\{([^\}]+)\}/g,(_,t)=>{switch(t){case 'mod':return pick(['core','conv','solver','io','post']);case 'res':return pick(['kernel','matrix','coeff','mesh']);case 'obj':return pick(['block','node','patch']);case 'data':return pick(['input','boundary','element']);case 'blk':return rnd(1,32);case 'th':return rnd(1,12);case 'bc':return pick(['free-surface','non-reflective','periodic']);case 'file':return `/output/${pick(['resp','log','data'])}_${rnd(1000,9999)}.bin`;default:return ''}});}
 
-/* function to fill template tokens with varied numbers/strings */
-function makeLine(i){
-  const tpl = pick(templates);
-  return tpl.replace(/\{([^\}]+)\}/g, (_, token)=>{
-    switch(token){
-      case 'eid': return 'E'+rnd(1000,9999);
-      case 'nid': return 'N'+rnd(10,9999);
-      case 'bid': return 'B'+rnd(1,99);
-      case 'ts':  return rnd(0,1200);
-      case 'pid': return 'P'+rnd(1,999);
-      case 'rid': return 'R'+rnd(100,9999);
-      case 'win': return rnd(10,800);
-      case 'gq':  return rnd(8,48);
-      case 'th':  return rnd(1,16);
-      case 'dof': return rnd(1,6)+'-'+rnd(10,999);
-      case 'rot': return (Math.random()*360).toFixed(1);
-      case 'tol': return (Math.random()*1e-3).toExponential(2);
-      case 'sd':  return rnd(1,32);
-      case 'sdn': return rnd(32,256);
-      case 'i': return rnd(1,9);
-      case 'j': return rnd(1,9);
-      case 'nnz': return rnd(10,1200);
-      case 'dt': return (Math.random()*5+0.1).toFixed(3);
-      case 'st': return 'STA'+rnd(1,999);
-      case 'mem': return rnd(4,2048);
-      case 'idx': return rnd(100000,999999);
-      case 'f': return (Math.random()*20+0.1).toFixed(2);
-      case 'seg': return rnd(1,48);
-      case 'len': return rnd(256,65536);
-      case 'mod': return pick(['core','conv','kern','io','solver','post']);
-      case 'mat': return 'mat_'+rnd(100,999);
-      case 'chunk': return rnd(1,9999);
-      case 'band': return rnd(1,24);
-      case 'edge': return rnd(0,7);
-      case 'cycle': return rnd(1,12);
-      case 's': return rnd(1,999);
-      case 'S': return rnd(100,1200);
-      case 'run': return rnd(1000,9999);
-      case 'cfl': return (Math.random()*0.5+0.1).toFixed(3);
-      case 'ord': return rnd(3,12);
-      case 'prof': return pick(['linear','gaussian','ricker']);
-      case 'sys': return pick(['local','global','geo']);
-      case 'res': return (Math.random()*1e-2).toFixed(5);
-      case 'a': return (Math.random()).toFixed(3);
-      case 'err': return (Math.random()*1e-4).toExponential(2);
-      case 'heap': return rnd(128,65536);
-      case 'tx': return rnd(0,12);
-      case 'ty': return rnd(0,12);
-      case 'frm': return rnd(0,99999);
-      case 'set': return 'BSET'+rnd(1,99);
-      case 'r0': return rnd(1,400);
-      case 'r1': return rnd(401,800);
-      case 'pass': return rnd(1,8);
-      default: return rnd(0,9999);
-    }
-  }) + `  /* line ${i} */`;
-}
+const timestamps=(function(){const arr=[];for(let i=0;i<TOTAL_LINES;i++){const base=(i/TOTAL_LINES)*TOTAL_DURATION;const jitter=(1-i/TOTAL_LINES)*18;arr.push(Math.max(0,Math.round(base+(Math.random()*2-1)*jitter)));}arr[TOTAL_LINES-1]=TOTAL_DURATION-80;return arr;})();
 
-/* --------------------------
-   Precompute schedule: generate timestamps for each line so whole sequence fits TOTAL_DURATION
-   We produce increasingly dense schedule with jitter to look realistic.
-   -------------------------- */
-const timestamps = (function(){
-  const arr = [];
-  const start = 0;
-  for(let i=0;i<TOTAL_LINES;i++){
-    // place base evenly, then add jitter that shrinks slightly with progress
-    const base = (i / TOTAL_LINES) * TOTAL_DURATION;
-    // jitter range bigger early, smaller later to mimic startup lag then steady processing
-    const jitter = (1 - i / TOTAL_LINES) * 18; // ms jitter factor
-    const t = Math.max(0, Math.round(base + (Math.random()*2-1)*jitter));
-    arr.push(t);
-  }
-  // ensure last near TOTAL_DURATION-50
-  arr[TOTAL_LINES-1] = TOTAL_DURATION - 80;
-  return arr;
-})();
+let startedAt=performance.now();
+function updateProgress(){const pct=Math.min(100,Math.round((performance.now()-startedAt)/TOTAL_DURATION*100));progressBar.style.width=pct+'%';}
+function pushLine(text,important=false){const el=document.createElement('div');el.className='logLine';el.textContent=(important?'>>> ':localTimeString()+' ')+text;viewport.appendChild(el);while(viewport.children.length>220)viewport.removeChild(viewport.children[0]);requestAnimationFrame(()=>el.classList.add('visible'));viewport.scrollTop=viewport.scrollHeight;return el;}
+function doVisualGlitch(){const targetIsHeader=Math.random()<0.1;if(targetIsHeader){header.classList.add('glitch');if(Math.random()<0.35)header.classList.add('glitchStrip');setTimeout(()=>{header.classList.remove('glitch');header.classList.remove('glitchStrip');},40+Math.random()*140);}else{const lines=Array.from(viewport.children).slice(-8);if(lines.length===0)return;const L=lines[Math.floor(Math.random()*lines.length)];L.classList.add('glitch');if(Math.random()<0.28)L.classList.add('glitchStrip');setTimeout(()=>{L.classList.remove('glitch');L.classList.remove('glitchStrip');},40+Math.random()*140);}}
+const glitchInterval=setInterval(()=>{if(Math.random()<0.36)doVisualGlitch();},90+Math.random()*70);
 
-/* --------------------------
-   Realistic progress: we'll move bar based on time elapsed (smooth) while logs appear at scheduled times.
-   -------------------------- */
-let startedAt = performance.now();
-function updateProgress(){
-  const elapsed = performance.now() - startedAt;
-  const pct = Math.min(100, Math.round((elapsed / TOTAL_DURATION) * 100));
-  progressBar.style.width = pct + '%';
-}
+function startEmission(){startedAt=performance.now();updateProgress();for(let i=0;i<TOTAL_LINES;i++){setTimeout(()=>{pushLine(makeLine());if(Math.random()<0.015){const imp=pushLine("Committing checkpoint and flushing I/O buffers...",true);imp.style.background='linear-gradient(90deg, rgba(255,204,51,0.04), rgba(255,153,0,0.02))';}},timestamps[i]);}
 
-/* --------------------------
-   Append line to viewport (with tiny chance to mark as important)
-   -------------------------- */
-function pushLine(text, important=false){
-  const el = document.createElement('div');
-  el.className = 'logLine';
-  el.textContent = (important ? '>>> ' : localTimeString() + ' ') + text;
-  viewport.appendChild(el);
-  // keep viewport from growing too long — keep last ~220 lines
-  while(viewport.children.length > 220) viewport.removeChild(viewport.children[0]);
-  // small delay to trigger show animation
-  requestAnimationFrame(()=> el.classList.add('visible'));
-  // keep scrolled to bottom
-  viewport.scrollTop = viewport.scrollHeight;
-  return el;
-}
+setTimeout(()=>{const finalEl=pushLine("DASBEM protocol engaged.",true);finalEl.classList.add('finalLine');},Math.max(TOTAL_DURATION-450,timestamps[TOTAL_LINES-1]));
 
-/* --------------------------
-   Random visual glitch (NO letter changes)
-   - picks header or recent line(s)
-   - applies transient CSS classes (.glitch or .glitchStrip)
-   - short random duration (40-160ms)
-   -------------------------- */
-function doVisualGlitch(){
-  // decide target: header (10% chance) or a recent line (90%)
-  const targetIsHeader = Math.random() < 0.10;
-  if(targetIsHeader){
-    header.classList.add('glitch');
-    // brief strip occasionally
-    if(Math.random()<0.35) header.classList.add('glitchStrip');
-    const d = 40 + Math.random()*140;
-    setTimeout(()=>{ header.classList.remove('glitch'); header.classList.remove('glitchStrip'); }, d);
-  } else {
-    // pick a recent line in the viewport (prefer last 6)
-    const lines = Array.from(viewport.children).slice(-8);
-    if(lines.length===0) return;
-    const L = lines[Math.floor(Math.random()*lines.length)];
-    L.classList.add('glitch');
-    if(Math.random()<0.28) L.classList.add('glitchStrip');
-    const d = 40 + Math.random()*140;
-    setTimeout(()=>{ L.classList.remove('glitch'); L.classList.remove('glitchStrip'); }, d);
-  }
-}
+const progressTicker=setInterval(()=>updateProgress(),20);
+setTimeout(()=>{clearInterval(progressTicker);progressBar.style.width='100%';const flash=document.createElement('div');flash.style.position='fixed';flash.style.inset='0';flash.style.background='radial-gradient(circle at 50% 20%, rgba(255,220,120,0.08), rgba(0,0,0,0))';flash.style.pointerEvents='none';flash.style.opacity='0';flash.style.transition='opacity 260ms ease-out';document.body.appendChild(flash);requestAnimationFrame(()=>flash.style.opacity='1');setTimeout(()=>{flash.style.opacity='0';},220);setTimeout(()=>{try{window.location.href=REDIRECT;}catch(e){}},420);},TOTAL_DURATION+220);}
 
-/* schedule periodic glitch attempts independent of logs (so it's random) */
-const glitchInterval = setInterval(()=>{
-  // low probability each tick to keep it sparse and random
-  if(Math.random() < 0.36) doVisualGlitch();
-}, 90 + Math.random()*70);
-
-/* --------------------------
-   Start emission based on timestamps
-   -------------------------- */
-function startEmission(){
-  startedAt = performance.now();
-  updateProgress();
-  for(let i=0;i<TOTAL_LINES;i++){
-    const t = timestamps[i];
-    setTimeout((idx=>{
-      return function(){
-        // generate unique line each time using index
-        const text = makeLine(idx+1);
-        pushLine(text);
-        // occasionally mark an 'important' operation that looks like "finalizing" (rare)
-        if(Math.random()<0.015){
-          const imp = pushLine("Committing checkpoint and flushing I/O buffers...", true);
-          // visual emphasis (but still no char changes)
-          imp.style.background = 'linear-gradient(90deg, rgba(255,204,51,0.04), rgba(255,153,0,0.02))';
-        }
-      };
-    })(i), t);
-  }
-
-  // finalization slightly before end to allow human to read final line
-  setTimeout(()=>{
-    const finalEl = pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    finalEl.classList.add('finalLine');
-  }, Math.max(TOTAL_DURATION - 450, timestamps[TOTAL_LINES-1]));
-
-  // ensure progress keeps updating and redirect at TOTAL_DURATION + small hold
-  const progressTicker = setInterval(()=> {
-    updateProgress();
-  }, 20);
-
-  setTimeout(()=> {
-    clearInterval(progressTicker);
-    progressBar.style.width = '100%';
-    // short visual 'boot flash' for success (subtle)
-    const flash = document.createElement('div');
-    flash.style.position='fixed';
-    flash.style.inset='0';
-    flash.style.background='radial-gradient(circle at 50% 20%, rgba(255,220,120,0.08), rgba(0,0,0,0))';
-    flash.style.pointerEvents='none';
-    flash.style.opacity='0';
-    flash.style.transition='opacity 260ms ease-out';
-    document.body.appendChild(flash);
-    requestAnimationFrame(()=> flash.style.opacity='1');
-    setTimeout(()=>{ flash.style.opacity='0'; }, 220);
-    setTimeout(()=> { try{ window.location.href = REDIRECT; }catch(e){} }, 420);
-  }, TOTAL_DURATION + 220);
-}
-
-/* kick off */
 startEmission();
-
-/* accessibility: allow user to skip loader by tapping header (optional) */
-header.addEventListener('click', ()=>{
-  // quickly finalize and redirect
-  // show final line and redirect
-  pushLine("User skip requested — entering Main Interface.", true).classList.add('finalLine');
-  progressBar.style.width = '100%';
-  setTimeout(()=>{ window.location.href = REDIRECT; }, 360);
-});
+header.addEventListener('click',()=>{pushLine("User skip requested — entering main interface.",true).classList.add('finalLine');progressBar.style.width='100%';setTimeout(()=>{window.location.href=REDIRECT;},360);});
 </script>
 </body>
 </html>
