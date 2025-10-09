@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0b0c0e;
-  --text:#33ff33;
+  --bg:#060606;
+  --text:#39ff14;
   --accent:#ffaa33;
   --highlight:#ffff66;
 }
@@ -33,31 +33,35 @@ html,body{
   box-sizing:border-box;
 }
 #header{
-  font-size:1.6rem;
-  font-weight:bold;
+  font-size:1.4rem;
   color:var(--accent);
-  margin-bottom:20px;
   letter-spacing:1px;
+  margin-bottom:10px;
 }
 #log{
   flex:1;
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  gap:2px;
-  font-size:0.95rem;
+  font-size:0.9rem;
+  line-height:1.2rem;
+  white-space:pre;
 }
 .logLine{
-  white-space:pre;
   opacity:0;
+  animation:fadeIn 0.2s linear forwards;
+}
+@keyframes fadeIn{
+  from{opacity:0;}
+  to{opacity:1;}
 }
 .progressBarContainer{
   width:100%;
-  height:20px;
+  height:18px;
   background:rgba(255,255,255,0.1);
   border-radius:6px;
-  margin-top:20px;
   overflow:hidden;
+  margin-top:10px;
 }
 .progressBar{
   width:0%;
@@ -65,16 +69,34 @@ html,body{
   background:var(--accent);
   transition:width 0.15s linear;
 }
-@media (max-width:640px){
-  #header{font-size:1.3rem;}
-  .progressBarContainer{height:16px;}
-  #log{font-size:0.8rem;}
+
+/* Grid flicker background */
+.grid{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  background-image:linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
+  background-size:20px 20px;
+  animation:gridMove 3s linear infinite;
+  z-index:-1;
+}
+@keyframes gridMove{
+  0%{background-position:0 0;}
+  100%{background-position:20px 20px;}
+}
+
+@media(max-width:640px){
+  #header{font-size:1.2rem;}
+  #log{font-size:0.75rem;}
+  .progressBarContainer{height:14px;}
 }
 </style>
 </head>
 <body>
+<div class="grid"></div>
 <div id="loaderContainer">
-  <div id="header">Initializing The DASBEM Project...</div>
+  <div id="header">Initializing DASBEM Computational Core...</div>
   <div id="log"></div>
   <div class="progressBarContainer"><div class="progressBar" id="progressBar"></div></div>
 </div>
@@ -87,74 +109,70 @@ function tehranTime(){
 }
 function timeStamp(){
   const t = tehranTime();
-  const hh=('0'+t.getHours()).slice(-2);
-  const mm=('0'+t.getMinutes()).slice(-2);
-  const ss=('0'+t.getSeconds()).slice(-2);
-  return `[${hh}:${mm}:${ss}]`;
+  return `[${('0'+t.getHours()).slice(-2)}:${('0'+t.getMinutes()).slice(-2)}:${('0'+t.getSeconds()).slice(-2)}]`;
 }
 
-const logEl = document.getElementById('log');
-const progressEl = document.getElementById('progressBar');
-
-// --- مراحل تخصصی DASBEM ---
-const logLines = [
+// فایل‌های فرضی (بیش از 500 عدد)
+const technicalPhrases = [
   "Loading boundary element matrices...",
   "Initializing SH-wave solver...",
   "Applying topography parameters...",
-  "Computing half-plane responses...",
-  "Assembling modified boundary integrals...",
-  "Generating influence coefficient matrices...",
-  "Formulating time-domain convolution kernels...",
-  "Constructing global dynamic stiffness matrix...",
-  "Solving step-by-step in time domain...",
-  "Extracting nodal displacement vectors...",
-  "Computing surface amplification ratios...",
-  "Mapping ground motion amplification contours...",
-  "Storing response history arrays...",
-  "Updating numerical integration modules...",
-  "Normalizing boundary condition sets...",
-  "Optimizing matrix decomposition routines...",
-  "Generating output data files...",
-  "Synchronizing visualization renderer...",
-  "Finalizing DASBEM computational sequence...",
+  "Computing half-plane Green’s functions...",
+  "Assembling modified BIEs...",
+  "Generating stiffness submatrices...",
+  "Integrating fundamental solutions...",
+  "Applying non-reflective boundary conditions...",
+  "Solving domain decomposition scheme...",
+  "Updating convolution integrals...",
+  "Calculating amplification coefficients...",
+  "Formulating recursive time-domain relations...",
+  "Performing LU decomposition...",
+  "Optimizing matrix-vector multiplications...",
+  "Synchronizing parallel solver threads...",
+  "Writing response data to output stream...",
+  "Finalizing numerical kernel...",
+  "Validating dynamic equilibrium...",
+  "Saving results to /output/DASBEM_run.dat",
   "System Ready."
 ];
 
-// ---- کنترل مدت زمان کل: 5 ثانیه ----
-const totalDuration = 5000; // ms
-const stepTime = totalDuration / logLines.length;
-let currentStep = 0;
+const logEl = document.getElementById("log");
+const progressEl = document.getElementById("progressBar");
 
-function appendLog(text,color){
-  const line = document.createElement('div');
-  line.className='logLine';
+let totalLines = 500; // حس فایل‌های زیاد
+let displayed = 0;
+let totalDuration = 5000; // کل زمان ≈ 5 ثانیه
+let intervalTime = totalDuration / totalLines;
+
+function appendLog(text){
+  const line = document.createElement("div");
+  line.className = "logLine";
   line.textContent = `${timeStamp()} ${text}`;
-  if(color) line.style.color=color;
   logEl.appendChild(line);
   logEl.scrollTop = logEl.scrollHeight;
-  fadeIn(line);
 }
 
-function fadeIn(el){
-  let op=0;
-  const interval = setInterval(()=>{
-    op+=0.1;
-    el.style.opacity=op;
-    if(op>=1) clearInterval(interval);
-  },30);
+function randomPhrase(){
+  return technicalPhrases[Math.floor(Math.random()*technicalPhrases.length)];
 }
 
 function startLoader(){
-  logLines.forEach((line,i)=>{
-    setTimeout(()=>{
-      let color = "var(--text)";
-      if(line.includes("Ready")) color = "var(--highlight)";
-      appendLog(line,color);
-      currentStep++;
-      progressEl.style.width = Math.floor((currentStep/logLines.length)*100)+"%";
-    }, i*stepTime);
-  });
+  const interval = setInterval(()=>{
+    appendLog(randomPhrase());
+    displayed++;
+    let percent = Math.min(100, (displayed/totalLines)*100);
+    progressEl.style.width = percent + "%";
+    if(displayed >= totalLines){
+      clearInterval(interval);
+      setTimeout(()=>{
+        appendLog(">>> Redirecting to Main Interface...");
+        progressEl.style.width = "100%";
+        setTimeout(()=>window.location.href="index.html",1000); // مسیر مقصد سایت
+      },300);
+    }
+  }, intervalTime);
 }
+
 startLoader();
 </script>
 </body>
