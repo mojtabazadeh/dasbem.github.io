@@ -81,8 +81,6 @@ body::before {
   opacity: 0;
   transform: translateY(5px);
 }
-
-/* Smooth fade + slide */
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -102,11 +100,11 @@ body::before {
   width: 0%;
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--highlight));
-  transition: width 0.2s ease;
+  transition: width 0.25s ease;
   box-shadow: 0 0 15px var(--accent);
 }
 
-/* ==== Responsive Adjustments ==== */
+/* ==== Responsive ==== */
 @media (max-width: 640px) {
   #loaderContainer { padding: 14px; }
   #header { font-size: 1.2rem; }
@@ -124,7 +122,7 @@ body::before {
 </div>
 
 <script>
-// ======== Utility: Tehran Time ========
+// ======== Tehran Time ========
 function tehranTime(){
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset()*60000;
@@ -133,25 +131,33 @@ function tehranTime(){
 }
 function timeStamp(){ 
   const t = tehranTime();
-  const hh = String(t.getHours()).padStart(2,'0');
-  const mm = String(t.getMinutes()).padStart(2,'0');
-  const ss = String(t.getSeconds()).padStart(2,'0');
-  return `[${hh}:${mm}:${ss}]`;
+  return `[${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}:${t.getSeconds().toString().padStart(2,'0')}]`;
 }
 
 // ======== Loader Simulation ========
-const files = [
-  "boundary_element.cpp","mesh_generator.h","solver.cpp","output_writer.py",
-  "topography_data.csv","material_library.json","visualization.js",
-  "postprocess.m","eigen_solver.cpp","damping_module.py"
-];
 const stages = [
-  "Reading Header...","Parsing Data...","Initializing Module...",
-  "Applying Boundary Conditions...","Calculating Response...","Done"
+  "Loading boundary element matrices...",
+  "Initializing SH-wave solver...",
+  "Applying topography parameters...",
+  "Computing half-plane responses...",
+  "Assembling modified BIEs...",
+  "Solving step-by-step in time domain...",
+  "Calculating amplification patterns...",
+  "Generating output files...",
+  "Updating GUI modules...",
+  "Finalizing DASBEM Project..."
 ];
+
+// تولید فایل‌های زیاد برای حس “سیستم سنگین”
+const extensions = [".cpp",".h",".py",".m",".json",".csv",".js",".dat",".bin",".mod"];
+const files = Array.from({length: 150}, (_,i)=>{
+  const prefix = ["module","solver","boundary","matrix","wave","output","geom","mesh","amp","core"][i%10];
+  const ext = extensions[Math.floor(Math.random()*extensions.length)];
+  return `${prefix}_${(1000+i).toString()}` + ext;
+});
+
 const logEl = document.getElementById("log");
 const progressEl = document.getElementById("progressBar");
-
 let totalSteps = files.length * stages.length;
 let currentStep = 0;
 
@@ -161,25 +167,29 @@ function appendLog(text,color){
   line.textContent = text;
   if(color) line.style.color = color;
   logEl.appendChild(line);
-  line.style.animation = "fadeSlideIn 0.3s forwards";
+  line.style.animation = "fadeSlideIn 0.25s forwards";
   logEl.scrollTop = logEl.scrollHeight;
 }
 
 function startLoader(){
+  let stepTime = 90; // سرعت هر مرحله
   files.forEach((file,i)=>{
-    stages.forEach((stage,j)=>{
-      const delay = (i*stages.length + j)*180;
-      setTimeout(()=>{
-        let color = "var(--text)";
-        if(stage==="Done") color = "var(--highlight)";
-        appendLog(`${timeStamp()} ${stage} ${file}`, color);
-        currentStep++;
-        let percent = Math.floor((currentStep/totalSteps)*100);
-        progressEl.style.width = percent + "%";
-      },delay);
-    });
+    const stage = stages[i % stages.length];
+    const delay = i * stepTime;
+    setTimeout(()=>{
+      let color = "var(--text)";
+      if(stage.includes("Finalizing")) color = "var(--highlight)";
+      appendLog(`${timeStamp()} ${stage} (${file})`, color);
+      currentStep++;
+      const percent = Math.floor((currentStep / files.length) * 100);
+      progressEl.style.width = percent + "%";
+      if(percent === 100){
+        setTimeout(()=>appendLog(`${timeStamp()} System Ready. Launching DASBEM Interface...`, "#66ffcc"),500);
+      }
+    }, delay);
   });
 }
+
 startLoader();
 </script>
 </body>
