@@ -12,6 +12,7 @@
   --accent:#ff9900;
   --highlight:#ffcc33;
 }
+
 html, body {
   margin:0; padding:0;
   width:100%; height:100%;
@@ -20,6 +21,7 @@ html, body {
   font-family:'Share Tech Mono', monospace;
   overflow:hidden;
 }
+
 #loaderContainer {
   position:relative;
   display:flex;
@@ -31,12 +33,14 @@ html, body {
   box-sizing:border-box;
   z-index:2;
 }
+
 #header {
   font-size:18px;
   color:var(--accent);
   letter-spacing:1px;
   margin-bottom:10px;
 }
+
 #log {
   flex:1;
   overflow-y:auto;
@@ -46,10 +50,12 @@ html, body {
   line-height:1.3em;
   white-space:pre-wrap;
 }
+
 .logLine {
   opacity:0;
   animation: fadeIn 0.15s linear forwards;
 }
+
 .finalLine {
   color:var(--highlight);
   font-weight:bold;
@@ -57,7 +63,9 @@ html, body {
   text-shadow:0 0 4px var(--highlight);
   margin-top:5px;
 }
+
 @keyframes fadeIn {from {opacity:0; transform:translateY(2px);} to {opacity:1; transform:translateY(0);}}
+
 .progressBarContainer {
   width:100%;
   height:18px;
@@ -66,12 +74,14 @@ html, body {
   overflow:hidden;
   margin-top:10px;
 }
+
 .progressBar {
   width:0;
   height:100%;
   background:linear-gradient(90deg, #ff9900, #ffcc33);
   transition:width 0.05s linear;
 }
+
 .grid {
   position:absolute;
   top:0; left:0;
@@ -82,7 +92,9 @@ html, body {
   animation:gridMove 3s linear infinite;
   z-index:0;
 }
+
 @keyframes gridMove {0% {background-position:0 0;}100% {background-position:20px 20px;}}
+
 .glowWave {
   position:absolute;
   bottom:-50%;
@@ -92,7 +104,9 @@ html, body {
   animation:pulseWave 6s ease-in-out infinite;
   z-index:0;
 }
+
 @keyframes pulseWave {0%,100%{transform:translateY(0) scale(1);opacity:0.5;}50%{transform:translateY(-10%) scale(1.05);opacity:1;}}
+
 @media(max-width:640px){
   #header{font-size:16px;text-align:center;}
   #log{font-size:12px;}
@@ -112,11 +126,10 @@ html, body {
 </div>
 
 <script>
-// زمان و Timestamp
 function tehranTime(){const now=new Date(); const utc=now.getTime()+now.getTimezoneOffset()*60000; return new Date(utc+3.5*60*60*1000);}
 function timeStamp(){const t=tehranTime(); return `[${('0'+t.getHours()).slice(-2)}:${('0'+t.getMinutes()).slice(-2)}:${('0'+t.getSeconds()).slice(-2)}]`;}
 
-// جملات تخصصی
+// جملات تخصصی بسیار متنوع برای حس واقعی لودینگ الگوریتم
 const technicalPhrases=[
 "Allocating half-space Green’s functions...",
 "Computing transient SH-wave integrals...",
@@ -169,29 +182,13 @@ const technicalPhrases=[
 
 const logEl=document.getElementById("log");
 const progressEl=document.getElementById("progressBar");
-const headerEl=document.getElementById("header");
 
 let totalLines=450;
 let displayed=0;
+let totalDuration=3000;
 
-// تولید فواصل طبیعی
+// تابع برای تولید فواصل طبیعی بین خطوط و سرعت Progress bar متغیر
 function randomInterval(min,max){return Math.random()*(max-min)+min;}
-function randomPhrase(){return technicalPhrases[Math.floor(Math.random()*technicalPhrases.length)];}
-
-// گلیچ رندوم روی Header و خطوط
-function glitchText(el){
-  if(!el) return;
-  const original=el.textContent;
-  let chars=original.split("");
-  for(let i=0;i<chars.length;i++){
-    if(Math.random()<0.08) chars[i]=String.fromCharCode(33+Math.floor(Math.random()*94));
-  }
-  el.textContent=chars.join("");
-  setTimeout(()=>{el.textContent=original; glitchText(el);}, 50+Math.random()*50);
-}
-
-// شروع گلیچ روی Header
-glitchText(headerEl);
 
 function appendLog(text,isFinal=false){
   const line=document.createElement("div");
@@ -199,14 +196,10 @@ function appendLog(text,isFinal=false){
   line.textContent=isFinal?`>>> ${text} <<<`:`${timeStamp()} ${text}`;
   logEl.appendChild(line);
   logEl.scrollTop=logEl.scrollHeight;
-
-  // اعمال گلیچ روی خطوط اخیر
-  if(!isFinal){
-    glitchText(line);
-  }
 }
 
-// تابع اصلی لودینگ
+function randomPhrase(){return technicalPhrases[Math.floor(Math.random()*technicalPhrases.length)];}
+
 function startLoader(){
   function nextLine(){
     if(displayed<totalLines-1){
@@ -214,7 +207,7 @@ function startLoader(){
       displayed++;
       let percent=Math.min(100,(displayed/totalLines)*100);
       progressEl.style.width=percent+"%";
-      setTimeout(nextLine, randomInterval(4,10));
+      setTimeout(nextLine, randomInterval(4,10)); // فاصله طبیعی بین خطوط (ms)
     }else{
       appendLog("DASBEM Core successfully initialized. Entering Main Interface.",true);
       progressEl.style.width="100%";
