@@ -1,179 +1,522 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DASBEM Loader</title>
+<title>DASBEM — Advanced Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#060606;
-  --text:#39ff14;
-  --accent:#ffaa33;
-  --highlight:#ffff66;
+  --bg:#050507;
+  --terminal:#39ff14;
+  --accent:#ff9a33;
+  --muted:rgba(255,255,255,0.06);
+  --glass: rgba(0,0,0,0.35);
+  --scan: rgba(255,255,255,0.03);
 }
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Share Tech Mono', monospace;
-  overflow:hidden;
-}
-#loaderContainer{
+
+/* Reset */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);font-family:'Share Tech Mono',monospace;color:var(--terminal);overflow:hidden}
+
+/* Container */
+.loaderWrap{
   position:relative;
   width:100%;
   height:100%;
   display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  padding:20px;
-  box-sizing:border-box;
+  align-items:flex-start;
+  justify-content:center;
+  padding:28px;
 }
-#header{
-  font-size:1.4rem;
-  color:var(--accent);
-  letter-spacing:1px;
-  margin-bottom:10px;
-}
-#log{
-  flex:1;
+
+/* Main panel */
+.panel{
+  width:min(1100px,96%);
+  height:84vh;
+  background:linear-gradient(180deg, rgba(10,10,10,0.55), rgba(0,0,0,0.6));
+  border-radius:10px;
+  padding:18px;
+  display:flex;
+  gap:12px;
+  border:1px solid rgba(255,255,255,0.03);
+  box-shadow:0 10px 40px rgba(0,0,0,0.6);
+  position:relative;
   overflow:hidden;
+}
+
+/* Background grid (wave) */
+.gridWrap{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+/* moving grid pattern */
+.gridWave{
+  position:absolute;
+  inset:-10% -10% -10% -10%;
+  background-image:
+    linear-gradient(transparent 60%, rgba(0,255,100,0.02) 61%),
+    linear-gradient(90deg, transparent 60%, rgba(0,255,100,0.02) 61%),
+    radial-gradient(ellipse at center, rgba(0,120,255,0.02), transparent 40%);
+  background-size: 24px 24px, 24px 24px, 600px 200px;
+  transform-origin:center;
+  animation:waveMove 6s linear infinite, wavePulse 8s ease-in-out infinite;
+  mix-blend-mode:screen;
+  filter:contrast(1.2) saturate(1.1);
+  opacity:0.85;
+  mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.05) 70%);
+}
+@keyframes waveMove{
+  0%{background-position:0 100%, 0 100%, 0 100%}
+  100%{background-position:0 -400px, 0 -400px, 0 -800px}
+}
+@keyframes wavePulse{
+  0%{transform:scale(1) rotate(-0.3deg)}
+  50%{transform:scale(1.02) rotate(0.3deg)}
+  100%{transform:scale(1) rotate(-0.3deg)}
+}
+
+/* CRT Scanlines and noise overlay */
+.crtOverlay{
+  position:absolute;inset:0;pointer-events:none;z-index:5;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size:100% 3px;
+  mix-blend-mode:overlay;
+  animation:scanMove 5s linear infinite;
+  opacity:0.9;
+}
+@keyframes scanMove{ 0%{background-position-y:0} 100%{background-position-y:300px} }
+
+/* subtle film grain via pseudo-element */
+.crtOverlay::after{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(0deg, rgba(255,255,255,0.002) 1px, transparent 1px),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.002) 0 2px, transparent 2px 6px);
+  opacity:0.9;mix-blend-mode:overlay;pointer-events:none;
+}
+
+/* Left column: Terminal Log */
+.terminal{
+  width:64%;
+  height:100%;
+  background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25));
+  border-radius:8px;
+  padding:16px;
   display:flex;
   flex-direction:column;
-  font-size:0.9rem;
+  gap:12px;
+  z-index:3;
+  box-shadow: inset 0 0 80px rgba(0,255,0,0.02);
+  border:1px solid rgba(255,255,255,0.03);
+}
+
+/* Header */
+.headerRow{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.headerTitle{
+  color:var(--accent);
+  font-size:1.05rem;
+  letter-spacing:1px;
+}
+.subTitle{color:rgba(255,255,255,0.12);font-size:0.8rem}
+
+/* Log viewport */
+.logView{
+  flex:1;
+  background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent 20%);
+  padding:12px;
+  border-radius:6px;
+  overflow:auto;
+  font-size:0.92rem;
   line-height:1.2rem;
   white-space:pre;
+  color:var(--terminal);
+  box-shadow:0 6px 18px rgba(0,0,0,0.5) inset;
+  scrollbar-width:thin;
 }
-.logLine{
-  opacity:0;
-  animation:fadeIn 0.2s linear forwards;
+.logView::-webkit-scrollbar{width:8px;height:8px}
+.logView::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.04);border-radius:6px}
+
+/* log lines with varying emphasis */
+.logLine{opacity:0;transform:translateX(6px);animation:lineIn 160ms linear forwards;will-change:transform,opacity}
+.logLine.heavy{color:var(--highlight);font-weight:700;letter-spacing:0.6px}
+.logLine.warn{color:#ffcc66}
+@keyframes lineIn{to{opacity:1;transform:translateX(0)}}
+
+/* progress & status */
+.progressArea{
+  display:flex;
+  gap:10px;
+  align-items:center;
 }
-@keyframes fadeIn{
-  from{opacity:0;}
-  to{opacity:1;}
-}
-.progressBarContainer{
-  width:100%;
-  height:18px;
-  background:rgba(255,255,255,0.1);
-  border-radius:6px;
-  overflow:hidden;
-  margin-top:10px;
-}
-.progressBar{
-  width:0%;
+.progressBarWrap{flex:1;background:var(--muted);height:14px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+.progressBar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent), #ffdf7f);transition:width 120ms linear}
+.statusText{width:220px;font-size:0.8rem;color:rgba(255,255,255,0.18);text-align:left}
+
+/* Right column: system panel */
+.sidePanel{
+  width:36%;
   height:100%;
-  background:var(--accent);
-  transition:width 0.15s linear;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:3;
+}
+.card{
+  background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.2));
+  border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.03);
+  min-height:80px;
 }
 
-/* Grid flicker background */
-.grid{
-  position:absolute;
-  top:0;left:0;
-  width:100%;height:100%;
-  background-image:linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
-                   linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
-  background-size:20px 20px;
-  animation:gridMove 3s linear infinite;
-  z-index:-1;
+/* CPU usage bars */
+.cpuBars{display:flex;flex-direction:column;gap:8px}
+.cpuBar{
+  height:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);border-radius:6px;overflow:hidden;position:relative;
 }
-@keyframes gridMove{
-  0%{background-position:0 0;}
-  100%{background-position:20px 20px;}
+.cpuBarInner{position:absolute;left:0;top:0;height:100%;width:0;background:linear-gradient(90deg,#3affb1,#39ff14);transition:width 220ms linear;box-shadow:0 4px 12px rgba(0,255,140,0.04)}
+
+/* small metrics row */
+.metrics{display:flex;gap:8px;font-size:0.78rem;color:rgba(255,255,255,0.12)}
+.metric{background:rgba(255,255,255,0.02);padding:8px;border-radius:6px;flex:1;text-align:center}
+
+/* footer subtle */
+.footer{
+  position:absolute;left:18px;right:18px;bottom:12px;font-size:0.75rem;color:rgba(255,255,255,0.06);z-index:4;text-align:center
 }
 
-@media(max-width:640px){
-  #header{font-size:1.2rem;}
-  #log{font-size:0.75rem;}
-  .progressBarContainer{height:14px;}
+/* Glitch effect overlay for final transition */
+.glitch{
+  position:absolute;inset:0;z-index:10;pointer-events:none;opacity:0;mix-blend-mode:screen;
+}
+.glitch .g{
+  position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.06),transparent);clip-path:polygon(0 10%,100% 12%,100% 20%,0 18%);
+  transform:skewX(-8deg);
+  animation:glitchMove 420ms linear infinite;
+  opacity:0.8;
+}
+@keyframes glitchMove{
+  0%{transform:translateX(-100px) skewX(-8deg)}
+  100%{transform:translateX(100px) skewX(-8deg)}
+}
+
+/* Boot flash */
+.bootFlash{position:absolute;inset:0;background:#fff;opacity:0;z-index:12;pointer-events:none}
+
+/* Responsive */
+@media (max-width:900px){
+  .panel{flex-direction:column;height:92vh;padding:12px}
+  .terminal{width:100%;height:62%}
+  .sidePanel{width:100%;height:36%}
+  .headerTitle{font-size:0.95rem}
 }
 </style>
 </head>
 <body>
-<div class="grid"></div>
-<div id="loaderContainer">
-  <div id="header">Initializing DASBEM Computational Core...</div>
-  <div id="log"></div>
-  <div class="progressBarContainer"><div class="progressBar" id="progressBar"></div></div>
+<div class="loaderWrap">
+  <div class="panel" role="main" aria-label="DASBEM loader interface">
+    <div class="gridWrap">
+      <div class="gridWave"></div>
+    </div>
+    <div class="crtOverlay"></div>
+
+    <div class="terminal" id="terminal" aria-live="polite">
+      <div class="headerRow">
+        <div>
+          <div class="headerTitle">DASBEM Computational Kernel  —  BOOT SEQUENCE</div>
+          <div class="subTitle">Initializing boundary-element time-domain solver...</div>
+        </div>
+      </div>
+
+      <div class="logView" id="logView"></div>
+
+      <div class="progressArea">
+        <div class="progressBarWrap" aria-hidden="true"><div class="progressBar" id="progressBar"></div></div>
+        <div class="statusText" id="statusText">0% — آغاز پردازش</div>
+      </div>
+    </div>
+
+    <div class="sidePanel">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:0.95rem;color:var(--accent)">System Monitor</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.12)">Kernel v3.14 · DASBEM</div>
+        </div>
+
+        <div style="height:10px"></div>
+        <div class="cpuBars">
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:rgba(255,255,255,0.12)">
+            <div>CPU Threads</div><div id="cpuPct">0%</div>
+          </div>
+          <div class="cpuBar"><div class="cpuBarInner" id="cpuInner1"></div></div>
+          <div class="cpuBar"><div class="cpuBarInner" id="cpuInner2"></div></div>
+          <div class="cpuBar"><div class="cpuBarInner" id="cpuInner3"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:0.95rem;color:var(--accent)">I/O & Storage</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.12)">/dev/dasbem · RAID-0</div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="metrics">
+          <div class="metric" id="metricFiles">Files: 0</div>
+          <div class="metric" id="metricMem">Mem: 0%</div>
+          <div class="metric" id="metricTime">ETA: --</div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.08)">
+        <div style="text-align:center">
+          <div style="font-size:1rem;color:var(--accent)">Initializing Topographic Solver</div>
+          <div style="font-size:0.78rem;margin-top:6px">Preparing BIE kernels · Assembling submatrices</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glitch" id="glitch"><div class="g"></div></div>
+    <div class="bootFlash" id="bootFlash"></div>
+    <div class="footer">DASBEM · Dynamic Analysis of Surface-Borne Elastic Motions — Loader</div>
+  </div>
 </div>
 
 <script>
-function tehranTime(){
+/* ===========================
+   Config
+   =========================== */
+const TOTAL_LINES = 600;          // simulate >500 files
+const TOTAL_DURATION = 5000;      // total approx milliseconds for log emission (5s)
+const END_HOLD = 600;             // hold after complete before transition
+const REDIRECT = "index.html";    // final target
+
+/* ===========================
+   Utility — local time (Asia/Baku)
+   =========================== */
+function bakuTime(){
   const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  return new Date(utc + 3.5 * 60 * 60 * 1000);
+  const utc = now.getTime() + now.getTimezoneOffset()*60000;
+  // Baku UTC+4
+  return new Date(utc + 4*3600*1000);
 }
 function timeStamp(){
-  const t = tehranTime();
-  return `[${('0'+t.getHours()).slice(-2)}:${('0'+t.getMinutes()).slice(-2)}:${('0'+t.getSeconds()).slice(-2)}]`;
+  const t = bakuTime();
+  const hh = String(t.getHours()).padStart(2,'0');
+  const mm = String(t.getMinutes()).padStart(2,'0');
+  const ss = String(t.getSeconds()).padStart(2,'0');
+  return `[${hh}:${mm}:${ss}]`;
 }
 
-// فایل‌های فرضی (بیش از 500 عدد)
+/* ===========================
+   Phrase pools & file names
+   =========================== */
 const technicalPhrases = [
-  "Loading boundary element matrices...",
-  "Initializing SH-wave solver...",
-  "Applying topography parameters...",
-  "Computing half-plane Green’s functions...",
-  "Assembling modified BIEs...",
-  "Generating stiffness submatrices...",
-  "Integrating fundamental solutions...",
-  "Applying non-reflective boundary conditions...",
-  "Solving domain decomposition scheme...",
-  "Updating convolution integrals...",
-  "Calculating amplification coefficients...",
-  "Formulating recursive time-domain relations...",
-  "Performing LU decomposition...",
-  "Optimizing matrix-vector multiplications...",
-  "Synchronizing parallel solver threads...",
-  "Writing response data to output stream...",
-  "Finalizing numerical kernel...",
-  "Validating dynamic equilibrium...",
+  "Loading boundary element matrices",
+  "Initializing SH-wave solver",
+  "Applying topography parameters",
+  "Computing half-plane Green's functions",
+  "Assembling modified BIEs",
+  "Generating stiffness submatrices",
+  "Integrating fundamental solutions",
+  "Applying non-reflective boundary conditions",
+  "Solving domain decomposition scheme",
+  "Updating convolution integrals",
+  "Calculating amplification coefficients",
+  "Formulating recursive time-domain relations",
+  "Performing LU decomposition",
+  "Optimizing matrix-vector multiplications",
+  "Synchronizing parallel solver threads",
+  "Writing response data to output stream",
+  "Finalizing numerical kernel",
+  "Validating dynamic equilibrium",
   "Saving results to /output/DASBEM_run.dat",
-  "System Ready."
+  "System Ready"
 ];
-
-const logEl = document.getElementById("log");
-const progressEl = document.getElementById("progressBar");
-
-let totalLines = 500; // حس فایل‌های زیاد
-let displayed = 0;
-let totalDuration = 5000; // کل زمان ≈ 5 ثانیه
-let intervalTime = totalDuration / totalLines;
-
-function appendLog(text){
-  const line = document.createElement("div");
-  line.className = "logLine";
-  line.textContent = `${timeStamp()} ${text}`;
-  logEl.appendChild(line);
-  logEl.scrollTop = logEl.scrollHeight;
-}
-
-function randomPhrase(){
+const filePrefixes = ["mesh","topo","kern","green","stiff","io","conv","resp","matrix","trace","node","elem"];
+function rndInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function randomPhraseHeavy(){
+  // sometimes return heavy phrases
+  if(Math.random()<0.08) return ">>> CRITICAL: Adaptive time-step required — refining grid";
+  if(Math.random()<0.06) return ">>> WARNING: Elevated reflection coefficient detected";
   return technicalPhrases[Math.floor(Math.random()*technicalPhrases.length)];
 }
-
-function startLoader(){
-  const interval = setInterval(()=>{
-    appendLog(randomPhrase());
-    displayed++;
-    let percent = Math.min(100, (displayed/totalLines)*100);
-    progressEl.style.width = percent + "%";
-    if(displayed >= totalLines){
-      clearInterval(interval);
-      setTimeout(()=>{
-        appendLog(">>> Redirecting to Main Interface...");
-        progressEl.style.width = "100%";
-        setTimeout(()=>window.location.href="index.html",1000); // مسیر مقصد سایت
-      },300);
-    }
-  }, intervalTime);
+function randomFileName(i){
+  const p = filePrefixes[Math.floor(Math.random()*filePrefixes.length)];
+  const num = String(i).padStart(4,'0');
+  const ext = Math.random()<0.6 ? ".dat" : (Math.random()<0.5?".bin":".dat");
+  return `/data/${p}_${num}${ext}`;
 }
 
+/* ===========================
+   UI refs
+   =========================== */
+const logView = document.getElementById("logView");
+const progressEl = document.getElementById("progressBar");
+const statusText = document.getElementById("statusText");
+const cpuPct = document.getElementById("cpuPct");
+const cpuInner1 = document.getElementById("cpuInner1");
+const cpuInner2 = document.getElementById("cpuInner2");
+const cpuInner3 = document.getElementById("cpuInner3");
+const metricFiles = document.getElementById("metricFiles");
+const metricMem = document.getElementById("metricMem");
+const metricTime = document.getElementById("metricTime");
+const glitch = document.getElementById("glitch");
+const bootFlash = document.getElementById("bootFlash");
+
+/* ===========================
+   Streaming simulation
+   =========================== */
+let emitted = 0;
+let start = performance.now();
+let lastHeavy = 0;
+
+function appendLog(text, cls){
+  const line = document.createElement("div");
+  line.className = "logLine" + (cls ? " "+cls : "");
+  line.textContent = `${timeStamp()}  ${text}`;
+  // Add slight jitter to animation-delay to avoid mechanical look
+  line.style.animationDelay = (Math.random()*140) + "ms";
+  logView.appendChild(line);
+  // keep last 180 lines only for performance
+  while(logView.children.length > 250) logView.removeChild(logView.children[0]);
+  logView.scrollTop = logView.scrollHeight;
+}
+
+/* simulate CPU & metrics */
+function updateMetrics(progressPercent){
+  // CPU simulated rises with random spikiness correlated with progress
+  const base = 20 + progressPercent*0.6;
+  const spike = Math.random()*30*Math.sin(progressPercent*3.14) ;
+  const cpu = Math.min(99, Math.floor(base + spike + (Math.random()*12-6)));
+  cpuPct.textContent = cpu + "%";
+  cpuInner1.style.width = (Math.max(6,cpu - rndInt(0,6))) + "%";
+  cpuInner2.style.width = (Math.max(4,cpu - rndInt(2,12))) + "%";
+  cpuInner3.style.width = (Math.max(2,cpu - rndInt(4,18))) + "%";
+
+  // memory approx inverse to free
+  const mem = Math.min(96, Math.floor(30 + progressPercent*0.45 + Math.random()*12));
+  metricMem.textContent = `Mem: ${mem}%`;
+
+  // files processed (simulate)
+  const files = Math.floor((emitted / TOTAL_LINES)* (TOTAL_LINES+150));
+  metricFiles.textContent = `Files: ${files.toLocaleString()}`;
+
+  // ETA estimation ~ remaining time
+  const elapsed = performance.now() - start;
+  const estTotal = Math.max(600, TOTAL_DURATION);
+  const remaining = Math.max(0, estTotal - elapsed);
+  metricTime.textContent = `ETA: ${Math.ceil(remaining/1000)}s`;
+}
+
+/* produce variable intervals to feel realistic */
+function nextInterval(i){
+  // base average interval
+  const base = TOTAL_DURATION / TOTAL_LINES;
+  // heavier processing events happen sometimes -> longer gap
+  const heavyChance = Math.random()<0.06 ? (Math.random()*180 + 80) : 0;
+  // small jitter
+  const jitter = (Math.random()-0.5) * base * 0.6;
+  return Math.max(12, base + jitter + heavyChance);
+}
+
+/* main emitter */
+function startLoader(){
+  function step(){
+    if(emitted >= TOTAL_LINES){
+      // finish
+      progressEl.style.width = "100%";
+      statusText.textContent = `100% — آماده‌سازی نهایی...`;
+      updateMetrics(100);
+      setTimeout(()=>startTransition(), END_HOLD);
+      return;
+    }
+
+    emitted++;
+    // choose content
+    let cls = "";
+    let content = "";
+    // occasionally show a file read/write line
+    if(Math.random() < 0.65){
+      const fname = randomFileName(emitted + rndInt(0,900));
+      content = `${randomPhraseHeavy()} · ${fname}`;
+      if(Math.random()<0.05){ cls = "heavy"; lastHeavy = emitted; }
+      if(Math.random()<0.04){ cls = "warn"; }
+    } else {
+      content = randomPhraseHeavy() + ` · chunk #${rndInt(1000,9999)}`;
+      if(Math.random()<0.07) cls = "heavy";
+    }
+
+    appendLog(content, cls);
+
+    // progress
+    const percent = Math.min(99, Math.floor((emitted/TOTAL_LINES)*100));
+    progressEl.style.width = percent + "%";
+    statusText.textContent = `${percent}% — ${percent < 10 ? "شروع" : percent < 50 ? "در حال محاسبه" : "ادغام داده‌ها"}`;
+
+    updateMetrics(percent);
+
+    // variable delay then schedule next
+    const delay = nextInterval(emitted);
+    setTimeout(step, delay);
+  }
+
+  // seed: initial few fast lines
+  for(let i=0;i<3;i++){
+    setTimeout(()=>{ /* just to create immediate feel */ }, i*50);
+  }
+  step();
+}
+
+/* ===========================
+   Transition & Glitch
+   =========================== */
+function startTransition(){
+  // reveal glitch briefly
+  glitch.style.opacity = 1;
+  // animate glitch opacity pulses
+  glitch.animate([{opacity:1},{opacity:0.2},{opacity:1}],{duration:420,iterations:8, easing:'ease-in-out'});
+
+  // expand final heavy "System Ready" line
+  appendLog(">>> Kernel bootstrap complete. Finalizing interface...", "heavy");
+  progressEl.style.width = "100%";
+  document.getElementById("statusText").textContent = "100% — انتقال به رابط اصلی...";
+
+  // flash then fade to white then redirect
+  setTimeout(()=>{
+    bootFlash.style.transition = "opacity 180ms ease-in";
+    bootFlash.style.opacity = 1;
+    // quick hold and fade out to show boot brightness
+    setTimeout(()=>{ bootFlash.style.transition = "opacity 900ms ease-out"; bootFlash.style.opacity = 0; }, 140);
+    // fade panel out
+    const panel = document.querySelector('.panel');
+    panel.style.transition = "filter 900ms ease, opacity 900ms ease, transform 900ms ease";
+    panel.style.filter = "blur(6px) saturate(0.5)";
+    panel.style.opacity = 0.02;
+    panel.style.transform = "scale(1.02)";
+    // finally redirect after visual sequence
+    setTimeout(()=> { window.location.href = REDIRECT; }, 1100);
+  }, 900);
+}
+
+/* start */
 startLoader();
+
+/* Minor: make grid more alive by adjusting CSS variables over time */
+(function animateBackground(){
+  const gw = document.querySelector('.gridWave');
+  let t = 0;
+  setInterval(()=> {
+    t++;
+    const r = 0.02 + Math.sin(t/30)*0.01;
+    gw.style.opacity = (0.7 + Math.sin(t/20)*0.08);
+  }, 240);
+})();
 </script>
 </body>
 </html>
