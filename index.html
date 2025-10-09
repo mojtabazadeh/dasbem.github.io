@@ -116,7 +116,7 @@ html, body {
 function tehranTime(){const now=new Date(); const utc=now.getTime()+now.getTimezoneOffset()*60000; return new Date(utc+3.5*60*60*1000);}
 function timeStamp(){const t=tehranTime(); return `[${('0'+t.getHours()).slice(-2)}:${('0'+t.getMinutes()).slice(-2)}:${('0'+t.getSeconds()).slice(-2)}]`;}
 
-// جملات تخصصی بسیار متنوع
+// جملات تخصصی
 const technicalPhrases=[
 "Allocating half-space Green’s functions...",
 "Computing transient SH-wave integrals...",
@@ -173,22 +173,25 @@ const headerEl=document.getElementById("header");
 
 let totalLines=450;
 let displayed=0;
-let totalDuration=3000;
 
 // تولید فواصل طبیعی
 function randomInterval(min,max){return Math.random()*(max-min)+min;}
 function randomPhrase(){return technicalPhrases[Math.floor(Math.random()*technicalPhrases.length)];}
 
-// گلیچ رندوم روی هدر
-function glitchHeader(){
-  const text = "Initializing The DASBEM Project Core...";
-  let glitchText = text.split("").map(c=>Math.random()<0.08?String.fromCharCode(33+Math.floor(Math.random()*94)):c).join("");
-  headerEl.textContent = glitchText;
-  setTimeout(()=>{headerEl.textContent=text; glitchHeader();}, 120+Math.random()*200);
+// گلیچ رندوم روی Header و خطوط
+function glitchText(el){
+  if(!el) return;
+  const original=el.textContent;
+  let chars=original.split("");
+  for(let i=0;i<chars.length;i++){
+    if(Math.random()<0.08) chars[i]=String.fromCharCode(33+Math.floor(Math.random()*94));
+  }
+  el.textContent=chars.join("");
+  setTimeout(()=>{el.textContent=original; glitchText(el);}, 50+Math.random()*50);
 }
 
-// شروع افکت گلیچ
-glitchHeader();
+// شروع گلیچ روی Header
+glitchText(headerEl);
 
 function appendLog(text,isFinal=false){
   const line=document.createElement("div");
@@ -196,6 +199,11 @@ function appendLog(text,isFinal=false){
   line.textContent=isFinal?`>>> ${text} <<<`:`${timeStamp()} ${text}`;
   logEl.appendChild(line);
   logEl.scrollTop=logEl.scrollHeight;
+
+  // اعمال گلیچ روی خطوط اخیر
+  if(!isFinal){
+    glitchText(line);
+  }
 }
 
 // تابع اصلی لودینگ
@@ -206,7 +214,7 @@ function startLoader(){
       displayed++;
       let percent=Math.min(100,(displayed/totalLines)*100);
       progressEl.style.width=percent+"%";
-      setTimeout(nextLine, randomInterval(4,10)); // فاصله طبیعی بین خطوط
+      setTimeout(nextLine, randomInterval(4,10));
     }else{
       appendLog("DASBEM Core successfully initialized. Entering Main Interface.",true);
       progressEl.style.width="100%";
