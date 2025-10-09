@@ -79,7 +79,7 @@ html, body {
   width:0;
   height:100%;
   background:linear-gradient(90deg, #ff9900, #ffcc33);
-  transition:width 0.05s linear;
+  transition:width 0.1s linear;
 }
 
 .grid {
@@ -105,13 +105,16 @@ html, body {
   z-index:0;
 }
 
-@keyframes pulseWave {0%,100%{transform:translateY(0) scale(1);opacity:0.5;}50%{transform:translateY(-10%) scale(1.05);opacity:1;}}
+@keyframes pulseWave {
+  0%,100%{transform:translateY(0) scale(1);opacity:0.5;}
+  50%{transform:translateY(-10%) scale(1.05);opacity:1;}
+}
 
 @media(max-width:640px){
-  #header{font-size:16px;text-align:center;}
-  #log{font-size:12px;}
-  .progressBarContainer{height:14px;border-radius:6px;}
-  #loaderContainer{padding:12px;}
+  #header{font-size:15px;text-align:center;}
+  #log{font-size:11px;}
+  .progressBarContainer{height:12px;border-radius:5px;}
+  #loaderContainer{padding:10px;}
 }
 </style>
 </head>
@@ -129,65 +132,34 @@ html, body {
 function tehranTime(){const now=new Date(); const utc=now.getTime()+now.getTimezoneOffset()*60000; return new Date(utc+3.5*60*60*1000);}
 function timeStamp(){const t=tehranTime(); return `[${('0'+t.getHours()).slice(-2)}:${('0'+t.getMinutes()).slice(-2)}:${('0'+t.getSeconds()).slice(-2)}]`;}
 
-// جملات تخصصی بسیار متنوع برای حس واقعی لودینگ الگوریتم
-const technicalPhrases=[
-"Allocating half-space Green’s functions...",
-"Computing transient SH-wave integrals...",
-"Initializing temporal boundary discretization...",
-"Applying free-surface boundary conditions...",
-"Assembling dynamic stiffness matrices...",
-"Evaluating elastodynamic influence matrices...",
-"Performing LU factorization for time-domain BEM...",
-"Optimizing recursive convolution kernels...",
-"Integrating fundamental solutions via Gaussian quadrature...",
-"Synchronizing subdomain time-step solvers...",
-"Updating displacement boundary vectors...",
-"Transforming coordinates to local reference frame...",
-"Assembling BIE coefficients for half-space...",
-"Validating radiation boundary condition...",
-"Performing domain decomposition for SH-waves...",
-"Generating stiffness submatrices for HSTD-BEM...",
-"Applying DASBEM recursive time-step solver...",
-"Computing amplification coefficients...",
-"Evaluating convolution integrals with memory storage...",
-"Storing system response at output nodes...",
-"Post-processing dynamic response...",
-"Exporting motion history data...",
-"Initializing numerical kernel modules...",
-"Loading modified boundary element matrices...",
-"Updating convolution integrals for SH-waves...",
-"Optimizing parallel solver threads...",
-"Applying non-reflective boundary matrices...",
-"Finalizing recursive time-domain calculations...",
-"Assembling half-space influence matrices...",
-"Calculating displacement and stress response...",
-"Synchronizing global time-stepping...",
-"Generating output files /output/DASBEM_run.dat...",
-"Validating time-domain solver stability...",
-"Optimizing matrix-vector multiplication routines...",
-"Performing high-order quadrature integration...",
-"Computing time-dependent boundary conditions...",
-"Transforming results to local coordinate system...",
-"Validating half-space BEM solutions...",
-"Performing boundary kernel updates...",
-"Evaluating dynamic equilibrium conditions...",
-"Optimizing solver memory allocation...",
-"Post-processing amplification factors...",
-"Storing SH-wave field history...",
-"Applying domain-specific boundary constraints...",
-"Computing influence coefficients for nodes...",
-"Finalizing DASBEM computational kernel...",
-"System Ready for Visualization Interface..."
-];
+// لیست واقعی و گسترده از خطوط تخصصی با تنوع زیاد
+const technicalPhrases=[];
+for(let i=0;i<600;i++){
+  const modules=[
+    "Assembling dynamic stiffness matrix","Computing convolution kernel",
+    "Applying recursive boundary update","Integrating SH-wave Green’s function",
+    "Evaluating transient boundary response","Synchronizing global solver thread",
+    "Performing LU decomposition","Validating boundary equilibrium condition",
+    "Updating displacement and stress vectors","Executing time-domain integration step",
+    "Allocating memory block for nodal response","Normalizing influence coefficients",
+    "Adjusting time increment Δt","Computing half-space reflection factor",
+    "Building element connectivity list","Updating Jacobian determinants",
+    "Recomputing fundamental solution for node "+Math.floor(Math.random()*200),
+    "Writing results to DASBEM_core/cache.tmp","Clearing temporary convolution data",
+    "Applying free-surface constraint matrix","Verifying solver stability criterion",
+    "Optimizing BEM matrix storage pattern","Synchronizing output data stream"
+  ];
+  technicalPhrases.push(modules[Math.floor(Math.random()*modules.length)]+"...");
+}
 
 const logEl=document.getElementById("log");
 const progressEl=document.getElementById("progressBar");
 
-let totalLines=450;
 let displayed=0;
-let totalDuration=3000;
+let totalLines=technicalPhrases.length;
+let startTime=performance.now();
+let duration=Math.random()*5000+6000; // بین 6 تا 11 ثانیه
 
-// تابع برای تولید فواصل طبیعی بین خطوط و سرعت Progress bar متغیر
 function randomInterval(min,max){return Math.random()*(max-min)+min;}
 
 function appendLog(text,isFinal=false){
@@ -198,26 +170,26 @@ function appendLog(text,isFinal=false){
   logEl.scrollTop=logEl.scrollHeight;
 }
 
-function randomPhrase(){return technicalPhrases[Math.floor(Math.random()*technicalPhrases.length)];}
+function nextLine(){
+  if(displayed<totalLines){
+    appendLog(technicalPhrases[displayed]);
+    displayed++;
+    let progress=(displayed/totalLines)*100;
+    progressEl.style.width=progress+"%";
 
-function startLoader(){
-  function nextLine(){
-    if(displayed<totalLines-1){
-      appendLog(randomPhrase());
-      displayed++;
-      let percent=Math.min(100,(displayed/totalLines)*100);
-      progressEl.style.width=percent+"%";
-      setTimeout(nextLine, randomInterval(4,10)); // فاصله طبیعی بین خطوط (ms)
-    }else{
-      appendLog("DASBEM Core successfully initialized. Entering Main Interface.",true);
-      progressEl.style.width="100%";
-      setTimeout(()=>window.location.href="index.html",800);
-    }
+    // سرعت تصادفی واقعی: گاهی مکث، گاهی سریع
+    let interval = randomInterval(2,8);
+    if(Math.random()<0.02) interval = randomInterval(100,250); // توقف‌های طبیعی سیستم
+
+    setTimeout(nextLine, interval);
+  }else{
+    appendLog("DASBEM Core successfully initialized. Entering Main Interface.",true);
+    progressEl.style.width="100%";
+    setTimeout(()=>window.location.href="index.html",1200);
   }
-  nextLine();
 }
 
-startLoader();
+nextLine();
 </script>
 </body>
 </html>
