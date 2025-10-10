@@ -264,6 +264,19 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 <script>
 /* ===== Page Loader ===== */
 const REDIRECT = "index.html";
+
+setTimeout(()=>{
+    pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
+    document.getElementById('siteLoader').style.transition = "opacity 0.6s ease";
+    document.getElementById('siteLoader').style.opacity = 0;
+    setTimeout(()=>{
+        if (window.location.pathname.split("/").pop() !== REDIRECT) {
+            window.location.href = REDIRECT;
+        } else {
+            document.getElementById('siteLoader').style.display = 'none';
+        }
+    }, 700);
+}, TOTAL_DURATION+200);
 const TOTAL_DURATION = 4000; // ms
 const TOTAL_LINES = 350;
 
