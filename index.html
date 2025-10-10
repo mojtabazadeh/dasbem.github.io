@@ -71,7 +71,7 @@ html,body{
 </head>
 <body>
 <div id="app">
-  <div id="header">Initializing DASBEM Core...</div>
+  <div id="header">Initializing The DASBEM Project Core...</div>
   <div class="viewport" id="viewport"></div>
   <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
@@ -87,7 +87,6 @@ const progressBar = document.getElementById('progressBar');
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function pick(arr){ return arr[rnd(0,arr.length-1)]; }
 
-// عبارات تخصصی DASBEM با فرمت‌های فایل مرموز
 const stages = [
   "Initializing computational kernel...",
   "Loading half-space fundamental solution coefficients...",
@@ -160,7 +159,6 @@ function pushLine(text, final=false){
   progressBar.style.width = pct+"%";
 }
 
-// توزیع تصادفی و واقع‌گرایانه خطوط
 const timestamps = Array.from({length:TOTAL_LINES}, (_,i)=>{
   const base = (i/TOTAL_LINES)*TOTAL_DURATION;
   const jitter = (1 - Math.abs(i/TOTAL_LINES-0.5)*2)*30;
