@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>DASBEM.IR</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/refs/heads/main/DASBEM.ico" sizes="48x48">
 <style>
@@ -280,7 +281,8 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 <script>
 /* ===== Page Loader ===== */
 const REDIRECT = "index.html";
-
+const TOTAL_DURATION = 4000; // ms
+const TOTAL_LINES = 350;
 setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
     document.getElementById('siteLoader').style.transition = "opacity 0.6s ease";
@@ -293,8 +295,6 @@ setTimeout(()=>{
         }
     }, 700);
 }, TOTAL_DURATION+200);
-const TOTAL_DURATION = 4000; // ms
-const TOTAL_LINES = 350;
 
 const viewport = document.getElementById('loader-viewport');
 const progressBar = document.getElementById('progressBar');
