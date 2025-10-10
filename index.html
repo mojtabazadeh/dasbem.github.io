@@ -19,30 +19,26 @@
 html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
 
 /* ===== Page Loader ===== */
-  :root{
+:root{
   --bg:#050505;
   --text:#39ff14;
-  --accent:#ff9900;
+  --accent-loader:#ff9900;
   --gold:#ffcc33;
 }
 
-html,body{
-  margin:0; padding:0; width:100%; height:100%;
-  background:var(--bg); color:var(--text);
+#app{
+  display:flex; flex-direction:column;
+  height:100vh; width:100vw;
+  padding:30px 20px;
+  background:var(--bg);
+  color:var(--text);
   font-family:'Share Tech Mono', monospace;
   display:flex; justify-content:center; align-items:center;
   overflow:hidden;
 }
 
-#app{
-  display:flex; flex-direction:column;
-  height:calc(100% - 60px);
-  width:calc(100% - 40px);
-  padding:30px 20px;
-}
-
 #header{
-  font-size:18px; color:var(--accent);
+  font-size:18px; color:var(--accent-loader);
   margin-bottom:12px; user-select:none; -webkit-user-select:none;
 }
 
@@ -221,16 +217,69 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 </head>
 <body>
 
+<!-- Page loader -->
 <div id="app">
   <div id="header">Initializing The DASBEM Project Core...</div>
   <div class="viewport" id="viewport"></div>
   <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
-  
 <canvas id="waveCanvas" aria-hidden="true"></canvas>
 
-  <script>
+<header class="site-header">
+  <h1>The DASBEM Project</h1>
+  <p>Dynamic Analysis of Structures by Boundary Element Method</p>
+</header>
+
+<div class="wrap">
+  <div class="header" aria-label="Researchers">
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+            </div>
+      <div class="name" id="r1-name">
+        <span>Dr. Mehdi Panji</span>
+        <span class="title-small">Associate Professor</span>
+        <div class="contact">
+          <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
+          <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Researcher 2 -->
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+      </div>
+      <div class="name" id="r2-name">
+        <span>Dr. Saeed Mojtabazadeh</span>
+        <span class="title-small">Postdoctoral Fellow</span>
+        <div class="contact">
+          <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
+          <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="papers" aria-label="Papers">
+    <h3>💡 Download Papers For Free</h3>
+    <div class="paper-list" id="paperList"></div>
+  </section>
+</div>
+
+<footer class="site-footer">
+  The DASBEM Project ©
+</footer>
+
+<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+  <div class="w-thumb" id="w-thumb"></div>
+  <div class="w-body" id="w-body"></div>
+</div>
+
+<script>
+/* ===== Page Loader ===== */
 const REDIRECT = "index.html";
 const TOTAL_DURATION = 4000; // ms
 const TOTAL_LINES = 350;
@@ -335,61 +384,7 @@ function startLoader(){
 }
 
 startLoader();
-</script>
-  
-<header class="site-header">
-  <h1>The DASBEM Project</h1>
-  <p>Dynamic Analysis of Structures by Boundary Element Method</p>
-</header>
 
-<div class="wrap">
-  <div class="header" aria-label="Researchers">
-    <section class="researcher" id="r1" aria-labelledby="r1-name">
-      <div class="photo-frame" aria-hidden="true">
-        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
-            </div>
-      <div class="name" id="r1-name">
-        <span>Dr. Mehdi Panji</span>
-        <span class="title-small">Associate Professor</span>
-        <div class="contact">
-          <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
-          <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Researcher 2 -->
-    <section class="researcher" id="r2" aria-labelledby="r2-name">
-      <div class="photo-frame" aria-hidden="true">
-        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
-      </div>
-      <div class="name" id="r2-name">
-        <span>Dr. Saeed Mojtabazadeh</span>
-        <span class="title-small">Postdoctoral Fellow</span>
-        <div class="contact">
-          <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
-          <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <section class="papers" aria-label="Papers">
-    <h3>💡 Download Papers For Free</h3>
-    <div class="paper-list" id="paperList"></div>
-  </section>
-</div>
-
-<footer class="site-footer">
-  The DASBEM Project ©
-</footer>
-
-<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
-  <div class="w-thumb" id="w-thumb"></div>
-  <div class="w-body" id="w-body"></div>
-</div>
-
-<script>
 /* ===== Background particles ===== */
 (function(){
   const canvas=document.getElementById('waveCanvas');
