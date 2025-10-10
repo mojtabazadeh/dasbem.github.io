@@ -301,7 +301,6 @@ const stages = [
   "Optimizing recursive convolution windows...",
   "Storing intermediate snapshots...",
   "Finalizing time-domain solver...",
-
   "Evaluating elastodynamic Green's functions [G{rnd}]...",
   "Performing LU factorization on influence submatrix {sub}...",
   "Computing boundary integral for SH-wave field [SH{rnd}].res...",
@@ -319,23 +318,14 @@ const stages = [
 function makeLine(){
   const stage = pick(stages);
   let extra = "";
-  
-  if(stage.includes("coefficients") || stage.includes("matrices")) 
-      extra = " [F"+rnd(1000,9999)+".bin]";
-  if(stage.includes("snapshots") || stage.includes("response")) 
-      extra = " [S"+rnd(100,999)+"]";
-  if(stage.includes("convolution") || stage.includes("memory")) 
-      extra = " window="+rnd(10,500)+"ms";
-  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) 
-      extra = " Node"+rnd(10,999);
-  if(stage.includes("Green's functions")) 
-      extra = " [G"+rnd(1000,9999)+".dat]";
-  if(stage.includes("spectral amplification")) 
-      extra = " [AMP"+rnd(10,99)+"]";
-  if(stage.includes("motion history")) 
-      extra = " [MH"+rnd(1000,9999)+".out]";
-  if(stage.includes("recursive time-domain solver")) 
-      extra = " Module-"+pick(["kern","conv","io","solver","post"]);
+  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
+  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
+  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
+  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
+  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
+  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
+  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
+  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
 
   return stage.replace(/\{rnd\}/g, () => rnd(1000,9999))
               .replace(/\{sub\}/g, () => "K"+rnd(1,99))
@@ -379,7 +369,7 @@ function startLoader(){
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
     document.getElementById('app').style.transition = "opacity 0.6s ease";
     document.getElementById('app').style.opacity = 0;
-    setTimeout(()=>{ window.location.href = REDIRECT; }, 700);
+    setTimeout(()=>{ document.getElementById('app').remove(); }, 700);
   }, TOTAL_DURATION+200);
 }
 
