@@ -391,7 +391,11 @@ function startLoader(){
   }, TOTAL_DURATION+200);
 }
 
+if(!sessionStorage.getItem('dasbemLoaderDone')){
   startLoader();
+  sessionStorage.setItem('dasbemLoaderDone','true');
+} else {
+  document.getElementById('siteLoader').style.display='none';
 } 
 
 /* ===== Background particles ===== */
