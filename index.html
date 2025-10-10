@@ -280,7 +280,7 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 
 <script>
 /* ===== Page Loader ===== */
-const REDIRECT = "index.html";
+const REDIRECT = "/";
 const TOTAL_DURATION = 4000; // ms
 const TOTAL_LINES = 350;
 setTimeout(()=>{
@@ -288,11 +288,7 @@ setTimeout(()=>{
     document.getElementById('siteLoader').style.transition = "opacity 0.6s ease";
     document.getElementById('siteLoader').style.opacity = 0;
     setTimeout(()=>{
-        if (window.location.pathname.split("/").pop() !== REDIRECT) {
-            window.location.href = REDIRECT;
-        } else {
-            document.getElementById('siteLoader').style.display = 'none';
-        }
+        document.getElementById('siteLoader').style.display='none';
     }, 700);
 }, TOTAL_DURATION+200);
 
@@ -400,7 +396,7 @@ if(!sessionStorage.getItem('dasbemLoaderDone')){
   sessionStorage.setItem('dasbemLoaderDone','true');
 } else {
   document.getElementById('siteLoader').style.display='none';
-}  
+} 
 
 /* ===== Background particles ===== */
 (function(){
