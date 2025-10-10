@@ -26,9 +26,16 @@ html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--b
 
 /* ===== Page Loader ===== */
 #siteLoader{
-  position:fixed; inset:0; background:var(--loader-bg);
-  z-index:9999; display:flex; flex-direction:column;
-  justify-content:center; align-items:center; padding:30px;
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  width:100%;
+  height:100%;
+  background:var(--loader-bg);
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 #loader-header{color:var(--loader-accent); font-family:'Share Tech Mono', monospace; font-size:18px; margin-bottom:12px;}
 #loader-viewport{
@@ -260,7 +267,7 @@ const REDIRECT = "index.html";
 const TOTAL_DURATION = 4000; // ms
 const TOTAL_LINES = 350;
 
-const viewport = document.getElementById('viewport');
+const viewport = document.getElementById('loader-viewport');
 const progressBar = document.getElementById('progressBar');
 
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
@@ -353,8 +360,8 @@ function startLoader(){
 
   setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    document.getElementById('app').style.transition = "opacity 0.6s ease";
-    document.getElementById('app').style.opacity = 0;
+    document.getElementById('siteLoader').style.transition = "opacity 0.6s ease";
+    document.getElementById('siteLoader').style.opacity = 0;
     setTimeout(()=>{ window.location.href = REDIRECT; }, 700);
   }, TOTAL_DURATION+200);
 }
