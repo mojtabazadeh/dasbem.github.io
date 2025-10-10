@@ -11,170 +11,116 @@
     --text:#39ff14;
     --accent:#ff9900;
     --gold:#ffcc33;
-    --muted: rgba(255,255,255,0.06);
   }
 
-  /* reset + layout */
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden;display:flex;align-items:center;justify-content:center;}
-  
+  html,body{
+    height:100%; width:100%; margin:0; padding:0;
+    background:var(--bg); color:var(--text);
+    font-family:'Share Tech Mono',monospace;
+    display:flex; align-items:center; justify-content:center;
+  }
+
   #app{
-    display:flex;
-    flex-direction:column;
-    height:100%;
-    width:100%;
-    padding:18px;
-    gap:12px;
+    display:flex; flex-direction:column;
+    height:100%; width:100%; padding:18px; gap:12px;
   }
 
-  /* header */
   #header{
-    font-size:17px;
-    color:var(--accent);
-    letter-spacing:1px;
-    user-select:none;
-    -webkit-user-select:none;
-    max-width:100%;
-    overflow:hidden;
-    white-space:nowrap;
+    font-size:17px; color:var(--accent);
+    user-select:none; -webkit-user-select:none;
   }
 
-  /* viewport */
   .viewport{
-    flex:1;
-    overflow-y:auto;
+    flex:1; overflow-y:auto;
     padding:10px 12px;
     background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,0.03);
+    border-radius:8px; border:1px solid rgba(255,255,255,0.03);
     word-break:break-word;
   }
 
   .logLine{
-    font-size:13px;
-    line-height:1.25;
-    margin:6px 0;
-    opacity:1; /* بدون افکت پرش */
-    max-width:100%;
-    white-space:pre-wrap;
+    font-size:13px; line-height:1.25; margin:4px 0;
   }
 
   .finalLine{
-    color:var(--gold);
-    font-weight:700;
-    font-size:15px;
+    color:var(--gold); font-weight:700; font-size:15px;
     text-shadow:0 0 6px rgba(255,204,51,0.14);
-    margin-top:8px;
-    padding:6px 8px;
-    border-radius:6px;
+    margin-top:8px; padding:6px 8px; border-radius:6px;
     background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
   }
 
   .progressWrap{
-    height:16px;
-    background:rgba(255,255,255,0.06);
-    border-radius:10px;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,0.03);
+    height:16px; background:rgba(255,255,255,0.06);
+    border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.03);
   }
 
   .progressBar{
-    height:100%;
-    width:0;
+    height:100%; width:0;
     background:linear-gradient(90deg,#ff9900,#ffcc33);
-    transition:width 80ms linear;
+    transition:width 60ms linear;
   }
 
-  /* background grid & glow */
   .grid{
-    pointer-events:none;
-    position:fixed;inset:0;z-index:0;
+    pointer-events:none; position:fixed; inset:0; z-index:0;
     background-image:
       linear-gradient(rgba(255,153,0,0.06) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,204,51,0.05) 1px, transparent 1px);
-    background-size:18px 18px;
-    mix-blend-mode:overlay;
-    opacity:0.65;
+    background-size:18px 18px; mix-blend-mode:overlay; opacity:0.65;
   }
 
   .glow{
-    pointer-events:none;
-    position:fixed;left:50%;transform:translateX(-50%);bottom:-40%;
-    width:160%;height:160%;
+    pointer-events:none; position:fixed; left:50%; transform:translateX(-50%); bottom:-40%;
+    width:160%; height:160%;
     background:radial-gradient(circle at 50% 120%, rgba(255,153,0,0.12), transparent 60%);
-    z-index:0;opacity:0.9;
+    z-index:0; opacity:0.9;
   }
 
   @media (max-width:640px){
-    #app{padding:12px;}
-    #header{font-size:15px;}
-    .logLine{font-size:12px;margin:8px 0;}
-    .progressWrap{height:14px;}
+    #app{padding:12px;} #header{font-size:15px;}
+    .logLine{font-size:12px;} .progressWrap{height:14px;}
   }
 </style>
 </head>
 <body>
-  <div class="grid" aria-hidden="true"></div>
-  <div class="glow" aria-hidden="true"></div>
+<div class="grid" aria-hidden="true"></div>
+<div class="glow" aria-hidden="true"></div>
 
-  <div id="app" role="main" aria-live="polite">
-    <div id="header">Initializing The DASBEM Project Core...</div>
-    <div class="viewport" id="viewport" role="region" aria-label="Loader log"></div>
-    <div class="progressWrap" aria-hidden="false" aria-label="Loading progress">
-      <div class="progressBar" id="progressBar"></div>
-    </div>
-  </div>
+<div id="app">
+  <div id="header">Initializing The DASBEM Project Core...</div>
+  <div class="viewport" id="viewport" role="region" aria-label="Loader log"></div>
+  <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
+</div>
 
 <script>
-const TOTAL_DURATION = 3000;
-const TOTAL_LINES = 300;
+const TOTAL_LINES = 300;       // تعداد کل خطوط لودر
+const TOTAL_DURATION = 3500;   // مدت زمان کل لودر (میلی ثانیه)
 const REDIRECT = "index.html";
 
 const viewport = document.getElementById('viewport');
 const progressBar = document.getElementById('progressBar');
 
-function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
 const templates = [
-  "Loading kernel {eid}.bin...",
-  "Reading boundary matrix {mat}.dat...",
-  "Integrating SH-wave profile {prof}.res...",
-  "Calculating displacement vector {dof}.vec...",
-  "Post-processing amplification map tile {tx}{ty}.amp...",
-  "Generating response snapshot idx {idx}.out...",
-  "Applying recursive solver step {pass}..."
+  "Loading half-space kernel file {file}.bin...",
+  "Reading boundary influence matrix {file}.dat...",
+  "Integrating SH-wave transient profile {file}.res...",
+  "Processing displacement vector {file}.vec...",
+  "Computing spectral amplification tile {file}.amp...",
+  "Saving response snapshot {file}.out...",
+  "Applying recursive solver step {step}..."
 ];
 
-function makeLine(i){
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pick(arr){ return arr[rnd(0, arr.length-1)]; }
+
+function makeFileLine(){
   const tpl = pick(templates);
-  return tpl.replace(/\{([^\}]+)\}/g, (_, token)=>{
-    switch(token){
-      case 'eid': return 'E'+rnd(1000,9999);
-      case 'mat': return 'M'+rnd(100,999);
-      case 'prof': return pick(['linear','gaussian','ricker']);
-      case 'dof': return rnd(1,6)+'-'+rnd(10,999);
-      case 'tx': return String.fromCharCode(65+rnd(0,12));
-      case 'ty': return rnd(0,9);
-      case 'idx': return rnd(100000,999999);
-      case 'pass': return rnd(1,8);
-      default: return rnd(0,9999);
-    }
-  }) + `  /* line ${i} */`;
+  return tpl.replace(/\{file\}/g, () => "F"+rnd(1000,9999))
+            .replace(/\{step\}/g, () => rnd(1,8));
 }
 
-const timestamps = Array.from({length: TOTAL_LINES}, (_, i)=>{
-  return Math.round((i/TOTAL_LINES)*TOTAL_DURATION);
-});
+const timestamps = Array.from({length:TOTAL_LINES}, (_,i) => Math.round((i/TOTAL_LINES)*TOTAL_DURATION));
 
-let startedAt = performance.now();
-
-function updateProgress(){
-  const elapsed = performance.now() - startedAt;
-  const pct = Math.min(100, Math.round((elapsed / TOTAL_DURATION) * 100));
-  progressBar.style.width = pct + '%';
-}
-
+let loadedCount = 0;
 function pushLine(text, important=false){
   const el = document.createElement('div');
   el.className = 'logLine';
@@ -183,24 +129,25 @@ function pushLine(text, important=false){
   viewport.appendChild(el);
   while(viewport.children.length > 220) viewport.removeChild(viewport.children[0]);
   viewport.scrollTop = viewport.scrollHeight;
+
+  // نوار پیشرفت بر اساس تعداد خطوط
+  loadedCount++;
+  const pct = Math.min(100, Math.round((loadedCount/TOTAL_LINES)*100));
+  progressBar.style.width = pct+'%';
 }
 
 function startEmission(){
-  startedAt = performance.now();
-  updateProgress();
   for(let i=0;i<TOTAL_LINES;i++){
     setTimeout(((idx)=>{
-      return function(){
-        pushLine(makeLine(idx+1));
-      };
+      return function(){ pushLine(makeFileLine()); };
     })(i), timestamps[i]);
   }
 
+  // خط نهایی و هدایت به صفحه اصلی
   setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    updateProgress();
     setTimeout(()=>{ window.location.href = REDIRECT; }, 500);
-  }, TOTAL_DURATION);
+  }, TOTAL_DURATION+100);
 }
 
 startEmission();
