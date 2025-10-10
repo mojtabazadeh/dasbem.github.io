@@ -1,125 +1,494 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DASBEM System Boot</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DASBEM Loader — Protocol</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-html,body {
-  margin:0;
-  padding:0;
-  height:100%;
-  background:#000;
-  overflow:hidden;
-  font-family:'Share Tech Mono', monospace;
-  color:#00ff88;
-}
-#grid {
-  position:absolute;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:radial-gradient(circle at center,rgba(0,255,136,0.1) 0%,rgba(0,0,0,1) 70%);
-  overflow:hidden;
-}
-canvas {
-  position:absolute;
-  top:0;left:0;
-  width:100%;height:100%;
-  opacity:0.25;
-}
-#terminal {
-  position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  width:80%;
-  max-width:900px;
-  height:300px;
-  overflow:hidden;
-  font-size:14px;
-  line-height:1.4em;
-  white-space:pre-wrap;
-  animation: flicker 1.5s infinite alternate;
-}
-@keyframes flicker {
-  0% {opacity:1;}
-  50% {opacity:0.98;}
-  100% {opacity:1;}
-}
-.cursor {
-  display:inline-block;
-  width:8px;
-  height:14px;
-  background:#00ff88;
-  animation:blink 0.8s infinite;
-}
-@keyframes blink {
-  0%,50% {opacity:1;}
-  51%,100% {opacity:0;}
-}
+  :root{
+    --bg:#050505;
+    --text:#39ff14;
+    --accent:#ff9900;
+    --gold:#ffcc33;
+    --muted: rgba(255,255,255,0.06);
+    --panel-bg: rgba(0,0,0,0.36);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+  /* full screen container */
+  #loaderWrap{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6));
+    z-index:9999;
+  }
+
+  /* canvas background (seismic grid) */
+  #bgCanvas{
+    position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mix-blend-mode:screen;opacity:0.85;
+  }
+
+  /* central panel */
+  .panel{
+    position:relative;z-index:2; width:100%; max-width:1100px; height:72vh; min-height:420px;
+    border-radius:12px; overflow:hidden;
+    background: linear-gradient(180deg, rgba(6,6,6,0.78), rgba(10,10,10,0.88));
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+    display:flex; gap:14px;
+  }
+
+  /* left terminal */
+  .terminal{
+    flex:1.4; padding:22px; display:flex; flex-direction:column; gap:12px; min-width:260px;
+    border-right:1px solid rgba(255,255,255,0.02);
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
+  }
+
+  #header{
+    font-size:16px;color:var(--accent);letter-spacing:0.6px; font-weight:700;
+  }
+
+  .viewport{
+    flex:1; overflow:auto; padding:8px 10px; border-radius:8px; background: rgba(0,0,0,0.06);
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .logLine{
+    font-size:13px; line-height:1.4; color:var(--text); margin:6px 0; white-space:pre-wrap; opacity:0; transform:translateY(6px);
+    transition:opacity .14s ease, transform .14s ease;
+  }
+  .logLine.show{opacity:1; transform:translateY(0);}
+
+  .final{
+    color:var(--gold); font-weight:700; background:linear-gradient(90deg, rgba(255,204,51,0.03), transparent);
+    padding:8px;border-radius:8px; margin-top:8px; font-size:14px;
+  }
+
+  /* right side: file list & status */
+  .side{
+    width:360px; min-width:220px; padding:18px; display:flex; flex-direction:column; gap:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.004), transparent);
+  }
+  .status{
+    height:140px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.004));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  }
+  .orb{
+    width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--accent);font-size:18px;
+    box-shadow:0 0 40px rgba(255,153,51,0.05), inset 0 0 18px rgba(255,153,51,0.02);
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
+  }
+  .meta{font-size:13px;color:rgba(255,255,255,0.6);text-align:center}
+
+  .file-list{flex:1; overflow:auto; padding:6px; border-radius:8px; background:rgba(0,0,0,0.03)}
+  .file-item{display:flex;align-items:center;gap:12px;padding:8px;border-radius:6px}
+  .file-name{flex:1;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .file-bar{width:130px;height:8px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+  .file-fill{height:100%;width:0;background:linear-gradient(90deg, rgba(255,153,0,0.16), var(--accent));transition:width 120ms linear}
+
+  /* overall progress bottom */
+  .bottom{
+    padding:12px;border-top:1px solid rgba(255,255,255,0.02);display:flex;gap:12px;align-items:center;
+    background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
+  }
+  .overall{flex:1;height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+  .overall .fill{height:100%;width:0;background:linear-gradient(90deg, rgba(255,153,0,0.16), var(--accent));box-shadow:0 6px 30px rgba(255,153,51,0.04);transition:width 80ms linear}
+  .pct{min-width:56px;text-align:right;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:13px}
+
+  /* responsive */
+  @media (max-width:920px){
+    .panel{flex-direction:column;height:86vh}
+    .terminal{padding:14px;border-right:none;border-bottom:1px solid rgba(255,255,255,0.02)}
+    .side{width:100%;min-width:unset;padding:12px}
+    .file-list{max-height:120px}
+  }
+  @media (max-width:520px){
+    #header{font-size:15px}
+    .orb{width:68px;height:68px;font-size:15px}
+    .panel{height:84vh}
+  }
 </style>
 </head>
 <body>
 
-<div id="grid"></div>
-<canvas id="wave"></canvas>
-<div id="terminal"></div>
+<div id="loaderWrap" role="dialog" aria-label="DASBEM boot loader">
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+  <div class="panel" role="document" aria-hidden="false">
+    <div class="terminal" aria-live="polite">
+      <div id="header">Initializing The DASBEM Project Core...</div>
+
+      <div class="viewport" id="viewport" role="region" aria-label="Loader log" tabindex="0">
+        <!-- logs injected here -->
+      </div>
+
+      <div class="bottom" aria-hidden="false">
+        <div class="overall" aria-hidden="true"><div class="fill" id="overallFill"></div></div>
+        <div class="pct" id="overallPct">0%</div>
+      </div>
+    </div>
+
+    <div class="side" aria-hidden="true">
+      <div class="status" role="status" aria-live="polite">
+        <div class="orb" id="orb">DASBEM</div>
+        <div class="meta" id="meta">Kernel: boundary-solver · Mode: time-domain</div>
+      </div>
+
+      <div class="file-list" id="fileList" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
 
 <script>
-const terminal=document.getElementById('terminal');
-const logs=[
-  "[DASBEM::BOOT] Initiating topographic dynamic solver...",
-  "[DASBEM::SYS] Loading boundary element matrices...",
-  "[DASBEM::WAVE] Simulating SH-wave propagation field...",
-  "[DASBEM::DATA] Importing seismic dataset: Tehran_Zone_Δt=0.002s",
-  "[DASBEM::GPU] Parallelizing FEM-BEM coupling process...",
-  "[DASBEM::STABLE] Waveform convergence reached (ε<10⁻⁶)",
-  "[DASBEM::STATUS] All modules successfully initialized.",
-  "[DASBEM::READY] Launching main interface..."
+/* ================== CONFIG ================== */
+const TOTAL_MS = 3000; // 3 seconds total
+const TOTAL_LINES = 60; // lines to show (realistic density for 3s)
+const REDIRECT = "index.html";
+
+/* ========== TIME (Asia/Tehran preferred but robust) ========== */
+function tzNowParts(){
+  try{
+    const dtf = new Intl.DateTimeFormat('en-GB', {timeZone:'Asia/Tehran', hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit', year:'numeric', month:'2-digit', day:'2-digit'});
+    const parts = dtf.formatToParts(new Date());
+    const get = (type)=> parts.find(p=>p.type===type)?.value || '00';
+    return {Y:get('year'),M:get('month'),D:get('day'),hh:get('hour'),mm:get('minute'),ss:get('second')};
+  }catch(e){
+    const d=new Date(); const pad=(n)=>String(n).padStart(2,'0');
+    return {Y:d.getFullYear(),M:pad(d.getMonth()+1),D:pad(d.getDate()),hh:pad(d.getHours()),mm:pad(d.getMinutes()),ss:pad(d.getSeconds())};
+  }
+}
+function timeStamp(){
+  const p = tzNowParts();
+  return `${p.hh}:${p.mm}:${p.ss}`;
+}
+
+/* ========== DOM refs ========== */
+const viewport = document.getElementById('viewport');
+const overallFill = document.getElementById('overallFill');
+const overallPct = document.getElementById('overallPct');
+const fileListEl = document.getElementById('fileList');
+const orb = document.getElementById('orb');
+const meta = document.getElementById('meta');
+const loaderWrap = document.getElementById('loaderWrap');
+
+/* ========== file-like items (weights) ==========
+   We'll show a handful of realistic files with weighted progress to feel authentic.
+============================================= */
+const files = [
+  {name:"mesh/semicircle.nod", weight:12},
+  {name:"mesh/elements.dat", weight:12},
+  {name:"kernels/bem_kern.bin", weight:18},
+  {name:"matrices/influence.mtx", weight:20},
+  {name:"params/runconfig.json", weight:4},
+  {name:"io/input_wave.srf", weight:14},
+  {name:"cache/precond.chk", weight:8},
+  {name:"viz/colormap.cfg", weight:2}
 ];
-let i=0;
-function printLogs(){
-  if(i<logs.length){
-    terminal.innerHTML+=logs[i]+"\n";
-    i++;
-    setTimeout(printLogs,300);
-  }else{
-    terminal.innerHTML+="\nSystem online <span class='cursor'></span>";
-  }
-}
-printLogs();
+const totalWeight = files.reduce((s,f)=>s+f.weight,0);
 
-// Wave background animation
-const c=document.getElementById('wave');
-const ctx=c.getContext('2d');
-function resize(){
-  c.width=window.innerWidth;
-  c.height=window.innerHeight;
-}
-window.addEventListener('resize',resize);
-resize();
+/* render file entries */
+files.forEach(f=>{
+  const el = document.createElement('div'); el.className='file-item';
+  el.innerHTML = `<div class="file-name" title="${f.name}">${f.name}</div><div class="file-bar"><div class="file-fill"></div></div>`;
+  fileListEl.appendChild(el);
+  f._el=el; f._fill = el.querySelector('.file-fill'); f._progress = 0;
+  // randomize effective speed so fills look organic
+  f._speed = 0.9 + Math.random()*1.8;
+});
 
-let t=0;
-function draw(){
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.beginPath();
-  const amp=40;
-  const freq=0.02;
-  for(let x=0;x<c.width;x+=20){
-    const y=c.height/2 + Math.sin(x*freq+t)*amp*Math.cos(t*0.5);
-    ctx.lineTo(x,y);
+/* ========== realistic log templates ========== */
+const LOG_TEMPLATES = [
+  "Performing power-on self test",
+  "Initializing boundary-engine modules",
+  "Opening data store: /var/dasbem/data",
+  "Loading node coordinates ({N} nodes)",
+  "Loading element connectivity ({E} elems)",
+  "Validating kernel signatures",
+  "Restoring preconditioner blocks ({B} bytes)",
+  "Assembling influence matrix",
+  "Factorizing block row {r}/{R}",
+  "Spawning solver workers (threads={T})",
+  "CFL/stability checks passed",
+  "Streaming input waveform frames",
+  "License handshake completed",
+  "Module {M} ready",
+  "Integrating fundamental solution with {gq} Gaussian points",
+  "Updating displacement vector for DOF {dof}",
+  "Applying free-surface boundary condition at patch {pid}",
+  "Synchronizing subdomain solvers (threads={th})",
+  "Computing transient SH-wave convolution (t-step {ts})",
+  "Storing response snapshot idx {idx} to /output/resp_{idx}.bin"
+];
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function craft(template){
+  return template.replace(/\{([^\}]+)\}/g, (_,tok)=>{
+    switch(tok){
+      case 'N': return rnd(1200,8192);
+      case 'E': return rnd(600,4096);
+      case 'B': return rnd(1024,65536);
+      case 'r': return rnd(1,9999);
+      case 'R': return rnd(1000,9999);
+      case 'T': return rnd(4,16);
+      case 'M': return pick(["influence","mesh","io","parallel","precond"]);
+      case 'gq': return rnd(8,48);
+      case 'dof': return rnd(1,6)+'-'+rnd(10,999);
+      case 'pid': return 'P'+rnd(1,999);
+      case 'th': return rnd(1,12);
+      case 'ts': return rnd(0,1200);
+      case 'idx': return rnd(100000,999999);
+      default: return rnd(0,9999);
+    }
+  });
+}
+
+/* ========== schedule lines across TOTAL_MS ==========
+   We'll generate a modest number of lines (TOTAL_LINES) and schedule them so they
+   appear smoothly across the 3s window. No artificial numbering/machine text appended.
+====================================================== */
+const timestamps = (function(){
+  const arr=[];
+  for(let i=0;i<TOTAL_LINES;i++){
+    const base = (i / TOTAL_LINES) * TOTAL_MS;
+    // early jitter greater, later smaller
+    const jitter = (1 - i / TOTAL_LINES) * 28;
+    const t = Math.max(0, Math.round(base + (Math.random()*2-1)*jitter));
+    arr.push(t);
   }
-  ctx.strokeStyle='rgba(0,255,136,0.4)';
-  ctx.lineWidth=2;
-  ctx.stroke();
-  t+=0.1;
+  arr[TOTAL_LINES-1] = TOTAL_MS - 90;
+  return arr;
+})();
+
+/* update overall progress based on time and weighted file progresses */
+let start = performance.now();
+function updateOverall(){
+  const now = performance.now();
+  const elapsed = Math.min(TOTAL_MS, now - start);
+  const ratio = elapsed / TOTAL_MS;
+
+  // update each file progress toward a target derived from ratio and weight
+  files.forEach((f, idx)=>{
+    const target = Math.min(100, Math.round(ratio * 100 * (f.weight / (totalWeight/1.4)) * f._speed));
+    // slight variation per file
+    f._progress = Math.max(f._progress, Math.min(100, Math.round(target - idx*0.6 + Math.sin((now/120) + idx)*2)));
+    f._fill.style.width = Math.max(0, Math.min(100,f._progress)) + '%';
+  });
+
+  // compute weighted overall
+  const weighted = files.reduce((s,f)=> s + (Math.min(100,f._progress) * f.weight), 0) / totalWeight;
+  const overall = Math.min(100, Math.round(weighted * 0.98 + ratio*2.2));
+  overallFill.style.width = overall + '%';
+  overallPct.textContent = overall + '%';
+  orb.textContent = 1200 + Math.round((overall/100)*7000);
+}
+
+/* append log line */
+function appendLine(text, cls){
+  const d = document.createElement('div');
+  d.className = 'logLine';
+  const stamp = timeStamp();
+  d.textContent = `${stamp}  ${text}`;
+  viewport.appendChild(d);
+  // keep DOM bounded
+  while(viewport.children.length > 300) viewport.removeChild(viewport.firstChild);
+  // trigger reveal
+  requestAnimationFrame(()=> d.classList.add('show'));
+  // autoscroll
+  viewport.scrollTop = viewport.scrollHeight;
+  return d;
+}
+
+/* Start emission */
+function startEmission(){
+  start = performance.now();
+  // warm initial hints
+  appendLine("Power check · PASS");
+  appendLine("Detecting CPU cores: " + (navigator.hardwareConcurrency || "unknown"));
+  appendLine("Mounting data store");
+
+  // schedule the generated template lines
+  for(let i=0;i<TOTAL_LINES;i++){
+    const t = timestamps[i];
+    setTimeout(((idx)=>{
+      return function(){
+        if(Math.random() < 0.14){
+          appendLine(craft(pick(LOG_TEMPLATES)));
+        } else {
+          // some shorter IO-style lines for variety
+          appendLine(pick([
+            "IO: read " + rnd(1024,65536) + " bytes from /data/waves.bin",
+            "MESH: loaded node block " + rnd(1,13) + "/13",
+            "SOLVER: factorizing block " + rnd(1,24) + "/24",
+            "CACHE: preconditioner warm-up " + rnd(10,99) + "%",
+            "PAR: worker wt-" + rnd(1,12) + " heartbeat OK",
+            "IO: flushed buffer to disk"
+          ]));
+        }
+        updateOverall();
+      };
+    })(i), t);
+  }
+
+  // final message slightly before finish
+  setTimeout(()=>{
+    const el = appendLine("DASBEM Protocol Engaged. System ONLINE.");
+    el.classList.add('final');
+  }, Math.max(TOTAL_MS - 420, timestamps[TOTAL_LINES-1]));
+
+  // tick progress frequently for smooth bar
+  const tick = setInterval(()=> {
+    updateOverall();
+  }, 24);
+
+  // finish: small flash (subtle) then redirect
+  setTimeout(()=>{
+    clearInterval(tick);
+    overallFill.style.width = '100%';
+    overallPct.textContent = '100%';
+    // gentle success flash
+    const flash = document.createElement('div');
+    flash.style.position='fixed'; flash.style.inset='0';
+    flash.style.pointerEvents='none';
+    flash.style.background='radial-gradient(circle at 50% 20%, rgba(255,220,120,0.06), rgba(0,0,0,0))';
+    flash.style.opacity='0'; flash.style.transition='opacity 220ms ease-out';
+    document.body.appendChild(flash);
+    requestAnimationFrame(()=> flash.style.opacity='1');
+    setTimeout(()=>{ flash.style.opacity='0'; }, 200);
+    // final redirect a fraction after finish to let user read final line
+    setTimeout(()=> { try{ window.location.href = REDIRECT; } catch(e){} }, 420);
+  }, TOTAL_MS + 140);
+}
+
+/* kick off automatically */
+startEmission();
+
+/* ========== SEISMIC GRID BACKGROUND ========== */
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = innerWidth;
+  let H = canvas.height = innerHeight;
+  window.addEventListener('resize', ()=>{ W = canvas.width = innerWidth; H = canvas.height = innerHeight; });
+
+  // grid parameters scale with screen
+  function buildGrid(){
+    return {
+      cols: Math.max(14, Math.floor(W/56)),
+      rows: Math.max(8, Math.floor(H/56)),
+    };
+  }
+  let grid = buildGrid();
+
+  // points
+  let points = [];
+  function resetPoints(){
+    points = [];
+    for(let r=0;r<=grid.rows;r++){
+      for(let c=0;c<=grid.cols;c++){
+        points.push({
+          ox: c * (W / grid.cols),
+          oy: r * (H / grid.rows),
+          amp: Math.random()*6 + 2,
+          phase: Math.random()*Math.PI*2
+        });
+      }
+    }
+  }
+  resetPoints();
+
+  const startTime = performance.now();
+  function draw(t){
+    const tt = (t - startTime)/1000;
+    ctx.clearRect(0,0,W,H);
+
+    // faint vignette
+    ctx.fillStyle = "rgba(0,0,0,0)";
+    ctx.fillRect(0,0,W,H);
+
+    // wave center near bottom-left for natural upward propagation
+    const cx = W * 0.32;
+    const cy = H * 0.78;
+
+    ctx.lineWidth = 1;
+    // horizontal lines
+    for(let r=0;r<=grid.rows;r++){
+      ctx.beginPath();
+      for(let c=0;c<=grid.cols;c++){
+        const idx = r*(grid.cols+1)+c;
+        const p = points[idx];
+        const dx = p.ox - cx, dy = p.oy - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy) + 0.0001;
+        const speed = 160; // px/sec
+        const wavePos = (tt*speed);
+        const d = Math.abs(dist - wavePos);
+        const sigma = 80 + (r*1.2);
+        const impact = Math.exp(- (d*d) / (2 * sigma * sigma));
+        const offset = Math.sin(tt*5 + p.phase) * p.amp * impact * (1 + r*0.02);
+        const x = p.ox + (dx/dist) * offset * 0.12;
+        const y = p.oy - offset;
+        if(c===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "rgba(255,153,51,0.038)";
+      ctx.stroke();
+    }
+
+    // vertical lines
+    for(let c=0;c<=grid.cols;c++){
+      ctx.beginPath();
+      for(let r=0;r<=grid.rows;r++){
+        const idx = r*(grid.cols+1)+c;
+        const p = points[idx];
+        const dx = p.ox - cx, dy = p.oy - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy) + 0.0001;
+        const speed = 160;
+        const wavePos = (tt*speed);
+        const d = Math.abs(dist - wavePos);
+        const sigma = 80 + (c*1.2);
+        const impact = Math.exp(- (d*d) / (2 * sigma * sigma));
+        const offset = Math.sin(tt*5 + p.phase) * p.amp * impact * (1 + c*0.02);
+        const x = p.ox + (dx/dist) * offset * 0.12;
+        const y = p.oy - offset;
+        if(r===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "rgba(255,179,71,0.028)";
+      ctx.stroke();
+    }
+
+    // tiny particles to add life (low opacity)
+    const overallPct = parseInt(overallPct.textContent) || 0;
+    const particleCount = 18 + Math.round((100 - overallPct) * 0.24);
+    for(let i=0;i<particleCount;i++){
+      const rx = Math.random() * W * 0.9 + W*0.05;
+      const ry = Math.random() * H * 0.65 + H*0.2;
+      const a = 0.01 + Math.random()*0.04;
+      ctx.beginPath(); ctx.arc(rx + Math.sin(tt*(0.3+i%5))*4, ry + Math.cos(tt*(0.4+i%6))*3, Math.random()*1.2, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,170,80,${a})`; ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
   requestAnimationFrame(draw);
-}
-draw();
 
-// Redirect after 3 seconds
-setTimeout(()=>{window.location.href='index.html';},3000);
+  // when resized, rebuild grid and points
+  window.addEventListener('resize', ()=>{
+    W = canvas.width = innerWidth; H = canvas.height = innerHeight;
+    grid = buildGrid();
+    resetPoints();
+  });
+})();
+
+/* ========== Accessibility: allow user to skip loader by tapping panel (optional) ========== */
+document.querySelector('.panel').addEventListener('click', (e)=>{
+  // Only skip if loader still active
+  try{
+    overallFill.style.width='100%';
+    overallPct.textContent='100%';
+    const final = document.createElement('div'); final.className='logLine final'; final.textContent = timeStamp() + '  User skipped loader — entering main interface.';
+    viewport.appendChild(final); final.classList.add('show');
+    setTimeout(()=>{ window.location.href = REDIRECT; }, 280);
+  }catch(e){}
+});
+
 </script>
-
 </body>
 </html>
