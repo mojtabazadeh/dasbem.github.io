@@ -19,9 +19,39 @@
 html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
 
 /* ===== Page Loader ===== */
-#siteLoader{position:fixed;inset:0;background:var(--bg-dark);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 1s ease;}
-#siteLoader div{color:var(--accent);font-family:'Playfair Display',serif;font-size:2rem;opacity:0;animation:loaderFade 1.5s forwards;}
-@keyframes loaderFade{0%{opacity:0;transform:translateY(15px);}100%{opacity:1;transform:translateY(0);}}
+#siteLoader{position:fixed;inset:0;background:#050505;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#header{
+  font-size:18px; color:#ff9900;
+  margin-bottom:12px; user-select:none; -webkit-user-select:none;
+}
+.viewport{
+  flex:1; overflow-y:auto; padding:10px 12px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-radius:8px; border:1px solid rgba(255,255,255,0.03);
+  word-break:break-word;
+  max-height:50vh; width:90vw;
+}
+.logLine{
+  font-size:13px; line-height:1.25; margin:4px 0;
+  font-family:'Share Tech Mono', monospace;
+  color:#39ff14;
+}
+.finalLine{
+  color:#ffcc33; font-weight:700; font-size:15px;
+  margin-top:10px; padding:6px 10px; border-radius:6px;
+  background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
+  text-shadow:0 0 6px rgba(255,204,51,0.14);
+}
+.progressWrap{
+  height:16px; background:rgba(255,255,255,0.06);
+  border-radius:10px; overflow:hidden; margin-top:12px; border:1px solid rgba(255,255,255,0.03);
+  width:90vw;
+}
+.progressBar{
+  width:0%; height:100%;
+  background:linear-gradient(90deg,#ff9900,#ffcc33);
+  transition:width 50ms linear;
+}
 
 /* ===== Background canvas ===== */
 #waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
@@ -165,12 +195,10 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 
 <!-- Page loader -->
 <div id="siteLoader">
-  <div>
-    <div id="app">
-      <div id="header">Initializing DASBEM Core...</div>
-      <div class="viewport" id="viewport"></div>
-      <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
-    </div>
+  <div id="app">
+    <div id="header">Initializing DASBEM Core...</div>
+    <div class="viewport" id="viewport"></div>
+    <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
   </div>
 </div>
 
@@ -230,84 +258,6 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 
 <script>
 /* ===== Page Loader ===== */
-window.addEventListener('load',()=>{
-  const loader=document.getElementById('siteLoader');
-  loader.style.opacity='0';
-  setTimeout(()=>loader.remove(),1000);
-});
-
-/* ===== Background particles ===== */
-(function(){
-  const canvas=document.getElementById('waveCanvas');
-  const ctx=canvas.getContext('2d');
-  let particles=[], isMobile=window.innerWidth<=640;
-  const mouse={x:-999,y:-999};
-  function resize(){canvas.width=innerWidth; canvas.height=innerHeight; initParticles();}
-  function initParticles(){
-    const count=isMobile?30:120;
-    particles=Array.from({length:count},()=>({
-      x:Math.random()*innerWidth,
-      y:Math.random()*innerHeight,
-      z:Math.random(),
-      r:Math.random()*3+1,
-      vx:(Math.random()-0.5)*(isMobile?0.3:0.6),
-      vy:(Math.random()-0.5)*(isMobile?0.3:0.6)
-    }));
-  }
-  function draw(){
-    ctx.clearRect(0,0,innerWidth,innerHeight);
-    for(let p of particles){
-      const dx=mouse.x-p.x, dy=mouse.y-p.y;
-      const dist=Math.hypot(dx,dy);
-      if(dist<80 && dist>0){p.x-=dx*0.003; p.y-=dy*0.003;}
-      const alpha = 0.2 + (1 - p.z) * 0.6;
-      const size = p.r * (1 + (1 - p.z) * 1.5);
-      ctx.fillStyle=`rgba(255,200,150,${alpha})`;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,size,0,Math.PI*2);
-      ctx.fill();
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0||p.x>innerWidth)p.vx*=-1;
-      if(p.y<0||p.y>innerHeight)p.vy*=-1;
-    }
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener('resize',()=>{
-    isMobile=window.innerWidth<=640;
-    resize();
-  });
-  window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;});
-  window.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
-  resize(); draw();
-})();
-
-/* ===== Papers Wizard ===== */
-(function(){
-  const papers=[
-    {title:"Time-History Responses on the Surface by Regularly Distributed Enormous Embedded Cavities: Incident SH-Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2018",href:"https://bayanbox.ir/download/7050831466408904062/3.pdf",journal:"https://www.equsci.org.cn/article/doi/10.29382/eqs-2018-0137-3?pageType=en",thumb:"https://bayanbox.ir/view/8045563318987990212/3.jpg",abstract:"The time-history responses of the surface were obtained for a linear elastic half-plane including regularly distributed enormous embedded circular cavities subjected to propagating obliquely incident plane SH-waves. An advanced numerical approach named half-plane time-domain boundary element method (BEM), which only located the meshes around the cavities, was used to create the model. By establishing the corresponding BEM system equations, the time-domain responses of displacement and stress were calculated. Results show that the maximum amplitude of the surface responses strongly depends on the frequency and cavity distribution."},
-    {title:"Transient Responses of SH-Waves in a Non-Homogeneous Elastic Half-Space",authors:"S. Mojtabazadeh",year:"2020",href:"https://bayanbox.ir/download/7969753210477108201/2.pdf",journal:"https://www.sciencedirect.com/science/article/pii/S1877705819317199",thumb:"https://bayanbox.ir/view/8809203073173183741/2.jpg",abstract:"This paper investigates transient SH-wave responses in a non-homogeneous linear elastic half-space, focusing on topographic features as a case study. A boundary element method (BEM) formulation with variable fundamental solutions was applied. The results highlight the influence of elastic property gradients on wave propagation and stress distribution."}
-  ];
-  const list=document.getElementById('paperList');
-  const wizard=document.getElementById('wizard');
-  const wThumb=document.getElementById('w-thumb');
-  const wBody=document.getElementById('w-body');
-  papers.forEach((p)=>{
-    const div=document.createElement('div');
-    div.className='paper';
-    div.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt="${p.title} thumbnail"></div>
-    <div class="meta"><div class="p-title">${p.title}</div><div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>
-    <a class="download-btn" href="${p.href}" target="_blank">📄 Download PDF</a>
-    <a class="journal-btn" href="${p.journal}" target="_blank">🔗 Journal Link</a>
-    </div>`;
-    div.addEventListener('mouseenter',()=>{ wThumb.innerHTML=`<img src="${p.thumb}">`; wBody.innerHTML=p.abstract; wizard.classList.add('show'); });
-    div.addEventListener('mouseleave',()=>{ wizard.classList.remove('show'); });
-    list.appendChild(div);
-  });
-})();
-</script>
-
-<!-- ===== DASBEM Loader Script ===== -->
-<script>
 const REDIRECT = "index.html";
 const TOTAL_DURATION = 4000; // ms
 const TOTAL_LINES = 350;
@@ -374,12 +324,11 @@ function startLoader(){
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
     document.getElementById('app').style.transition = "opacity 0.6s ease";
     document.getElementById('app').style.opacity = 0;
-    setTimeout(()=>{ window.location.href = REDIRECT; }, 700);
+    setTimeout(()=>{ document.getElementById('siteLoader').remove(); window.location.href = REDIRECT; }, 700);
   }, TOTAL_DURATION+200);
 }
 
 startLoader();
 </script>
-
 </body>
 </html>
