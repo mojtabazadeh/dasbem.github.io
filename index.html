@@ -222,13 +222,13 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 }
 
 /* Fade in content */
-body.fade-in {
-  opacity: 1;
-  transition: opacity 0.7s ease;
-}
 body {
-  opacity: 0; /* شروع با محتوا مخفی */
+  opacity: 0; transition: opacity 0.7s ease; /* شروع با محتوا مخفی */
 }
+  body.fade-in {
+  opacity: 1; 
+}
+
 </style>
 </head>
 <body>
@@ -300,17 +300,13 @@ const TOTAL_DURATION = 4000; // ms
 const TOTAL_LINES = 350;
 setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    
-    // Fade out loader
+
     const loader = document.getElementById('siteLoader');
-    loader.classList.add('fade-out');
+    loader.classList.add('fade-out'); // افکت مخفی شدن
 
-    // Fade in صفحه اصلی
-    document.body.classList.add('fade-in');
+    document.body.classList.add('fade-in'); // افکت ظاهر شدن محتوا
 
-    setTimeout(()=>{
-      loader.style.display = 'none';
-    }, 700); // طول انیمیشن
+    setTimeout(()=>{ loader.style.display='none'; }, 700);
 }, TOTAL_DURATION+200);
 
 const viewport = document.getElementById('loader-viewport');
