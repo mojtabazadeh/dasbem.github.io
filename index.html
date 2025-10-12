@@ -23,9 +23,9 @@ html,body{
 
 #app{
   display:flex; flex-direction:column;
-  height:calc(100% - 60px); /* فاصله از بالا و پایین */
+  height:calc(100% - 60px);
   width:calc(100% - 40px);
-  padding:30px 20px; /* بالا و پایین بیشتر */
+  padding:30px 20px;
 }
 
 #header{
@@ -53,7 +53,8 @@ html,body{
 
 .progressWrap{
   height:16px; background:rgba(255,255,255,0.06);
-  border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03);
+  border-radius:10px; overflow:hidden; margin-top:16px;
+  border:1px solid rgba(255,255,255,0.03);
 }
 
 .progressBar{
@@ -77,9 +78,10 @@ html,body{
 </div>
 
 <script>
-const REDIRECT = "index.html";
-const TOTAL_DURATION = 4000; // ms
-const TOTAL_LINES = 350;
+const REDIRECT = "/"; // آدرس ثابت بدون index.html
+const TOTAL_DURATION = 60000; // ms (1 دقیقه)
+const TOTAL_LINES = 1200; // تعداد خطوط برای نمایش
+const MAX_DOM_LINES = 200; // محدودیت خطوط در DOM برای کارایی
 
 const viewport = document.getElementById('viewport');
 const progressBar = document.getElementById('progressBar');
@@ -98,7 +100,6 @@ const stages = [
   "Optimizing recursive convolution windows...",
   "Storing intermediate snapshots...",
   "Finalizing time-domain solver...",
-
   "Evaluating elastodynamic Green's functions [G{rnd}]...",
   "Performing LU factorization on influence submatrix {sub}...",
   "Computing boundary integral for SH-wave field [SH{rnd}].res...",
@@ -110,30 +111,29 @@ const stages = [
   "Storing intermediate response snapshot [RS{rnd}].bin...",
   "Validating HSTD-BEM residuals (tolerance={tol})...",
   "Exporting motion history segment [MH{rnd}].out...",
-  "Initializing recursive time-domain solver module '{mod}'..."
+  "Initializing recursive time-domain solver module '{mod}'...",
+  "Running temporal Fourier transform kernel...",
+  "Allocating dynamic memory buffers...",
+  "Updating convergence criteria at iteration {it}...",
+  "Computing seismic amplification factor...",
+  "Storing intermediate result packet [PK{rnd}].tmp...",
+  "Synchronizing solver threads..."
 ];
 
 function makeLine(){
   const stage = pick(stages);
   let extra = "";
   
-  if(stage.includes("coefficients") || stage.includes("matrices")) 
-      extra = " [F"+rnd(1000,9999)+".bin]";
-  if(stage.includes("snapshots") || stage.includes("response")) 
-      extra = " [S"+rnd(100,999)+"]";
-  if(stage.includes("convolution") || stage.includes("memory")) 
-      extra = " window="+rnd(10,500)+"ms";
-  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) 
-      extra = " Node"+rnd(10,999);
-  if(stage.includes("Green's functions")) 
-      extra = " [G"+rnd(1000,9999)+".dat]";
-  if(stage.includes("spectral amplification")) 
-      extra = " [AMP"+rnd(10,99)+"]";
-  if(stage.includes("motion history")) 
-      extra = " [MH"+rnd(1000,9999)+".out]";
-  if(stage.includes("recursive time-domain solver")) 
-      extra = " Module-"+pick(["kern","conv","io","solver","post"]);
-
+  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
+  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
+  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
+  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
+  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
+  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
+  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
+  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
+  if(stage.includes("iteration")) extra = " step="+rnd(1,999);
+  
   return stage.replace(/\{rnd\}/g, () => rnd(1000,9999))
               .replace(/\{sub\}/g, () => "K"+rnd(1,99))
               .replace(/\{blk\}/g, () => rnd(1,24))
@@ -141,6 +141,8 @@ function makeLine(){
               .replace(/\{edge\}/g, () => rnd(0,7))
               .replace(/\{coordSys\}/g, () => pick(["local","global","geo"]))
               .replace(/\{tol\}/g, () => (Math.random()*1e-3).toExponential(2))
+              .replace(/\{it\}/g, () => rnd(1,999))
+              .replace(/\{mod\}/g, () => pick(["kern","conv","io","solver","post"]))
               + extra;
 }
 
@@ -151,7 +153,7 @@ function pushLine(text, final=false){
   if(final) el.classList.add('finalLine');
   el.textContent = text;
   viewport.appendChild(el);
-  while(viewport.children.length>220) viewport.removeChild(viewport.children[0]);
+  while(viewport.children.length>MAX_DOM_LINES) viewport.removeChild(viewport.children[0]);
   viewport.scrollTop = viewport.scrollHeight;
 
   loadedCount++;
@@ -159,25 +161,25 @@ function pushLine(text, final=false){
   progressBar.style.width = pct+"%";
 }
 
+// توزیع زمان‌بندی طبیعی‌تر
 const timestamps = Array.from({length:TOTAL_LINES}, (_,i)=>{
-  const base = (i/TOTAL_LINES)*TOTAL_DURATION;
-  const jitter = (1 - Math.abs(i/TOTAL_LINES-0.5)*2)*30;
-  return base + (Math.random()*jitter*2 - jitter);
+  const t = i / TOTAL_LINES;
+  const ease = 0.5 - Math.cos(t * Math.PI) / 2; // smooth start/end
+  return ease * TOTAL_DURATION;
 });
 
 function startLoader(){
   for(let i=0;i<TOTAL_LINES;i++){
-    setTimeout(((idx)=>{
-      return function(){ pushLine(makeLine()); };
-    })(i), timestamps[i]);
+    setTimeout(()=> pushLine(makeLine()), timestamps[i]);
   }
 
   setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    document.getElementById('app').style.transition = "opacity 0.6s ease";
-    document.getElementById('app').style.opacity = 0;
-    setTimeout(()=>{ window.location.href = REDIRECT; }, 700);
-  }, TOTAL_DURATION+200);
+    const app = document.getElementById('app');
+    app.style.transition = "opacity 1s ease";
+    app.style.opacity = 0;
+    setTimeout(()=>{ window.location.href = REDIRECT; }, 1200);
+  }, TOTAL_DURATION + 800);
 }
 
 startLoader();
