@@ -2,172 +2,115 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>DASBEM Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{
+:root {
   --bg:#050505;
   --text:#39ff14;
   --accent:#ff9900;
   --gold:#ffcc33;
 }
 
-/* ====== ساختار کلی صفحه ====== */
-html,body{
-  margin:0; padding:0; width:100%; height:100%;
+/* تمام صفحه و سازگار با موبایل */
+html, body {
+  margin:0; padding:0;
+  width:100%; height:100%;
   background:var(--bg); color:var(--text);
   font-family:'Share Tech Mono', monospace;
-  overflow:hidden;
+  overflow:hidden; /* جلوگیری از اسکرول */
 }
 
-/* ====== بخش لودر ====== */
-#loader{
+#app {
   position:fixed;
-  inset:0;
+  inset:0; /* top:0; right:0; bottom:0; left:0 */
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
+  padding:30px 20px;
+  box-sizing:border-box;
   background:radial-gradient(circle at 50% 40%, #0a0a0a 0%, #010101 100%);
-  z-index:1000;
-  transition:opacity 0.8s ease;
+  z-index:9999;
+  transition:opacity 0.6s ease;
 }
 
-#loader::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.015) 0px,
-    rgba(255,255,255,0.015) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  animation:scan 6s linear infinite;
-  pointer-events:none;
-}
-@keyframes scan{
-  0%{transform:translateY(0);}
-  100%{transform:translateY(-20px);}
+/* ساختار اصلی */
+#header {
+  font-size:18px; color:var(--accent);
+  margin-bottom:12px; user-select:none; -webkit-user-select:none;
 }
 
-/* عنوان بالای لودر */
-#header{
-  font-size:clamp(16px,2vw,22px);
-  color:var(--accent);
-  margin-bottom:14px;
-  text-shadow:0 0 10px rgba(255,153,0,0.5);
-  z-index:2;
-  user-select:none;
-}
-
-/* پنجره متن لودینگ */
-.viewport{
-  width:90%;
-  max-width:600px;
-  height:40vh;
-  overflow-y:auto;
-  background:rgba(255,255,255,0.02);
-  border:1px solid rgba(255,255,255,0.05);
-  border-radius:10px;
+.viewport {
+  flex:1; overflow-y:auto; width:100%;
+  max-width:720px; /* محدودیت عرض برای زیبایی در دسکتاپ */
   padding:12px 14px;
-  box-shadow:0 0 25px rgba(57,255,20,0.06);
-  z-index:2;
-}
-.viewport::-webkit-scrollbar{
-  width:4px;
-}
-.viewport::-webkit-scrollbar-thumb{
-  background:rgba(57,255,20,0.3);
-  border-radius:2px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.03);
+  word-break:break-word;
 }
 
-.logLine{
-  font-size:clamp(11px,1.5vw,13px);
-  line-height:1.25;
-  margin:4px 0;
+.logLine {
+  font-size:13px; line-height:1.25; margin:4px 0;
 }
-.finalLine{
-  color:var(--gold);
-  font-weight:700;
-  font-size:clamp(13px,1.8vw,15px);
-  margin-top:10px;
-  padding:6px 10px;
+
+.finalLine {
+  color:var(--gold); font-weight:700; font-size:15px;
+  margin-top:10px; padding:6px 10px;
   border-radius:6px;
-  background:linear-gradient(90deg, rgba(255,204,51,0.05), transparent);
-  text-shadow:0 0 6px rgba(255,204,51,0.25);
+  background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
+  text-shadow:0 0 6px rgba(255,204,51,0.14);
 }
 
-/* نوار پیشرفت */
-.progressWrap{
-  width:90%;
-  max-width:600px;
-  height:16px;
+.progressWrap {
+  height:16px; width:100%;
+  max-width:720px;
   background:rgba(255,255,255,0.06);
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:20px;
-  border:1px solid rgba(255,255,255,0.04);
-  z-index:2;
+  border-radius:10px; overflow:hidden;
+  margin-top:16px;
+  border:1px solid rgba(255,255,255,0.03);
 }
-.progressBar{
+
+.progressBar {
   width:0%; height:100%;
   background:linear-gradient(90deg,#ff9900,#ffcc33);
   transition:width 50ms linear;
-  box-shadow:0 0 8px #ffcc33cc;
 }
 
-/* ====== محتوای اصلی ====== */
-#mainContent{
-  opacity:0;
-  transition:opacity 1.2s ease;
-  position:relative;
-  z-index:1;
-}
-#mainContent.visible{
-  opacity:1;
-}
-
-/* ====== موبایل ====== */
-@media(max-width:480px){
-  .viewport{height:45vh;}
-  .progressWrap{height:14px;}
+/* واکنش‌گرا برای موبایل */
+@media(max-width:640px) {
+  #header { font-size:16px; }
+  .logLine { font-size:12px; }
+  .progressWrap { height:14px; }
+  .viewport { max-width:100%; }
 }
 </style>
 </head>
 <body>
 
-<!-- لودر تمام‌صفحه -->
-<div id="loader">
+<div id="app">
   <div id="header">Initializing The DASBEM Project Core...</div>
   <div class="viewport" id="viewport"></div>
   <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
-<!-- محتوای اصلی سایت -->
-<div id="mainContent">
-  <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;text-align:center;">
-    <h1 style="color:var(--gold);font-size:clamp(26px,5vw,42px);margin-bottom:10px;">Welcome to DASBEM</h1>
-    <p style="color:#ccc;font-size:clamp(14px,2.5vw,18px);max-width:600px;">
-      The Dynamic Analysis System for Boundary Element Modeling is now active.
-    </p>
-  </div>
-</div>
-
 <script>
-/* ====== تنظیمات کلی ====== */
-const TOTAL_DURATION = 4000; // ms
+/* ------------------- تنظیمات اصلی ------------------- */
+const REDIRECT = "/";              // مسیر بعد از لودر (بدون index.html)
+const TOTAL_DURATION = 4000;       // ms
 const TOTAL_LINES = 350;
 
+/* ------------------- المان‌ها ------------------- */
 const viewport = document.getElementById('viewport');
 const progressBar = document.getElementById('progressBar');
 
+/* ------------------- توابع کمکی ------------------- */
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function pick(arr){ return arr[rnd(0,arr.length-1)]; }
 
-/* مراحل لودینگ */
+/* ------------------- داده‌های ساختگی ------------------- */
 const stages = [
   "Initializing computational kernel...",
   "Loading half-space fundamental solution coefficients...",
@@ -193,27 +136,18 @@ const stages = [
   "Initializing recursive time-domain solver module '{mod}'..."
 ];
 
-/* تولید خطوط تصادفی لود */
+/* ------------------- ساخت خطوط ------------------- */
 function makeLine(){
   const stage = pick(stages);
   let extra = "";
-  
-  if(stage.includes("coefficients") || stage.includes("matrices")) 
-      extra = " [F"+rnd(1000,9999)+".bin]";
-  if(stage.includes("snapshots") || stage.includes("response")) 
-      extra = " [S"+rnd(100,999)+"]";
-  if(stage.includes("convolution") || stage.includes("memory")) 
-      extra = " window="+rnd(10,500)+"ms";
-  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) 
-      extra = " Node"+rnd(10,999);
-  if(stage.includes("Green's functions")) 
-      extra = " [G"+rnd(1000,9999)+".dat]";
-  if(stage.includes("spectral amplification")) 
-      extra = " [AMP"+rnd(10,99)+"]";
-  if(stage.includes("motion history")) 
-      extra = " [MH"+rnd(1000,9999)+".out]";
-  if(stage.includes("recursive time-domain solver")) 
-      extra = " Module-"+pick(["kern","conv","io","solver","post"]);
+  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
+  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
+  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
+  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
+  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
+  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
+  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
+  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
 
   return stage.replace(/\{rnd\}/g, () => rnd(1000,9999))
               .replace(/\{sub\}/g, () => "K"+rnd(1,99))
@@ -222,10 +156,11 @@ function makeLine(){
               .replace(/\{edge\}/g, () => rnd(0,7))
               .replace(/\{coordSys\}/g, () => pick(["local","global","geo"]))
               .replace(/\{tol\}/g, () => (Math.random()*1e-3).toExponential(2))
+              .replace(/\{mod\}/g, () => pick(["core","conv","io","solver","post"]))
               + extra;
 }
 
-/* درج خطوط در ویوپورت */
+/* ------------------- نمایش خطوط و نوار پیشرفت ------------------- */
 let loadedCount = 0;
 function pushLine(text, final=false){
   const el = document.createElement('div');
@@ -235,20 +170,19 @@ function pushLine(text, final=false){
   viewport.appendChild(el);
   while(viewport.children.length>220) viewport.removeChild(viewport.children[0]);
   viewport.scrollTop = viewport.scrollHeight;
-
   loadedCount++;
   const pct = Math.min(100, Math.round((loadedCount/TOTAL_LINES)*100));
   progressBar.style.width = pct+"%";
 }
 
-/* تولید تایمینگ تصادفی خطوط */
+/* ------------------- زمان‌بندی خطوط ------------------- */
 const timestamps = Array.from({length:TOTAL_LINES}, (_,i)=>{
   const base = (i/TOTAL_LINES)*TOTAL_DURATION;
   const jitter = (1 - Math.abs(i/TOTAL_LINES-0.5)*2)*30;
   return base + (Math.random()*jitter*2 - jitter);
 });
 
-/* اجرای لودر */
+/* ------------------- اجرای لودر ------------------- */
 function startLoader(){
   for(let i=0;i<TOTAL_LINES;i++){
     setTimeout(((idx)=>{
@@ -256,20 +190,17 @@ function startLoader(){
     })(i), timestamps[i]);
   }
 
+  // خط نهایی و افکت محو
   setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    const loader = document.getElementById('loader');
-    const main = document.getElementById('mainContent');
-
-    loader.style.opacity = 0;
-    setTimeout(()=>{
-      loader.style.display = 'none';
-      main.classList.add('visible');
-    }, 900);
+    const app = document.getElementById('app');
+    app.style.opacity = 0;
+    setTimeout(()=>{ window.location.href = REDIRECT; }, 700);
   }, TOTAL_DURATION+200);
 }
 
 startLoader();
 </script>
+
 </body>
 </html>
