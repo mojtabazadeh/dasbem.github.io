@@ -17,20 +17,15 @@ html,body{
   margin:0; padding:0; width:100%; height:100%;
   background:var(--bg); color:var(--text);
   font-family:'Share Tech Mono', monospace;
-  overflow:hidden; /* جلوگیری از اسکرول صفحه */
+  display:flex; justify-content:center; align-items:center;
+  overflow:hidden;
 }
 
 #app{
-  position:fixed; /* تمام‌صفحه واقعی */
-  inset:0;
   display:flex; flex-direction:column;
-  justify-content:center; align-items:center;
-  width:100%; height:100%;
-  padding:30px 20px;
-  background:radial-gradient(circle at 50% 40%, #0a0a0a 0%, #010101 100%);
-  box-sizing:border-box;
-  z-index:9999;
-  transition:opacity 0.6s ease;
+  height:calc(100% - 60px); /* فاصله از بالا و پایین */
+  width:calc(100% - 40px);
+  padding:30px 20px; /* بالا و پایین بیشتر */
 }
 
 #header{
@@ -43,7 +38,6 @@ html,body{
   background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
   border-radius:8px; border:1px solid rgba(255,255,255,0.03);
   word-break:break-word;
-  max-width:720px; width:100%;
 }
 
 .logLine{
@@ -59,9 +53,7 @@ html,body{
 
 .progressWrap{
   height:16px; background:rgba(255,255,255,0.06);
-  border-radius:10px; overflow:hidden; margin-top:16px;
-  border:1px solid rgba(255,255,255,0.03);
-  max-width:720px; width:100%;
+  border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03);
 }
 
 .progressBar{
@@ -74,7 +66,6 @@ html,body{
   #header{font-size:16px;}
   .logLine{font-size:12px;}
   .progressWrap{height:14px;}
-  .viewport{max-width:100%;}
 }
 </style>
 </head>
@@ -86,7 +77,7 @@ html,body{
 </div>
 
 <script>
-const REDIRECT = "/"; // آدرس اصلی سایت، بدون index.html
+const REDIRECT = "index.html";
 const TOTAL_DURATION = 4000; // ms
 const TOTAL_LINES = 350;
 
@@ -107,6 +98,7 @@ const stages = [
   "Optimizing recursive convolution windows...",
   "Storing intermediate snapshots...",
   "Finalizing time-domain solver...",
+
   "Evaluating elastodynamic Green's functions [G{rnd}]...",
   "Performing LU factorization on influence submatrix {sub}...",
   "Computing boundary integral for SH-wave field [SH{rnd}].res...",
@@ -125,14 +117,22 @@ function makeLine(){
   const stage = pick(stages);
   let extra = "";
   
-  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
-  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
-  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
-  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
-  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
-  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
-  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
-  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
+  if(stage.includes("coefficients") || stage.includes("matrices")) 
+      extra = " [F"+rnd(1000,9999)+".bin]";
+  if(stage.includes("snapshots") || stage.includes("response")) 
+      extra = " [S"+rnd(100,999)+"]";
+  if(stage.includes("convolution") || stage.includes("memory")) 
+      extra = " window="+rnd(10,500)+"ms";
+  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) 
+      extra = " Node"+rnd(10,999);
+  if(stage.includes("Green's functions")) 
+      extra = " [G"+rnd(1000,9999)+".dat]";
+  if(stage.includes("spectral amplification")) 
+      extra = " [AMP"+rnd(10,99)+"]";
+  if(stage.includes("motion history")) 
+      extra = " [MH"+rnd(1000,9999)+".out]";
+  if(stage.includes("recursive time-domain solver")) 
+      extra = " Module-"+pick(["kern","conv","io","solver","post"]);
 
   return stage.replace(/\{rnd\}/g, () => rnd(1000,9999))
               .replace(/\{sub\}/g, () => "K"+rnd(1,99))
@@ -174,8 +174,8 @@ function startLoader(){
 
   setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    const app = document.getElementById('app');
-    app.style.opacity = 0; // افکت محو خروجی
+    document.getElementById('app').style.transition = "opacity 0.6s ease";
+    document.getElementById('app').style.opacity = 0;
     setTimeout(()=>{ window.location.href = REDIRECT; }, 700);
   }, TOTAL_DURATION+200);
 }
