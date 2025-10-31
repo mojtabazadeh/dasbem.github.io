@@ -18,67 +18,10 @@
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
 
-  html,body{
-  margin:0; padding:0; width:100%; height:100%;
-  background:var(--bg); color:var(--text);
-  font-family:'Share Tech Mono', monospace;
-  overflow:hidden;
-}
-
 /* ===== Page Loader ===== */
-#loader {
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  background:var(--bg);
-  color:var(--text);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  transition:opacity 1s ease, visibility 1s ease;
-}
-
-#app{
-  display:flex; flex-direction:column;
-  height:calc(100% - 60px);
-  width:calc(100% - 40px);
-  padding:30px 20px;
-}
-
-#header{
-  font-size:18px; color:var(--accent);
-  margin-bottom:12px; user-select:none;
-}
-
-.viewport{
-  flex:1; overflow-y:auto; padding:12px 14px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-  border-radius:8px; border:1px solid rgba(255,255,255,0.03);
-  word-break:break-word;
-}
-
-.logLine{
-  font-size:13px; line-height:1.25; margin:4px 0;
-}
-
-.finalLine{
-  color:var(--gold); font-weight:700; font-size:15px;
-  margin-top:10px; padding:6px 10px; border-radius:6px;
-  background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
-  text-shadow:0 0 6px rgba(255,204,51,0.14);
-}
-
-.progressWrap{
-  height:16px; background:rgba(255,255,255,0.06);
-  border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03);
-}
-
-.progressBar{
-  width:0%; height:100%;
-  background:linear-gradient(90deg,#ff9900,#ffcc33);
-  transition:width 50ms linear;
-}
+#siteLoader{position:fixed;inset:0;background:var(--bg-dark);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 1s ease;}
+#siteLoader div{color:var(--accent);font-family:'Playfair Display',serif;font-size:2rem;opacity:0;animation:loaderFade 1.5s forwards;}
+@keyframes loaderFade{0%{opacity:0;transform:translateY(15px);}100%{opacity:1;transform:translateY(0);}}
 
 /* ===== Background canvas ===== */
 #waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
@@ -221,13 +164,7 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 <body>
 
 <!-- Page loader -->
-<div id="loader">
-  <div id="app">
-    <div id="header">Initializing The DASBEM Project Core...</div>
-    <div class="viewport" id="viewport"></div>
-    <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
-  </div>
-</div>
+<div id="siteLoader"><div> >D A S B E M . I R_ </div></div>
 
 <canvas id="waveCanvas" aria-hidden="true"></canvas>
 
@@ -285,101 +222,11 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 
 <script>
 /* ===== Page Loader ===== */
-const TOTAL_DURATION = 4000; // زمان لودر
-const FINAL_DELAY = 1800;    // توقف بیشتر برای خط آخر
-const TOTAL_LINES = 350;
-
-const viewport = document.getElementById('viewport');
-const progressBar = document.getElementById('progressBar');
-
-function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-function pick(arr){ return arr[rnd(0,arr.length-1)]; }
-
-const stages = [
-  "Initializing computational kernel...",
-  "Loading half-space fundamental solution coefficients...",
-  "Reading boundary element matrices...",
-  "Assembling influence coefficients...",
-  "Integrating transient SH-wave responses...",
-  "Applying free-surface boundary conditions...",
-  "Computing displacement and stress vectors...",
-  "Optimizing recursive convolution windows...",
-  "Storing intermediate snapshots...",
-  "Finalizing time-domain solver...",
-  "Evaluating elastodynamic Green's functions [G{rnd}]...",
-  "Performing LU factorization on influence submatrix {sub}...",
-  "Computing boundary integral for SH-wave field [SH{rnd}].res...",
-  "Synchronizing half-space radiation conditions...",
-  "Post-processing spectral amplification map [AMP{rnd}].amp...",
-  "Loading convolution memory blocks {blk} of {totalBlk}...",
-  "Applying non-reflective boundary matrix at edge {edge}...",
-  "Transforming local to global coordinate system '{coordSys}'...",
-  "Storing intermediate response snapshot [RS{rnd}].bin...",
-  "Validating HSTD-BEM residuals (tolerance={tol})...",
-  "Exporting motion history segment [MH{rnd}].out...",
-  "Initializing recursive time-domain solver module '{mod}'..."
-];
-
-function makeLine(){
-  const stage = pick(stages);
-  let extra = "";
-  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
-  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
-  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
-  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
-  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
-  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
-  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
-  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
-  return stage.replace(/\{rnd\}/g, () => rnd(1000,9999))
-              .replace(/\{sub\}/g, () => "K"+rnd(1,99))
-              .replace(/\{blk\}/g, () => rnd(1,24))
-              .replace(/\{totalBlk\}/g, () => rnd(24,128))
-              .replace(/\{edge\}/g, () => rnd(0,7))
-              .replace(/\{coordSys\}/g, () => pick(["local","global","geo"]))
-              .replace(/\{tol\}/g, () => (Math.random()*1e-3).toExponential(2))
-              + extra;
-}
-
-let loadedCount = 0;
-function pushLine(text, final=false){
-  const el = document.createElement('div');
-  el.className = 'logLine';
-  if(final) el.classList.add('finalLine');
-  el.textContent = text;
-  viewport.appendChild(el);
-  while(viewport.children.length>220) viewport.removeChild(viewport.children[0]);
-  viewport.scrollTop = viewport.scrollHeight;
-  loadedCount++;
-  const pct = Math.min(100, Math.round((loadedCount/TOTAL_LINES)*100));
-  progressBar.style.width = pct+"%";
-}
-
-const timestamps = Array.from({length:TOTAL_LINES}, (_,i)=>{
-  const base = (i/TOTAL_LINES)*TOTAL_DURATION;
-  const jitter = (1 - Math.abs(i/TOTAL_LINES-0.5)*2)*30;
-  return base + (Math.random()*jitter*2 - jitter);
+window.addEventListener('load',()=>{
+  const loader=document.getElementById('siteLoader');
+  loader.style.opacity='0';
+  setTimeout(()=>loader.remove(),1000);
 });
-
-function startLoader(){
-  for(let i=0;i<TOTAL_LINES;i++){
-    setTimeout(()=>{ pushLine(makeLine()); }, timestamps[i]);
-  }
-
-  setTimeout(()=>{
-    pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    setTimeout(()=>{
-      const loader = document.getElementById('loader');
-      const main = document.querySelector('main');
-      loader.style.opacity = 0;
-      loader.style.visibility = "hidden";
-      setTimeout(()=> loader.remove(), 900);
-      main.style.opacity = 1; // نمایش محتوای سایت
-    }, FINAL_DELAY);
-  }, TOTAL_DURATION+300);
-}
-
-window.addEventListener("load", startLoader);
 
 /* ===== Background particles ===== */
 (function(){
