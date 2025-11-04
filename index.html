@@ -1,527 +1,195 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>DASBEM.IR</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/refs/heads/main/DASBEM.ico" sizes="48x48">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DASBEM | Dynamic Analysis System</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg-dark:#1a1a1a;
-  --text-light:#fff;
-  --glass: rgba(255,255,255,0.08);
-  --accent:#ffb347;
-  --muted:#ddd;
-  --gold:#ffcc33;
-  --gold-strong:#ffb347;
-  --btn-glow: 0 8px 30px rgba(255,204,51,0.12);
-  --btn-glow-strong: 0 12px 40px rgba(255,180,80,0.18);
+:root {
+  --neon1: #00f3ff;
+  --neon2: #ff00c8;
+  --bg: #050505;
+  --text: #f1f1f1;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Orbitron', sans-serif;
+  overflow-x: hidden;
 }
 
-/* Reset & base */
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-
-/* ===== Header ===== */
-header.site-header{position:relative;z-index:2;text-align:center;padding:80px 20px 60px;}
-header.site-header h1{
-  font-family:"Playfair Display",serif;font-size:3.2rem;font-weight:900;
-  margin:0 0 12px;letter-spacing:1.6px;text-transform:uppercase;
-  background:linear-gradient(90deg,var(--gold-strong),var(--gold),#ff7e5f);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  text-shadow:0 0 18px rgba(255,170,90,0.09);
-  display:inline-block;
-}
-header.site-header p{
-  font-size:1.05rem;color:var(--muted);max-width:820px;margin:0 auto;line-height:1.6;
-}
-
-/* ===== Layout Wrap ===== */
-.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 14px 64px;display:flex;flex-direction:column;align-items:center;}
-
-/* ===== Researchers ===== */
-.header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;width:100%;}
-.researcher{
-  position:relative;width:300px;min-width:260px;
-  display:flex;flex-direction:column;align-items:center;
-  backdrop-filter: blur(6px);padding:18px;border-radius:20px;
-  background:var(--glass);
-  box-shadow:0 10px 30px rgba(0,0,0,0.55);
-  transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;
-}
-.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.7); }
-
-.photo-frame{
-  position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
-  padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.03), transparent 30%);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 12px rgba(255,255,255,0.06) inset;
-  margin-bottom:12px;
-  border: 2px solid rgba(255,255,255,0.04);
-  transition: transform 0.9s ease-in-out;
-}
-.photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;transition: transform 1.2s ease-in-out;}
-
-.name{
-  font-family:"Playfair Display",serif;font-size:1.12rem;font-weight:700;color:var(--text-light);
-  letter-spacing:0.4px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out;
-}
-.name .title-small{ font-size:0.97rem;font-weight:500;color:var(--muted);margin-top:6px;text-align:center;}
-.contact{margin-top:8px;font-size:0.9rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:6px;}
-.contact a{color:var(--accent);text-decoration:none;font-weight:600;}
-.contact a:hover{text-decoration:underline;}
-
-/* ===== Papers ===== */
-.papers{margin-top:18px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.45);width:100%;}
-.papers h3{ margin:0 0 12px 0;font-size:1.3rem;font-family:"Playfair Display",serif;}
-.paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
-.paper{
-  background: rgba(255,255,255,0.06);
-  padding:12px;border-radius:12px;display:flex;flex-direction:column;
-  gap:10px;align-items:center;transition:transform .35s ease, box-shadow .35s ease;
-  cursor:pointer;
-  width:100%;
-}
-.paper:hover{ transform:translateY(-6px); box-shadow:0 12px 30px rgba(0,0,0,0.5); }
-.paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
-.paper .thumb img { filter: blur(8px); transition: filter 0.4s ease-out, transform 0.4s ease-out; transform: scale(1.05);}
-.paper .thumb img.loaded { filter: blur(0); transform: scale(1);}
-.paper .thumb img{width:100%;height:100%;object-fit:cover;}
-.paper .meta{ flex:1; text-align:center;margin-top:6px; }
-.paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
-.paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
-.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
-
-/* ===== Download / Journal Buttons (existing) ===== */
-.download-btn, .journal-btn{
-  display:inline-block;
-  padding:8px 18px;
-  font-size:0.9rem;
-  font-weight:600;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  text-decoration:none;
-  transition:all 0.3s ease;
-  margin:4px 4px 0 0;
-}
-.download-btn{background: linear-gradient(135deg,#ff7e5f,#feb47b);box-shadow:0 4px 15px rgba(255,126,95,0.4);}
-.download-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(255,126,95,0.6);}
-.journal-btn{background: linear-gradient(135deg,#6a11cb,#2575fc);box-shadow:0 4px 15px rgba(106,17,203,0.4);}
-.journal-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(106,17,203,0.6);}
-
-/* ===== Floating special buttons (About & Contact) ===== */
-/* Distinct, glassy, golden pulse style — clearly different from download buttons */
-.floating-btn {
+/* ----------- Fancy Corner Buttons ----------- */
+.corner-btn {
   position: fixed;
   top: 20px;
-  z-index: 9999;
-  padding: 10px 18px;
-  min-width:110px;
-  border-radius: 28px;
-  border: 1px solid rgba(255,200,90,0.18);
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));
-  backdrop-filter: blur(8px);
-  color: var(--gold);
-  font-weight:700;
-  letter-spacing:0.4px;
-  box-shadow: var(--btn-glow);
+  padding: 10px 22px;
+  font-size: 15px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 1px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-image: linear-gradient(90deg, var(--neon1), var(--neon2)) 1;
+  border-radius: 40px;
   cursor: pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  transition: transform .25s ease, box-shadow .25s ease, color .2s ease;
-  -webkit-tap-highlight-color: transparent;
+  z-index: 9999;
+  box-shadow: 0 0 15px var(--neon1), 0 0 25px var(--neon2);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
 }
-#aboutFloat { left: 22px; }
-#contactFloat { right: 22px; }
-
-/* inner visual badge (shine) */
-.floating-btn .badge {
-  width:10px;height:10px;border-radius:50%;
-  background: radial-gradient(circle at 30% 30%, #fff8c6 0%, #ffcc33 30%, #ff9b00 70%);
-  box-shadow: 0 4px 18px rgba(255,180,50,0.25), inset 0 1px 2px rgba(255,255,255,0.4);
-  transform-origin:center;
-  transition: transform .3s ease;
+.corner-btn:hover {
+  color: #fff;
+  background: linear-gradient(90deg, var(--neon1), var(--neon2));
+  box-shadow: 0 0 25px var(--neon1), 0 0 45px var(--neon2), 0 0 65px #fff;
+  transform: scale(1.08);
 }
+.btn-left { left: 20px; }
+.btn-right { right: 20px; }
 
-/* pulse animation */
-@keyframes subtlePulse {
-  0% { box-shadow: 0 8px 30px rgba(255,204,51,0.12); transform: translateY(0);}
-  50% { box-shadow: 0 16px 40px rgba(255,204,51,0.18); transform: translateY(-2px);}
-  100% { box-shadow: 0 8px 30px rgba(255,204,51,0.12); transform: translateY(0);}
-}
-.floating-btn.pulse { animation: subtlePulse 3.6s ease-in-out infinite; }
-
-.floating-btn:hover{
-  color:#111;
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--btn-glow-strong);
-}
-.floating-btn:hover .badge{ transform: scale(1.12); }
-
-/* make them visually distinct from download-btn (which are solid gradients) */
-.floating-btn::after{
-  content:'';
-  position:absolute; inset:0;
-  border-radius:28px;
-  pointer-events:none;
-  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  mix-blend-mode: overlay;
-}
-
-/* ===== Popups (About & Contact) ===== */
-.popup-overlay {
+/* ---------- Modal / Wizard Container ---------- */
+.modal {
   display: none;
   position: fixed;
-  z-index: 9950;
-  left: 0; top: 0;
+  z-index: 99999;
+  top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  justify-content: center;
-  align-items: center;
+  backdrop-filter: blur(12px);
+  background: rgba(0,0,0,0.8);
+  animation: fadeIn 0.5s ease forwards;
 }
-.popup-overlay.show { display:flex; animation: popupFade .2s ease; }
-@keyframes popupFade { from {opacity:0; transform:translateY(-6px)} to {opacity:1; transform:none} }
-
-.popup {
-  width: 92%;
-  max-width: 720px;
-  background: linear-gradient(180deg, rgba(20,20,20,0.96), rgba(16,16,16,0.98));
-  border-radius: 14px;
-  padding: 22px;
-  border: 1px solid rgba(255,200,90,0.08);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  color:var(--text-light);
-  position:relative;
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
-
-/* header of popup */
-.popup h2{ margin:0 0 8px 0; color:var(--gold); font-family:"Playfair Display",serif; font-size:1.35rem; }
-.popup .close {
-  position:absolute; right:14px; top:14px; font-size:20px; color:var(--gold);
-  cursor:pointer; transition:transform .18s ease;
+.modal-content {
+  position: relative;
+  background: rgba(15,15,15,0.9);
+  border: 2px solid;
+  border-image: linear-gradient(135deg, var(--neon1), var(--neon2)) 1;
+  border-radius: 20px;
+  margin: 10% auto;
+  padding: 40px;
+  width: 80%;
+  max-width: 600px;
+  color: var(--text);
+  box-shadow: 0 0 40px var(--neon1), inset 0 0 15px var(--neon2);
+  animation: scaleUp 0.5s ease forwards;
 }
-.popup .close:hover{ transform:scale(1.15); color:#ffd86b; }
-
-/* about text */
-.popup .about-text{ color:var(--muted); line-height:1.6; text-align:justify; max-height:48vh; overflow:auto; padding-right:6px; }
-
-/* contact form */
-.popup form{ margin-top:12px; display:flex; flex-direction:column; gap:10px; }
-.popup input, .popup textarea{
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,200,90,0.06);
-  padding:10px 12px;
-  border-radius:8px;
-  color:var(--gold);
-  font-size:0.95rem;
-  outline:none;
+@keyframes scaleUp {
+  from {transform: scale(0.6); opacity: 0;}
+  to {transform: scale(1); opacity: 1;}
 }
-.popup input::placeholder, .popup textarea::placeholder{ color: rgba(255,200,90,0.36); }
-.popup button.send {
-  margin-top:6px;
-  background: linear-gradient(90deg,var(--gold),#ff9800);
-  color:#111;
-  border:none;
-  padding:10px 12px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-  box-shadow: 0 8px 30px rgba(255,180,70,0.12);
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 26px;
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
-.popup .note{ font-size:0.85rem; color:rgba(255,255,255,0.4); margin-top:8px; }
+.close-btn:hover { color: var(--neon1); }
 
-/* ===== Wizard popup (paper preview) ===== */
-.wizard{
-  position:fixed;z-index:9990;pointer-events:none;opacity:0;transform:scale(.98);
-  transition:all .16s ease;max-width:420px;background: rgba(0,0,0,0.95);
-  border-radius:12px;padding:12px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;
+/* ----------- Contact Form ----------- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
 }
-.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
-.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.92rem; color:#fff; line-height:1.5; max-height:220px; overflow-y:auto; padding-right:6px; text-align:justify; }
-
-/* ===== Footer ===== */
-footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(--muted);}
-
-/* ===== Responsive ===== */
-@media (max-width:640px){
-  header.site-header{padding:40px 12px 28px;}
-  header.site-header h1{font-size:2.4rem;}
-  .floating-btn{ top:14px; padding:8px 14px; min-width:92px; border-radius:22px;}
-  #aboutFloat{ left:12px; }
-  #contactFloat{ right:12px; }
-  .popup{ padding:16px; }
-  .wizard{ max-width:320px;}
+input, textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text);
+  padding: 10px;
+  border-radius: 8px;
+  font-family: inherit;
+}
+input:focus, textarea:focus {
+  border-color: var(--neon1);
+  outline: none;
+  box-shadow: 0 0 10px var(--neon1);
+}
+button.submit-btn {
+  background: linear-gradient(90deg, var(--neon1), var(--neon2));
+  border: none;
+  padding: 12px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+button.submit-btn:hover {
+  box-shadow: 0 0 20px var(--neon1), 0 0 30px var(--neon2);
+  transform: scale(1.05);
 }
 </style>
 </head>
+
 <body>
 
-<!-- Floating Buttons -->
-<button id="aboutFloat" class="floating-btn pulse" aria-label="About DASBEM">
-  <span class="badge" aria-hidden="true"></span>
-  <span style="font-size:0.95rem;">About</span>
-</button>
+<!-- Top Neon Buttons -->
+<button class="corner-btn btn-left" id="aboutBtn">About</button>
+<button class="corner-btn btn-right" id="contactBtn">Contact Us</button>
 
-<button id="contactFloat" class="floating-btn pulse" aria-label="Contact DASBEM">
-  <span style="font-size:0.95rem;">Contact Us</span>
-  <span class="badge" aria-hidden="true"></span>
-</button>
-
-<!-- ===== Main Site (loader removed) ===== -->
-<header class="site-header">
-  <h1>The DASBEM Project</h1>
-  <p>Dynamic Analysis of Structures by Boundary Element Method — modeling wave-structure interaction in semi-infinite domains with advanced time-domain BEM techniques.</p>
-</header>
-
-<div class="wrap">
-  <div class="header" aria-label="Researchers">
-    <section class="researcher" id="r1" aria-labelledby="r1-name">
-      <div class="photo-frame" aria-hidden="true">
-        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
-      </div>
-      <div class="name" id="r1-name">
-        <span>Dr. Mehdi Panji</span>
-        <span class="title-small">Associate Professor</span>
-        <div class="contact">
-          <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
-          <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="researcher" id="r2" aria-labelledby="r2-name">
-      <div class="photo-frame" aria-hidden="true">
-        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
-      </div>
-      <div class="name" id="r2-name">
-        <span>Dr. Saeed Mojtabazadeh</span>
-        <span class="title-small">Postdoctoral Fellow</span>
-        <div class="contact">
-          <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
-          <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <section class="papers" aria-label="Papers">
-    <h3>💡 Download Papers For Free</h3>
-    <div class="paper-list" id="paperList"></div>
-  </section>
-</div>
-
-<footer class="site-footer">
-  The DASBEM Project ©
-</footer>
-
-<!-- Wizard (paper hover preview) -->
-<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
-  <div class="w-thumb" id="w-thumb"></div>
-  <div class="w-body" id="w-body"></div>
-</div>
-
-<!-- About Popup -->
-<div id="aboutPopup" class="popup-overlay" aria-hidden="true" role="dialog" aria-label="About DASBEM Popup">
-  <div class="popup" role="document">
-    <div class="close" onclick="closePopup('aboutPopup')">✕</div>
+<!-- About Modal -->
+<div id="aboutModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" data-close="aboutModal">&times;</span>
     <h2>About DASBEM</h2>
-    <div class="about-text">
-      <p><strong>DASBEM</strong> — Dynamic Analysis of Structures by Boundary Element Method — is an academic platform dedicated to modeling and analyzing wave-structure interaction problems in semi-infinite media using advanced <em>time-domain Boundary Element Methods (BEM)</em>. The project emphasizes efficient handling of infinite domains, accurate radiation boundary conditions, and high-order integration schemes for near-singular kernels.</p>
-      <p>The research integrates transient BEM solvers, arch-based pillar pressure modeling, and practical case studies (e.g., mine stopes and cavity-induced scattering) to provide reliable tools for geotechnical engineers, seismologists, and structural dynamics researchers. DASBEM aims to be a resource for reproducible simulations, downloadable datasets, and open-source code fragments for education and research collaborations.</p>
-      <p style="margin-top:8px;"><strong>Highlights:</strong></p>
-      <ul style="color:var(--muted);line-height:1.5;">
-        <li>Time-domain half-space BEM for SH-wave propagation and scattering.</li>
-        <li>Techniques for arching pressure modeling and pillar optimization.</li>
-        <li>Exportable result histories, contour maps, and frequency-domain amplification analyses.</li>
-      </ul>
-    </div>
+    <p>DASBEM (Dynamic Analysis System using Boundary Element Method) is a pioneering research platform for 
+    seismic wave propagation and half-space time-domain boundary analysis. Our mission is to blend computational
+    mechanics with modern visualization to simulate seismic SH-wave scattering with unprecedented accuracy.</p>
+    <p>This project integrates advanced algorithms, dynamic boundary formulations, and real-time analytics to 
+    redefine the standards of wave interaction studies in engineering seismology.</p>
   </div>
 </div>
 
-<!-- Contact Popup (form is visual only for now) -->
-<div id="contactPopup" class="popup-overlay" aria-hidden="true" role="dialog" aria-label="Contact DASBEM Popup">
-  <div class="popup" role="document">
-    <div class="close" onclick="closePopup('contactPopup')">✕</div>
-    <h2>Contact DASBEM Team</h2>
-    <p class="note">Use this form to send a message to the DASBEM team. (Currently form is client-side only — later you can connect EmailJS or your server to send real emails.)</p>
-    <form id="contactForm" onsubmit="submitMessage(event)">
-      <input type="text" id="c-name" name="name" placeholder="Your name" required />
-      <input type="email" id="c-email" name="email" placeholder="Your email" required />
-      <textarea id="c-message" name="message" placeholder="Your message..." rows="5" required></textarea>
-      <button type="submit" class="send">Send Message</button>
-      <div class="note" style="margin-top:8px;">Planned recipient: <strong>mojtabazadeh@outlook.com</strong></div>
+<!-- Contact Modal -->
+<div id="contactModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" data-close="contactModal">&times;</span>
+    <h2>Contact Us</h2>
+    <p>Have a question or want to collaborate? Send us a message below — we’d love to hear from you.</p>
+    <form id="contactForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
+      <button type="submit" class="submit-btn">Send Message</button>
     </form>
   </div>
 </div>
 
 <script>
-/* ===== Papers data + Wizard logic ===== */
-(function(){
-  const papers=[
-    {
-      title:"Time-History Responses on the Surface by Regularly Distributed Enormous Embedded Cavities: Incident SH-Waves",
-      authors:"Mehdi Panji & Saeed Mojtabazadeh",
-      year:"2018",
-      href:"https://bayanbox.ir/download/7050831466408904062/3.pdf",
-      journal:"https://www.equsci.org.cn/article/doi/10.29382/eqs-2018-0137-3?pageType=en",
-      thumb:"https://bayanbox.ir/view/8045563318987990212/3.jpg",
-      abstract:"The time-history responses of the surface were obtained for a linear elastic half-plane including regularly distributed enormous embedded circular cavities subjected to propagating obliquely incident plane SH-waves. An advanced numerical approach named half-plane time-domain boundary element method (BEM), which only located the meshes around the cavities, was used to create the model. By establishing the modified boundary integral equation (BIE) independently for each cavity and forming the matrices, the final coupled equation was solved step-by-step in the time-domain to obtain the boundary values. The responses were developed for a half-plane with 512 cavities. The amplification patterns were also obtained to illustrate the frequency-domain responses for some cases. According to the results, the presence of enormous cavities affects the scattering and diffraction of the waves arrived to the surface. The introduced method can be recommended for geotechnical/mechanical engineers to model structures in the fields of earthquake engineering and composite materials."
-    }
-  ];
-
-  const list=document.getElementById('paperList');
-  const wizard=document.getElementById('wizard');
-  const wThumb=document.getElementById('w-thumb');
-  const wBody=document.getElementById('w-body');
-  const isMobile = window.innerWidth <= 640;
-
-  function positionWizard(x,y){
-    const wRect=wizard.getBoundingClientRect();
-    let left=x, top=y;
-    if(isMobile){
-      left=Math.min(Math.max(10,left),window.innerWidth - wRect.width - 10);
-      top=Math.min(Math.max(80,top),window.innerHeight - wRect.height - 10);
-    } else {
-      if(left + wRect.width > window.innerWidth) left = x - wRect.width - 18;
-      if(top + wRect.height > window.innerHeight) top = y - wRect.height - 18;
-    }
-    wizard.style.left = left + 'px';
-    wizard.style.top = top + 'px';
+// Open & Close modal logic
+document.getElementById("aboutBtn").onclick = () => {
+  document.getElementById("aboutModal").style.display = "block";
+};
+document.getElementById("contactBtn").onclick = () => {
+  document.getElementById("contactModal").style.display = "block";
+};
+document.querySelectorAll(".close-btn").forEach(btn=>{
+  btn.onclick = ()=> {
+    document.getElementById(btn.dataset.close).style.display = "none";
   }
-
-  papers.forEach(p=>{
-    const node=document.createElement('div'); node.className='paper';
-    node.innerHTML=`
-      <div class="thumb"><img src="${p.thumb}" alt=""></div>
-      <div class="meta">
-        <div class="p-title">${p.title}</div>
-        <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>
-      </div>
-      <div>
-        <a href="${p.href}" target="_blank" class="download-btn">📥 Download</a>
-        <a href="${p.journal}" target="_blank" class="journal-btn">🌐 Link</a>
-      </div>`;
-    const thumb=node.querySelector('.thumb');
-    const img = thumb.querySelector('img');
-    img.addEventListener('load',()=> img.classList.add('loaded'));
-
-    if(isMobile){
-      thumb.addEventListener('click',(ev)=>{
-        if(wizard.classList.contains('show')){
-          wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
-        } else {
-          wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-          wBody.textContent = p.abstract;
-          wBody.scrollTop = 0;
-          const rect = thumb.getBoundingClientRect();
-          positionWizard(rect.left, rect.top + window.scrollY);
-          wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-        }
-      });
-      wizard.addEventListener('click',()=>{
-        wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
-      });
-    } else {
-      thumb.addEventListener('mouseenter',(ev)=>{
-        wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-        wBody.textContent = p.abstract;
-        wBody.scrollTop = 0;
-        positionWizard(ev.clientX + 18, ev.clientY + 12);
-        wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-      });
-      thumb.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX + 18, ev.clientY + 12));
-      thumb.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-      thumb.addEventListener('wheel',(e)=>{
-        if(wizard.classList.contains('show')){ e.preventDefault(); wBody.scrollTop += e.deltaY; }
-      });
-    }
-    list.appendChild(node);
-  });
-})();
-
-/* ===== Floating buttons & popups logic ===== */
-(function(){
-  const aboutBtn = document.getElementById('aboutFloat');
-  const contactBtn = document.getElementById('contactFloat');
-  const aboutPopup = document.getElementById('aboutPopup');
-  const contactPopup = document.getElementById('contactPopup');
-
-  function openPopup(el){
-    el.classList.add('show');
-    el.setAttribute('aria-hidden','false');
+});
+window.onclick = (event) => {
+  if(event.target.classList.contains("modal")){
+    event.target.style.display = "none";
   }
-  function closePopupById(id){
-    const el = document.getElementById(id);
-    if(el) { el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }
-  }
+};
 
-  aboutBtn.addEventListener('click', ()=> {
-    openPopup(aboutPopup);
-  });
-  contactBtn.addEventListener('click', ()=> {
-    openPopup(contactPopup);
-    setTimeout(()=> document.getElementById('c-name').focus(), 220);
-  });
-
-  // close on overlay click (not when clicking inner popup)
-  document.querySelectorAll('.popup-overlay').forEach(ov => {
-    ov.addEventListener('click', (e) => {
-      if(e.target === ov) { ov.classList.remove('show'); ov.setAttribute('aria-hidden','true'); }
-    });
-  });
-
-  // expose closePopup for close buttons
-  window.closePopup = closePopupById;
-
-})();
-
-/* ===== Contact form (client-side only for now) ===== */
-function submitMessage(e){
+// Placeholder form submission
+document.getElementById("contactForm").addEventListener("submit", (e)=>{
   e.preventDefault();
-  const name = document.getElementById('c-name').value.trim();
-  const email = document.getElementById('c-email').value.trim();
-  const message = document.getElementById('c-message').value.trim();
-
-  if(!name || !email || !message){
-    alert("لطفاً تمام فیلدها را کامل کنید.");
-    return;
-  }
-
-  // client-side placeholder behavior:
-  // store in localStorage as a simple draft/list (optional), and show success toast
-  try {
-    const saved = JSON.parse(localStorage.getItem('dasbem_messages') || "[]");
-    saved.push({ name, email, message, date: new Date().toISOString() });
-    localStorage.setItem('dasbem_messages', JSON.stringify(saved));
-  } catch(err){ /* ignore storage errors */ }
-
-  // visual confirmation
-  alert(`✅ با تشکر ${name} — پیام شما ذخیره شد (محلی). بعداً می‌توانید ارسال ایمیل را فعال کنید.`);
-  // close popup
-  document.getElementById('contactPopup').classList.remove('show');
-  document.getElementById('contactPopup').setAttribute('aria-hidden','true');
-  // reset form
-  e.target.reset();
-}
-
-/* Optional: keyboard accessibility (Esc to close popups) */
-document.addEventListener('keydown', (e)=>{
-  if(e.key === "Escape"){
-    document.querySelectorAll('.popup-overlay.show').forEach(ov => {
-      ov.classList.remove('show'); ov.setAttribute('aria-hidden','true');
-    });
-    document.querySelectorAll('.wizard.show').forEach(w => { w.classList.remove('show'); w.setAttribute('aria-hidden','true'); });
-  }
+  alert("Your message was recorded! (Email integration coming soon)");
+  document.getElementById("contactModal").style.display = "none";
 });
 </script>
 
