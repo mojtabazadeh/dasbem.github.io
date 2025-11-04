@@ -1,196 +1,670 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DASBEM | Dynamic Analysis System</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>DASBEM.IR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/refs/heads/main/DASBEM.ico" sizes="48x48">
 <style>
-:root {
-  --neon1: #00f3ff;
-  --neon2: #ff00c8;
-  --bg: #050505;
-  --text: #f1f1f1;
-}
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Orbitron', sans-serif;
-  overflow-x: hidden;
+:root{
+  --bg-dark:#1a1a1a;
+  --text-light:#fff;
+  --glass: rgba(255,255,255,0.12);
+  --accent:#ffb347;
+  --muted:#ddd;
+
+    /* Loader Colors */
+  --loader-bg:#050505;
+  --loader-text:#39ff14;
+  --loader-accent:#ff9900;
+  --loader-gold:#ffcc33;
 }
 
-/* ----------- Fancy Corner Buttons ----------- */
-.corner-btn {
-  position: fixed;
-  top: 20px;
-  padding: 10px 22px;
-  font-size: 15px;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: 1px;
-  background: transparent;
-  border: 2px solid transparent;
-  border-image: linear-gradient(90deg, var(--neon1), var(--neon2)) 1;
-  border-radius: 40px;
-  cursor: pointer;
-  z-index: 9999;
-  box-shadow: 0 0 15px var(--neon1), 0 0 25px var(--neon2);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-}
-.corner-btn:hover {
-  color: #fff;
-  background: linear-gradient(90deg, var(--neon1), var(--neon2));
-  box-shadow: 0 0 25px var(--neon1), 0 0 45px var(--neon2), 0 0 65px #fff;
-  transform: scale(1.08);
-}
-.btn-left { left: 20px; }
-.btn-right { right: 20px; }
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
 
-/* ---------- Modal / Wizard Container ---------- */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 99999;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  backdrop-filter: blur(12px);
-  background: rgba(0,0,0,0.8);
-  animation: fadeIn 0.5s ease forwards;
+/* ===== Page Loader ===== */
+#app{
+  position:fixed; inset:0; z-index:9999;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  background:var(--loader-bg); color:var(--loader-text);
+  font-family:'Share Tech Mono', monospace;
 }
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
-}
-.modal-content {
-  position: relative;
-  background: rgba(15,15,15,0.9);
-  border: 2px solid;
-  border-image: linear-gradient(135deg, var(--neon1), var(--neon2)) 1;
-  border-radius: 20px;
-  margin: 10% auto;
-  padding: 40px;
-  width: 80%;
-  max-width: 600px;
-  color: var(--text);
-  box-shadow: 0 0 40px var(--neon1), inset 0 0 15px var(--neon2);
-  animation: scaleUp 0.5s ease forwards;
-}
-@keyframes scaleUp {
-  from {transform: scale(0.6); opacity: 0;}
-  to {transform: scale(1); opacity: 1;}
-}
-.close-btn {
-  position: absolute;
-  top: 15px;
-  right: 25px;
-  font-size: 26px;
-  color: var(--text);
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-.close-btn:hover { color: var(--neon1); }
 
-/* ----------- Contact Form ----------- */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
+#header{
+  font-size:18px; color:var(--loader-accent); margin-bottom:12px; user-select:none; -webkit-user-select:none;
 }
-input, textarea {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--text);
-  padding: 10px;
-  border-radius: 8px;
-  font-family: inherit;
+
+.viewport{
+  flex:1; overflow-y:auto; padding:12px 14px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-radius:8px; border:1px solid rgba(255,255,255,0.03);
+  width:calc(100% - 60px);
+  max-height:60%;
+  word-break:break-word;
 }
-input:focus, textarea:focus {
-  border-color: var(--neon1);
-  outline: none;
-  box-shadow: 0 0 10px var(--neon1);
+
+.logLine{
+  font-size:13px; line-height:1.25; margin:4px 0;
 }
-button.submit-btn {
-  background: linear-gradient(90deg, var(--neon1), var(--neon2));
-  border: none;
-  padding: 12px;
-  font-weight: 600;
-  border-radius: 30px;
-  cursor: pointer;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
+
+.finalLine{
+  color:var(--loader-gold); font-weight:700; font-size:15px;
+  margin-top:10px; padding:6px 10px; border-radius:6px;
+  background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
+  text-shadow:0 0 6px rgba(255,204,51,0.14);
 }
-button.submit-btn:hover {
-  box-shadow: 0 0 20px var(--neon1), 0 0 30px var(--neon2);
-  transform: scale(1.05);
+
+.progressWrap{
+  height:16px; background:rgba(255,255,255,0.06);
+  border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03);
+  width:calc(100% - 60px);
+}
+
+.progressBar{
+  width:0%; height:100%;
+  background:linear-gradient(90deg,#ff9900,#ffcc33);
+  transition:width 50ms linear;
+}
+
+@media(max-width:640px){
+  #header{font-size:16px;}
+  .logLine{font-size:12px;}
+  .progressWrap{height:14px;}
+}
+
+/* ===== Main Site Hidden Initially ===== */
+#mainSite{opacity:0; transition:opacity 1s ease;}
+
+/* ===== Background canvas ===== */
+#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* ===== Header ===== */
+header.site-header{
+  position:relative;z-index:2;text-align:center;padding:80px 20px 60px;
+}
+header.site-header h1{
+  font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;
+  margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 25px rgba(255,200,150,0.35), 0 0 40px rgba(255,180,120,0.45);
+  display:inline-block;
+  animation: glow 6s ease-in-out infinite;
+  transition: transform .35s ease;
+}
+@keyframes glow{
+  0%,100%{text-shadow:0 0 20px rgba(255,200,150,0.3), 0 0 35px rgba(255,180,120,0.4);}
+  50%{text-shadow:0 0 45px rgba(255,200,150,0.6), 0 0 70px rgba(255,180,120,0.7);}
+}
+header.site-header p{
+  font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;
+  text-shadow:0 0 18px rgba(255,190,130,0.4), 0 0 30px rgba(255,160,100,0.25);
+  animation: pulse 5s ease-in-out infinite alternate;
+}
+@keyframes pulse{
+  0%{opacity:0.8;transform:translateY(0);}
+  50%{opacity:1;transform:translateY(-3px);}
+  100%{opacity:0.8;transform:translateY(0);}
+}
+
+/* ===== Wrap ===== */
+.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 10px;display:flex;flex-direction:column;align-items:center;}
+
+/* ===== Researchers ===== */
+.header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.researcher{
+  position:relative;width:300px;min-width:260px;
+  display:flex;flex-direction:column;align-items:center;
+  backdrop-filter: blur(10px);padding:18px;border-radius:20px;
+  background:var(--glass);
+  box-shadow:0 10px 40px rgba(0,0,0,0.55);
+  transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;
+}
+.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.7); }
+
+.photo-frame{
+  position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
+  padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.15) inset;
+  margin-bottom:12px;
+  border: 3px solid rgba(255,255,255,0.09);
+  transition: transform 1.2s ease-in-out;
+}
+.photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;transition: transform 1.2s ease-in-out;}
+
+.name{
+  font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;color:var(--text-light);
+  letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out;
+}
+.name .title-small{ font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+.contact{margin-top:6px;font-size:0.9rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:2px;}
+.contact a{color:var(--accent);text-decoration:none;font-weight:600;}
+.contact a:hover{text-decoration:underline;}
+.researcher:hover .photo-frame{ transform: translateY(-2px);}
+.researcher:hover .name{ transform: translateY(2px);}
+
+/* ===== Papers ===== */
+.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.45);width:100%;max-width:100%;}
+.papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
+.paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
+.paper{
+  background: rgba(255,255,255,0.12);
+  padding:12px;border-radius:12px;display:flex;flex-direction:column;
+  gap:10px;align-items:center;transition:transform .4s ease, box-shadow .4s ease;
+  cursor:pointer;
+  width:100%;
+}
+.paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.5); }
+.paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
+.paper .thumb img { filter: blur(8px); transition: filter 0.4s ease-out, transform 0.4s ease-out; transform: scale(1.05);}
+.paper .thumb img.loaded { filter: blur(0); transform: scale(1);}
+.paper .thumb img{width:100%;height:100%;object-fit:cover;}
+.paper .meta{ flex:1; text-align:center;margin-top:6px; }
+.paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
+.paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
+.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
+
+/* ===== Buttons ===== */
+.download-btn, .journal-btn{
+  display:inline-block;
+  padding:8px 18px;
+  font-size:0.9rem;
+  font-weight:600;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  text-decoration:none;
+  transition:all 0.3s ease;
+  margin:4px 4px 0 0;
+}
+.download-btn{background: linear-gradient(135deg,#ff7e5f,#feb47b);box-shadow:0 4px 15px rgba(255,126,95,0.4);}
+.download-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(255,126,95,0.6);}
+.download-btn:active{transform:translateY(0) scale(0.98);box-shadow:0 4px 12px rgba(255,126,95,0.5);}
+.journal-btn{background: linear-gradient(135deg,#6a11cb,#2575fc);box-shadow:0 4px 15px rgba(106,17,203,0.4);}
+.journal-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(106,17,203,0.6);}
+.journal-btn:active{transform:translateY(0) scale(0.98);box-shadow:0 4px 12px rgba(106,17,203,0.5);}
+
+/* ===== Wizard popup ===== */
+.wizard{
+  position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
+  transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
+  border-radius:12px;padding:12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;
+}
+.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
+.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
+.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
+
+/* ===== Footer ===== */
+footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(--text-light);}
+
+/* ===== Responsive ===== */
+@media (max-width:640px){
+  header.site-header{padding:50px 10px 40px;}
+  header.site-header h1{font-size:2.8rem;}
+  header.site-header p{font-size:1.1rem;}
+  .researcher{width:100%;flex-direction:row;align-items:center;padding:12px;justify-content:center;}
+  .photo-frame{width:120px;height:120px;margin-right:12px;}
+  .name{align-items:flex-start;font-size:1rem;}
+  .paper .thumb{height:180px;}
 }
 </style>
 </head>
-
 <body>
 
-<!-- Top Neon Buttons -->
-<button class="corner-btn btn-left" id="aboutBtn">About</button>
-<button class="corner-btn btn-right" id="contactBtn">Contact Us</button>
-
-<!-- About Modal -->
-<div id="aboutModal" class="modal">
-  <div class="modal-content">
-    <span class="close-btn" data-close="aboutModal">&times;</span>
-    <h2>About DASBEM</h2>
-    <p>DASBEM (Dynamic Analysis System using Boundary Element Method) is a pioneering research platform for 
-    seismic wave propagation and half-space time-domain boundary analysis. Our mission is to blend computational
-    mechanics with modern visualization to simulate seismic SH-wave scattering with unprecedented accuracy.</p>
-    <p>This project integrates advanced algorithms, dynamic boundary formulations, and real-time analytics to 
-    redefine the standards of wave interaction studies in engineering seismology.</p>
-  </div>
+<!-- Page loader -->
+<div id="app">
+  <div id="header">Initializing The DASBEM Project Core...</div>
+  <div class="viewport" id="viewport"></div>
+  <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
-<!-- Contact Modal -->
-<div id="contactModal" class="modal">
-  <div class="modal-content">
-    <span class="close-btn" data-close="contactModal">&times;</span>
-    <h2>Contact Us</h2>
-    <p>Have a question or want to collaborate? Send us a message below — we’d love to hear from you.</p>
-    <form id="contactForm">
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Your Email" required>
-      <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
-      <button type="submit" class="submit-btn">Send Message</button>
-    </form>
+  <!-- ===== Main Site ===== -->
+<div id="mainSite">
+<canvas id="waveCanvas" aria-hidden="true"></canvas>
+
+<header class="site-header">
+  <h1>The DASBEM Project</h1>
+  <p>Dynamic Analysis of Structures by Boundary Element Method</p>
+</header>
+
+<div class="wrap">
+  <div class="header" aria-label="Researchers">
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+            </div>
+      <div class="name" id="r1-name">
+        <span>Dr. Mehdi Panji</span>
+        <span class="title-small">Associate Professor</span>
+        <div class="contact">
+          <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
+          <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Researcher 2 -->
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+      </div>
+      <div class="name" id="r2-name">
+        <span>Dr. Saeed Mojtabazadeh</span>
+        <span class="title-small">Postdoctoral Fellow</span>
+        <div class="contact">
+          <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
+          <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
+        </div>
+      </div>
+    </section>
   </div>
+
+  <section class="papers" aria-label="Papers">
+    <h3>💡 Download Papers For Free</h3>
+    <div class="paper-list" id="paperList"></div>
+  </section>
+</div>
+
+<footer class="site-footer">
+  The DASBEM Project ©
+</footer>
+
+<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+  <div class="w-thumb" id="w-thumb"></div>
+  <div class="w-body" id="w-body"></div>
 </div>
 
 <script>
-// Open & Close modal logic
-document.getElementById("aboutBtn").onclick = () => {
-  document.getElementById("aboutModal").style.display = "block";
-};
-document.getElementById("contactBtn").onclick = () => {
-  document.getElementById("contactModal").style.display = "block";
-};
-document.querySelectorAll(".close-btn").forEach(btn=>{
-  btn.onclick = ()=> {
-    document.getElementById(btn.dataset.close).style.display = "none";
-  }
-});
-window.onclick = (event) => {
-  if(event.target.classList.contains("modal")){
-    event.target.style.display = "none";
-  }
-};
+/* ===== Loader Script ===== */
+const TOTAL_DURATION = 4000;
+const TOTAL_LINES = 350;
+const viewport = document.getElementById('viewport');
+const progressBar = document.getElementById('progressBar');
 
-// Placeholder form submission
-document.getElementById("contactForm").addEventListener("submit", (e)=>{
-  e.preventDefault();
-  alert("Your message was recorded! (Email integration coming soon)");
-  document.getElementById("contactModal").style.display = "none";
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pick(arr){ return arr[rnd(0,arr.length-1)]; }
+
+const stages = [
+  "Loading half-space Green’s function library [G_SH_Layered.bin]...",
+  "Initializing transient boundary element solver (HSTD-BEM)...",
+  "Parsing boundary topology file [geo_surface_topo.geo]...",
+  "Assembling time-dependent influence coefficients...",
+  "Reading seismic source definition [SRC_SH01.mat]...",
+  "Computing stress kernel integrals for near-boundary elements...",
+  "Evaluating free-surface reflection operator for SH-wave components...",
+  "Initializing dynamic boundary traction array...",
+  "Compiling convolution quadrature functions [conv_SH.dll]...",
+  "Mapping local panels to global boundary index table...",
+  "Integrating SH-wave Green’s derivatives over singular elements...",
+  "Loading viscoelastic half-space parameters from config.yaml...",
+  "Computing displacement field for transient half-space excitation...",
+  "Normalizing influence tensors for numerical stability...",
+  "Generating elastodynamic kernel lookup table [kern_SH.h5]...",
+  "Constructing collocation matrix for boundary discretization...",
+  "Importing time integration scheme [RK4_BEM.scheme]...",
+  "Activating adaptive convolution memory blocks (depth=256)...",
+  "Assembling mixed traction-displacement boundary conditions...",
+  "Evaluating incident SH-wave field at boundary nodes...",
+  "Computing half-space radiation damping matrix [RDM_SH.bin]...",
+  "Performing direct integration of transient boundary influence...",
+  "Applying absorbing boundary layer correction (ABC type-II)...",
+  "Reconstructing equivalent nodal loads from seismic source...",
+  "Generating fundamental solution snapshot [FS_SH_02.dat]...",
+  "Stabilizing numerical response using recursive filtering...",
+  "Integrating hypersingular kernels for boundary traction jumps...",
+  "Updating dynamic equilibrium conditions along interface nodes...",
+  "Loading convolution history state [hist_conv_SH.chk]...",
+  "Balancing computational subdomains for parallel processing...",
+  "Evaluating elastodynamic reciprocity across subdomain interfaces...",
+  "Building temporal Green’s tensor [Gij_t_SH.res]...",
+  "Interpolating time-domain responses for observation points...",
+  "Constructing fast multipole tree for far-field evaluation...",
+  "Computing scattered SH-wave displacement amplitudes...",
+  "Applying time-marching scheme for half-space transient problem...",
+  "Evaluating stress intensity factors at boundary discontinuities...",
+  "Performing LU decomposition on submatrix [SUB_T45.block]...",
+  "Activating spectral acceleration postprocessor [SPEC_AMP.exe]...",
+  "Transforming local boundary stresses to global coordinate frame...",
+  "Calculating convolution quadrature weights (N=2048)...",
+  "Storing intermediate stiffness matrix snapshot [K_SH_09.bin]...",
+  "Integrating boundary pressure field for surface reflection analysis...",
+  "Reassembling traction kernels for irregular boundary geometry...",
+  "Generating free-surface motion history [MOTION_FS.out]...",
+  "Validating transient solver output via benchmark comparison...",
+  "Exporting scattered field amplitude [SF_SH_AMP.csv]...",
+  "Computing partial derivatives of SH fundamental solution...",
+  "Loading preconditioner matrix [Prec_SH.h5]...",
+  "Performing GMRES iterations for boundary integral solution...",
+  "Monitoring convergence of residual norm across time steps...",
+  "Computing transient energy flux through boundary interface...",
+  "Constructing equivalent traction-displacement relationship...",
+  "Updating elastodynamic coefficients for layer transitions...",
+  "Interpolating motion field using high-order temporal splines...",
+  "Evaluating convolution integral accuracy (Δt-convergence)...",
+  "Generating synthetic seismogram at receiver array...",
+  "Importing mesh partitioning configuration [subdomains.cfg]...",
+  "Performing adaptive Gaussian integration on curved panels...",
+  "Recomputing Jacobian corrections for distorted boundary elements...",
+  "Balancing computational loads among MPI processes...",
+  "Compressing memory footprint for convolution kernels...",
+  "Assembling hybrid boundary matrices (Dirichlet + Neumann)...",
+  "Evaluating near-field correction terms for SH-wave diffraction...",
+  "Exporting field snapshots for visualization [WaveField_SH.vtk]...",
+  "Initializing viscoelastic convolution model [VE_SH.conv]...",
+  "Integrating stress waveforms over microcrack interfaces...",
+  "Performing consistency check of dynamic equilibrium equations...",
+  "Computing reflection coefficients at half-space boundary z=0...",
+  "Re-evaluating half-space Green’s tensor derivatives numerically...",
+  "Synchronizing parallel threads for matrix-vector operations...",
+  "Updating global stiffness structure with half-space coupling...",
+  "Constructing impedance boundary operator [Z_SH_02.mat]...",
+  "Exporting transient boundary motion [BOUND_TRN_01.out]...",
+  "Verifying reciprocity theorem for SH scattering configuration...",
+  "Applying local damping correction in radiation boundary region...",
+  "Computing displacement gradients for nodal postprocessing...",
+  "Activating fast convolution algorithm (FFT-based) for time-domain...",
+  "Evaluating transient stress tensor at observation depths...",
+  "Assembling influence coefficients using adaptive precision...",
+  "Loading analytical benchmark results [HalfSpace_Test1.ref]...",
+  "Performing error analysis on boundary residuals...",
+  "Computing complex conjugate of SH-wave Green’s components...",
+  "Generating response map of scattered field amplitude [MAP_SH.amp]...",
+  "Integrating traction kernels with temporal convolution window...",
+  "Refining boundary mesh for stress concentration near edges...",
+  "Exporting Green’s function database [G_SH_3D.db]...",
+  "Evaluating free-surface amplification due to topography...",
+  "Applying reflection operator for layered half-space model...",
+  "Simulating point source excitation at depth h=50 m...",
+  "Loading material damping profile [DAMP_LAYERS.tbl]...",
+  "Computing frequency-dependent attenuation coefficients...",
+  "Constructing transient response spectrum at surface stations...",
+  "Performing inverse Fourier transform of spectral solution...",
+  "Storing surface acceleration envelopes [ACC_ENV_SH.bin]...",
+  "Checking stability criterion for Δt and element size ratio...",
+  "Updating half-space truncation boundaries dynamically...",
+  "Exporting solver diagnostics [diag_SH.log]...",
+  "Evaluating energy dissipation across boundary interfaces...",
+  "Generating far-field radiation pattern for SH-wave components...",
+  "Reassembling traction history for subdomain coupling...",
+  "Calculating instantaneous stress peaks at boundary nodes...",
+  "Applying topographic correction for curved surface elements...",
+  "Constructing dual boundary representation matrix...",
+  "Recomputing convolution state vectors for next time step...",
+  "Verifying displacement continuity across interface elements...",
+  "Generating real-time visual monitor [Console_SH.live]...",
+  "Storing half-space dynamic impedance curves [Z_dyn_SH.res]...",
+  "Performing data compression for response history [resp_SH.h5]...",
+  "Normalizing time-domain output files [out_norm_SH.dat]...",
+  "Integrating transient velocity components from displacement data...",
+  "Computing far-field scattering coefficients analytically...",
+  "Updating convolution memory state [mem_tSH.chk]...",
+  "Assembling viscoelastic response kernels for half-space layer 3...",
+  "Performing inverse Laplace transform via quadrature rule...",
+  "Evaluating numerical dispersion for SH-wave propagation...",
+  "Extracting maximum ground motion amplitudes at surface nodes...",
+  "Applying dynamic boundary relaxation scheme...",
+  "Computing nodal tractions using influence superposition...",
+  "Storing residual statistics [res_SH_12.json]...",
+  "Comparing time-domain and steady-state SH-wave responses...",
+  "Loading surface receiver configuration [recv_surface.cfg]...",
+  "Computing normalized response spectra for boundary points...",
+  "Integrating scattered SH-wave fields in layered half-space...",
+  "Balancing load distribution across solver threads...",
+  "Reconstructing equivalent nodal forces from traction history...",
+  "Building boundary element matrix using collocation method...",
+  "Evaluating half-space Green’s function for buried source...",
+  "Simulating transient surface motion due to subsurface scattering...",
+  "Generating displacement gradient contours [grad_SH.png]...",
+  "Computing mode conversion ratio for oblique SH incidence...",
+  "Performing parametric study on half-space stiffness contrast...",
+  "Applying symmetry constraints on boundary integral formulation...",
+  "Evaluating peak stress tensors at surface irregularities...",
+  "Recomputing kernel functions for updated source depth...",
+  "Exporting intermediate solver state [solver_state_SH.chk]...",
+  "Integrating traction-displacement relations for contact zones...",
+  "Computing time-averaged power flux of scattered field...",
+  "Storing transient displacement results [u_SH_t.bin]...",
+  "Calculating attenuation curves across frequency bands...",
+  "Comparing reflected vs transmitted energy at interface boundaries...",
+  "Refining convolution window width for late-time stability...",
+  "Analyzing SH-wave diffraction from surface valley model...",
+  "Evaluating displacement gradients for viscoelastic coupling...",
+  "Performing convolution with precomputed Green’s function blocks...",
+  "Recording nodal histories to [HIST_NODE_240.dat]...",
+  "Constructing stress recovery operator [σ_SH_RCV.mat]...",
+  "Computing scattered field at free-surface receivers...",
+  "Exporting motion animation frames [frame_SH_#.tif]...",
+  "Validating solver results against closed-form half-space solutions...",
+  "Performing convergence test on temporal discretization...",
+  "Reassembling global system matrix after mesh refinement...",
+  "Updating damping ratios for each half-space sublayer...",
+  "Performing high-order integration for near-singular panels...",
+  "Extracting instantaneous energy density across the surface...",
+  "Generating contour map of normalized displacement amplitudes...",
+  "Computing transient scattering coefficients [SC_SH.csv]...",
+  "Activating recursive solver checkpointing routine...",
+  "Applying radiation boundary condition at truncation plane...",
+  "Integrating traction kernel derivatives for energy flux...",
+  "Saving final boundary response history [Resp_SH_Final.bin]...",
+  "Exporting simulation metadata [meta_SH_run.json]...",
+  "Compressing output archives [run_SH_01.zip]...",
+  "Simulation sequence completed successfully."
+];
+
+function makeLine(){
+  const stage = pick(stages);
+  let extra = "";
+  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
+  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
+  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
+  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
+  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
+  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
+  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
+  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
+
+  return stage.replace(/\{rnd\}/g,()=>rnd(1000,9999))
+              .replace(/\{sub\}/g,()=> "K"+rnd(1,99))
+              .replace(/\{blk\}/g,()=> rnd(1,24))
+              .replace(/\{totalBlk\}/g,()=> rnd(24,128))
+              .replace(/\{edge\}/g,()=> rnd(0,7))
+              .replace(/\{coordSys\}/g,()=> pick(["local","global","geo"]))
+              .replace(/\{tol\}/g,()=> (Math.random()*1e-3).toExponential(2))
+              + extra;
+}
+
+let loadedCount = 0;
+function pushLine(text, final=false){
+  const el = document.createElement('div');
+  el.className='logLine';
+  if(final) el.classList.add('finalLine');
+  el.textContent=text;
+  viewport.appendChild(el);
+  while(viewport.children.length>220) viewport.removeChild(viewport.children[0]);
+  viewport.scrollTop = viewport.scrollHeight;
+  loadedCount++;
+  const pct = Math.min(100, Math.round((loadedCount/TOTAL_LINES)*100));
+  progressBar.style.width = pct+"%";
+}
+
+const timestamps = Array.from({length:TOTAL_LINES}, (_,i)=>{
+  const base = (i/TOTAL_LINES)*TOTAL_DURATION;
+  const jitter = (1 - Math.abs(i/TOTAL_LINES-0.5)*2)*30;
+  return base + (Math.random()*jitter*2 - jitter);
 });
+
+function startLoader(){
+  for(let i=0;i<TOTAL_LINES;i++){
+    setTimeout(((idx)=>{return function(){ pushLine(makeLine()); };})(i), timestamps[i]);
+  }
+
+  setTimeout(()=>{
+    pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
+    setTimeout(()=>{
+      document.getElementById('app').style.transition="opacity 1s ease";
+      document.getElementById('app').style.opacity=0;
+      document.getElementById('mainSite').style.opacity=1;
+      setTimeout(()=>{document.getElementById('app').remove();},1000);
+    },1200);
+  }, TOTAL_DURATION+200);
+}
+
+startLoader();
+
+/* ===== Background particles ===== */
+(function(){
+  const canvas=document.getElementById('waveCanvas');
+  const ctx=canvas.getContext('2d');
+  let particles=[], isMobile=window.innerWidth<=640;
+  const mouse={x:-999,y:-999};
+  function resize(){canvas.width=innerWidth; canvas.height=innerHeight; initParticles();}
+  function initParticles(){
+    const count=isMobile?30:120;
+    particles=Array.from({length:count},()=>({
+      x:Math.random()*innerWidth,
+      y:Math.random()*innerHeight,
+      z:Math.random(),
+      r:Math.random()*3+1,
+      vx:(Math.random()-0.5)*(isMobile?0.3:0.6),
+      vy:(Math.random()-0.5)*(isMobile?0.3:0.6)
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for(let p of particles){
+      const dx=mouse.x-p.x, dy=mouse.y-p.y;
+      const dist=Math.hypot(dx,dy);
+      if(dist<80 && dist>0){p.x-=dx*0.003; p.y-=dy*0.003;}
+      const alpha = 0.2 + (1 - p.z) * 0.6;
+      const size = p.r * (1 + (1 - p.z) * 1.5);
+      ctx.fillStyle=`rgba(255,200,150,${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,size,0,Math.PI*2);
+      ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>innerWidth)p.vx*=-1;
+      if(p.y<0||p.y>innerHeight)p.vy*=-1;
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{
+    isMobile=window.innerWidth<=640;
+    resize();
+  });
+  window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+  window.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
+  resize(); draw();
+})();
+
+/* ===== Papers Wizard ===== */
+(function(){
+  const papers=[
+    {title:"SH-Wave Scattering by an Orthotrpic Triangular Soft Hill",authors:"Mehdi Panji, Saeed Mojtabazadeh & Farinaz Saleki",year:"2025",href:"https://bayanbox.ir/download/7281427747269149039/28.pdf",journal:"https://ceij.ut.ac.ir/article_102916.html",thumb:"https://bayanbox.ir/view/4214250098465250760/28.jpg",abstract:"In this paper, the SH-wave scattering by an orthotropic triangular soft hill settled on the underlying half-space was investigated using a half-space time-domain boundary element method to obtain a seismic ground response. The surface of the hill and its interface were only discretized by quadratic elements to elaborate on the computational model. First, a brief formulation of the method and the modified boundary integral equation with damping were presented. Then, the method was implemented in a developed DASBEM algorithm and analyzed as a verification example to compare with the literature and confirm the obtained results. Finally, an advanced numerical study was carried out to sensitize the key parameters of the model, including the isotropy factor, shape ratio of the hill, incident wave angle, and frequency content. The results showed that the proposed method had the powerful ability to create sharp corner features. Also, the orientation of the material texture of the triangular hill was extremely effective on the seismic ground response and changing the amplification patterns."},
+    {title:"The Orthotropy Effect of Underground Inclusion on the Seismic Response of Ground Surface",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2025",href:"https://bayanbox.ir/view/7765349511351506314/27.pdf",journal:"https://sjce.journals.sharif.edu/article_23630.html?lang=en",thumb:"https://bayanbox.ir/view/5154196375924709012/27.jpg",abstract:"This paper presents a formulation of the attenuated orthotropic time-domain half-space boundary element method for analyzing the orthotropic effect of underground inclusions subjected to transient SH-waves. The stress-free boundary condition at the ground surface is satisfied using wave source image theory. To account for material damping, the Barkan approach is employed to attenuate the half-space by introducing a constant logarithmic reduction into the modified boundary integral equation. This method is easily implemented in a time-domain computer code for analyzing seismic homogeneous orthotropic mediums. To model underground inclusions, a sub-structuring approach is introduced to ensure continuity conditions at interfaces based on node position and normal direction. Several practical examples involving SH-waves are solved and compared with existing literature to validate surface response, particularly focusing on isotropic convergence. A favorable agreement is found between responses, confirming the capability of the proposed method for simple modeling of orthotropic subsurface features. Finally, in the form of an advanced numerical study, the surface motions of orthotropic models, including an underground inclusion embedded in a linear elastic half-space were successfully obtained under transient SH-wave propagation. Utilizing the time-domain boundary element approach, a simple model was developed only by discretizing the boundaries/interfaces. To illustrate responses in the time/frequency-domain, a comprehensive sensitivity analysis is performed considering parameters such as frequency, shape ratio, and isotropy factor, visualized through snapshots, seismograms, and amplification patterns. Results demonstrate that orthotropic anisotropy significantly influences seismic patterns of ground surfaces, highlighting the impact of mentioned parameter variations."},
+    {title:"Seismic Response of the Orthotropic Ground Surface Including Underground Circular Unlined Tunnel",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2025",href:"https://bayanbox.ir/download/16572426325719444/26.pdf",journal:"https://www.jsce.ir/article_199086.html?lang=en",thumb:"https://bayanbox.ir/view/2445473100347626734/26.jpg",abstract:"The actual behavior of the ground surface in the presence of underground structures is strongly influenced by a thorough understanding of the effects of anisotropy in the surrounding half-space. This anisotropy, typically manifested as orthotropic behavior in the soil layers, is intricately linked with the seismic response of orthotropic ground surface. Therefore, this article presents the seismic response of orthotropic ground surface in the presence of an underground circular tunnel without lining subjected to incident SH-waves. The problem model is prepared solely using the boundary element method in the time-domain, with tunnel boundary discretization. Material damping is indirectly applied using exponential functions in integral equations. In addition to providing a brief formulation of the method, several verification examples are analyzed, focusing on key model parameters such as isotropy factor, frequency content, and wave incidence angle. The seismic response of the ground surface containing an unlined circular tunnel is sensitively investigated in both time and frequency domains. The results indicate that the orthotropic properties of materials and geological formations are influential not only in the response amplitudes but also in the amplification patterns around the tunnel and the establishment of safe zones. Additionally, a maximum surface amplification of 3.2 is observed during the onset of horizontal wave-front."},
+    {title:"Amplification Pattern of Orthotropic Gaussian-Shaped Valley",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2025",href:"https://bayanbox.ir/download/3154543215433539353/25.pdf",journal:"https://ceej.tabrizu.ac.ir/article_18068.html",thumb:"https://bayanbox.ir/view/5355156485572317503/25.jpg",abstract:"In this paper, the surface amplification of a Gaussian-shaped valley in an orthotropic half-space subjected to vertical incident SH-waves is presented. The time-domain orthotropic half-space boundary element method, previously proposed by the authors, was employed to analyze the aforementioned problem. Upon validation of the results using a convergence approach, a comprehensive parametric study focusing on certain key parameters such as isotropy factor, valley aspect ratio, and frequency content was conducted. The results were primarily presented as snapshots and three-dimensional outcomes in both the time and frequency domains. The results indicated that the material properties of the valley and the orientation of geological formations significantly affect the seismic amplification pattern of the ground surface. Moreover, the maximum valley amplification of 2.14 occurred for periods less than 0.5 and the assumed maximum isotropy factor."},
+    {title:"A Simple TD-BEM Model for Heterogeneous Orthotropic Hill-Shaped Topographies",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2024",href:"https://bayanbox.ir/download/430521160017991613/24.pdf",journal:"https://link.springer.com/article/10.1007/s42452-024-05695-7",thumb:"https://bayanbox.ir/view/6758900697719127128/24.jpg",abstract:"A simple numerical model named DASBEM was successfully developed to analyze the seismic heterogeneous orthotropic hill-shaped topographies by a time-domain boundary element method (TD-BEM) based on half-space Green’s functions. The model was elaborated only by discretizing the hill surface and its interface with the underlying half-space through the use of image source theory and the substructure approach. To improve the model at the corners, the double node procedure was applied to the extreme nodes of the quadratic elements. An attenuation ratio is implemented in the boundary equations using a decremental exponential function. After presenting the technique, a validation example is presented alongside the literature to measure the convergence with an isotropic response. Next, a sample Gaussian-shaped hill model is prepared under propagating obliquely incident SH-waves as a common sample topography and the surface response is obtained by considering some significant parameters as well as the shape ratio, isotropy factor, frequency content, and angle of the incident wave. The ground surface response is sensitized in two time and frequency domains. The results showed that the amplitude of the response was not only dependent on the impedance ratio but also the orthotropy ratio, which was always effective in orienting the wave-front to amplify the ground movement."},
+    {title:"Seismic Response of the Ground Surface Including Underground Horseshoe-Shaped Cavity",authors:"Mehdi Panji, Saeed Mojtabazadeh & Amirabbas Fakhravar",year:"2022",href:"https://bayanbox.ir/download/7446585706927614078/23.pdf",journal:"https://link.springer.com/article/10.1007/s40515-021-00178-3",thumb:"https://bayanbox.ir/view/228467197696099370/23.jpg",abstract:"In this paper, the seismic response of elastic homogeneous ground surface was presented in the presence of unlined horseshoe-shaped underground cavities subjected to obliquely propagating incident SH-waves by using the time-domain half-plane boundary element method (BEM). The Ricker wavelet was considered for the incident wave function. In the use of the proposed method, the boundary around the tunnel was only required to be discretized. After comparing the results of the present study with existing analytical responses, it was found that the method had good accuracy in modeling horseshoe-shaped tunnels. The responses are presented as two-/three-dimensional diagrams in the time/frequency domain. Also, a comparative study is carried out between circular and horseshoe cross-sections to observe the effect of the geometry on the response pattern. The results show that the existence of subsurface openings as well as horseshoe-shaped cavities has a significant effect on the variation of seismic patterns and critical states of the ground surface. The used method can be proposed to geotechnical engineers for preparing simple underground models to achieve the transient responses."},
+    {title:"On Seismic Response of Attenuated Orthotropic Gaussian- Shaped Sedimentary Basin",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2022",href:"https://bayanbox.ir/download/5002331800429480918/22.pdf",journal:"https://www.researchgate.net/publication/359413955_On_Seismic_Response_of_Attenuated_Orthotropic_Gaussian-_Shaped_Sedimentary_Basin",thumb:"https://bayanbox.ir/view/4405294226514817992/22.jpg",abstract:"The surface motion of an orthotropic Gaussian-shaped sedimentary basin embedded in a linear elastic halfspace was successfully obtained under transient SH-wave propagation. In the use of the time-domain boundary element approach, a simple model was developed only by discretizing the interface. To achieve better convergence of the response, an attenuation rule was implemented with the assistance of the reduction exponential function applied in the boundary integral equations. After a brief overview of the method, the heterogonous sub-structured basin model was created and decomposed into two parts to satisfy the modified continuity conditions based on the normal direction at the interface node position. The developed computer code was tested by solving a validation example. Finally, to illustrate the basin surface response in the time/frequency-domain, a general sensitivity analysis was performed by considering the parameters of frequency, isotropy-factor, wave angle, seismograms, and amplification patterns. The results showed that the effect of orthotropic anisotropy was very efficient on the ground response and different seismic patterns on the surface of sedimentary basins were extracted by changes in the quantity of this parameter."},
+    {title:"Scattering Attenuation of Transient SH-Wave by an Orthotropic Gaussian-Shaped Sedimentary Basin",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2022",href:"https://bayanbox.ir/download/7072554900002798608/21-compressed.pdf",journal:"https://www.sciencedirect.com/science/article/abs/pii/S095579972200131X?via%3Dihub",thumb:"https://bayanbox.ir/view/5024991772697586097/21.jpg",abstract:"The surface motion of an orthotropic Gaussian-shaped sedimentary basin embedded in a linear elastic half-space was successfully obtained under transient SH-wave propagation. In the use of the time-domain boundary element approach, a simple model was developed only by discretizing the interface. To achieve better convergence of the response, an attenuation rule was implemented with the assistance of the reduction exponential function applied in the boundary integral equations. After a brief overview of the method, the heterogonous sub-structured basin model was created and decomposed into two parts to satisfy the modified continuity conditions based on the normal direction at the interface node position. Then, the coupled matrices were temporarily solved at each time-step to obtain the boundary values. The developed computer code was tested by solving a validation example. Finally, to illustrate the valley surface response in the time/frequency-domain, a general sensitivity analysis was performed by considering the parameters of frequency, shape-ratio, isotropy-factor, and wave angle in the form of snapshots, seismograms, and amplification patterns. The results showed that the effect of orthotropic anisotropy was very efficient on the ground response and different seismic patterns on the surface of sedimentary basins were extracted by changes in the quantity of this parameter."},
+    {title:"Attenuated Orthotropic Time-Domain Half-Space BEM for SH-Wave Scattering Problems",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2022",href:"https://bayanbox.ir/download/174215418238224670/20.pdf",journal:"https://academic.oup.com/gji/article/229/3/1881/6515946?login=false",thumb:"https://bayanbox.ir/view/4452589848164309334/20.jpg",abstract:"In this paper, the complete formulation of the attenuated orthotropic time-domain half-space boundary element method was proposed to analyse the transient SH-wave scattering problems. By changing the spatial variable, the time-domain half-space Green's functions were obtained in an isotropic-like analytical process by solving the singular form of the scalar wave equation. The stress-free boundary condition of the ground surface was satisfied using the wave source image theory. To include the materials damping, the Barkan approach was used in the formulation to attenuate the half-space by applying a constant logarithmic reduction into the modified boundary integral equation. The closed-form attenuated orthotropic half-space scalar kernels were obtained in the time-domain for displacement/traction fields by analytical integration of Green's functions. The method was easily implemented in a time-domain computer code to analyse the seismic homogenous orthotropic medium. To elaborate the model of the heterogeneous problems, a substructuring approach was presented to satisfy the continuity conditions at the interface depending on the position of the node and normal. Then, several seismic problems including a surface canyon, an underground cavity, a subsurface inclusion, and an alluvial valley subjected to SH wave was solved and compared with the literature to validate the surface response in the case of isotropic convergence. To evaluate the accuracy and the time of analysis for the proposed method versus the full-space boundary element models, a comparative test was carried out for two examples. A favourite agreement was testified between the responses to verify the proposed method's capability for simple modelling of the orthotropic topographic features. Finally, the ability of the method to analyse the problems with high degrees of freedom was investigated by solving a half-space model including 25 subsurface orthotropic circular inclusions."},
+    {title:"Seismic Ground Response by Twin Lined Tunnels with Different Cross Sections",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2021",href:"https://bayanbox.ir/download/3861824407228499302/19.pdf",journal:"https://link.springer.com/article/10.1007/s42452-021-04770-7",thumb:"https://bayanbox.ir/view/6197836250209469848/19.jpg",abstract:"In this paper, the geometrical effects of shallow twin lined tunnels with different cross sections are investigated to obtain the anti-plane seismic ground motion under vertical/horizontal incident plane SH waves. A model of long two-dimensional lined tunnels is established and embedded in a homogeneous linear elastic half-plane by an applied numerical time-domain boundary element approach. In addition to a brief introduction to the formulation of the method, by considering five tunnel sections including circular, elliptical, horseshoe, square and rectangular, the surface response is sensitized to observe the normalized displacement amplitude/amplification ratio. In this regard, the angle of the incident wave and the frequency of the response are also included in changing the response pattern. To illustrate the results in both time and frequency domains, they are presented as blanket charts, snapshots, and three-/two-dimensional diagrams. The results showed that the seismic response of the surface is extremely affected by the geometric parameters of underground tunnels, which can create different conditions on the ground surface with shifting the direction of the wavefront."},
+    {title:"Seismic Analysis of Semi-Circular Orthotropic Valley subjected to Incident SH-Waves",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2021",href:"https://bayanbox.ir/download/3988721835803432067/18.pdf",journal:"https://www.researchgate.net/publication/352440322_Seismic_Analysis_of_Semi-Circular_Orthotropic_Valley_subjected_to_Incident_SH-Waves_In_Persian",thumb:"https://bayanbox.ir/view/1815906665122404040/18.jpg",abstract:"In this study, the seismic response of a semi-circular valley situated on an orthotropic half-space under incident SH waves is investigated. The time-domain half-plane boundary element method is employed to simulate the seismic behavior of the model. Initially, the formulation development for the valley and its numerical implementation within a comprehensive algorithm are briefly reviewed, followed by a validation example to verify the accuracy of the proposed model. Due to limited availability of documented technical references, a convergence approach toward isotropic surface response by varying the orthotropy factor is utilized to examine the influence of orthotropic properties on the seismic response. Subsequently, with a fixed orthotropy factor, time-domain analyses are performed to provide a detailed observation of wave propagation across the surface. In addition, frequency-domain results are presented for selected cases, highlighting the tangible effects of surface displacements. The results demonstrate that the orthotropy factor significantly affects the surface amplification patterns, indicating that the proposed methodology can serve as a practical tool for enhancing and refining existing seismic design codes and improving the understanding of the seismic behavior of both surface and subsurface topographical features."},
+    {title:"A Review On SH-Wave Propagation for Orthotropic Topographic Features",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2021",href:"http://https//bayanbox.ir/download/421311570099311432/17.pdf",journal:"https://www.bese.ir/article_244240.html?lang=en",thumb:"https://bayanbox.ir/view/6419292832514727100/17.jpg",abstract:"The propagation of waves is a fundamental topic in seismic analysis. This paper reviews research on the propagation of SH-waves in non-homogeneous orthotropic elastic media, with consideration of topographic features. Analytical, semi-analytical, and numerical methods for seismic analysis are discussed, highlighting the growing importance of numerical approaches due to increased computational capabilities. Among numerical methods, the Boundary Element Method (BEM) is particularly effective, as it focuses on boundaries, reduces data and computation time, and ensures high accuracy especially in the half-plane formulation for infinite or semi-infinite problems. This work serves as a reference point for researchers interested in the seismic analysis of both homogeneous and non-homogeneous sites."},
+    {title:"Surface Motion of Alluvial Valleys Subjected to Obliquely Incident Plane SH-Wave Propagation",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2021",href:"https://bayanbox.ir/download/906910132861857046/16.pdf",journal:"https://www.tandfonline.com/doi/full/10.1080/13632469.2021.1927886",thumb:"https://bayanbox.ir/view/8647492134183397413/16.jpg",abstract:"In this paper, a simple numerical model is presented for analyzing arbitrarily shaped alluvial valleys subjected to propagating obliquely incident plane SH-waves. A time-domain half-plane boundary element method (BEM) was successfully used to prepare the model in which the interface needs only to be discretized. First, the problem was decomposed into two parts, a half-plane valley-shaped feature and a closed filled alluvium. Then, the method was applied to each part to obtain the considered matrices. Finally, by satisfying the continuity conditions at the interface, the coupled equation was transiently solved to determine the boundary values. All ground surface responses were also obtained in a secondary solution as internal points. After implementing the method in a general algorithm, several practical examples were analyzed to validate the responses. Moreover, an advanced numerical study was performed to sensitize the surface motion of semi-cylindrical alluvial valleys with variable shape ratios as synthetic seismograms and three-dimensional (3D) amplification patterns. The proposed method can easily be combined with other numerical methods to achieve nonlinear site responses."},
+    {title:"On Subsurface Box-Shaped Lined Tunnel Under Incident SH-wave Propagation",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2021",href:"https://bayanbox.ir/download/6026704407342428119/15.pdf",journal:"https://link.springer.com/article/10.1007/s11709-021-0740-x",thumb:"https://bayanbox.ir/view/1701924337595460178/15.jpg",abstract:"In this paper, a half-plane time-domain boundary element method is applied to obtain the seismic ground response, including a subsurface box-shaped lined tunnel deployed in a linear homogenous elastic medium exposed to obliquely incident SH-waves. Only the boundary around the tunnel is required to be discretized. To prepare an appropriate model by quadratic elements, a double-node procedure is used to receive dual boundary fields at corners as well as change the direction of the normal vector. After encoding the method in a previously confirmed computer program, a numerical study is carried out to sensitize some effective parameters, including frequency content and incident wave angle for obtaining a surface response. The depth and impedance ratio of the lining are assumed to be unvaried. The responses are illustrated in the time and frequency domains as two/three-dimensional graphs. The results showed that subsurface openings with sharp corners distorted the propagation path of the anti-plane waves to achieve the critical states on the ground surface. The present approach can be proposed to civil engineers for preparing simple underground box-shaped models with angular boundaries."},
+    {title:"Seismic Analysis of the Surface in the Presence of Underground Lined Tunnel Subjected to Incident P/SV & SH-Waves",authors:"Mehdi Panji, Saeed Mojtabazadeh & Ali Ghiasvand",year:"2021",href:"https://bayanbox.ir/download/5816400326290005546/14.pdf",journal:"https://tuse.shahroodut.ac.ir/article_2106.html",thumb:"https://bayanbox.ir/view/8467349527077166675/14.jpg",abstract:"This study investigates the seismic response of the ground surface to incident vertical P/SV and SH waves in the presence of a circularly lined underground tunnel. A three-dimensional finite element method, implemented via the numerical software ABAQUS, has been employed for modeling purposes. After briefly presenting the theoretical foundations of the finite element method and validating the approach through a benchmark example, a sensitivity analysis of the ground surface response is conducted, considering key parameters such as tunnel depth and the impedance ratio of the lining relative to the surrounding soil. Subsequently, a comparative study is performed between the three-dimensional results and two-dimensional half-space boundary element responses. The findings indicate that at depth ratios of 5 and 8, for P/SV and SH waves respectively, the tunnel’s influence diminishes, and the response converges toward that of the free-field ground motion. Moreover, for in-plane P/SV wave incidence, each unit increase in the impedance ratio contributes to a minimum reduction of approximately 5% in the horizontal response at the tunnel crown, whereas for out-of-plane SH waves, an opposite trend is observed. The results of this study can provide valuable insights for the refinement and enhancement of current seismic design codes regarding site microzonation in the presence of subsurface openings."},
+    {title:"Amplification Pattern of Trapezoidal Alluvial Valley Subjected to SH-waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2021",href:"https://bayanbox.ir/download/7071119755334010540/13.pdf",journal:"https://mcej.modares.ac.ir/browse.php?a_id=43920&slc_lang=en&sid=16&printcase=1&hbnr=1&hmb=1",thumb:"https://bayanbox.ir/view/8734725462663568532/13.jpg",abstract:"This study presents a numerical model for analyzing trapezoidal alluvial valleys subjected to obliquely incident SH-waves using an advanced half-plane time-domain boundary element method (BEM). Unlike previous studies limited to homogeneous subsurfaces or frequency-domain analyses, this approach directly computes surface and internal responses in the time domain. The method decomposes the problem into a half-plane valley and filled alluvium, applies influence coefficients, and enforces boundary/continuity conditions to solve for unknowns at each time step. Implemented in the DASBEM algorithm, the model produces synthetic seismograms, 3D amplification patterns, and transient snapshots of the alluvium and surrounding bedrock. Sensitivity analyses examine the effects of shape and impedance ratios, incident wave angle, and frequency on seismic amplification. Results demonstrate that these factors strongly influence surface motion and provide valuable insights for improving seismic design codes and understanding near-field site effects."},
+    {title:"Seismic Antiplane Response of Gaussian-Shaped Alluvial Valley",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2020",href:"https://bayanbox.ir/download/8165459071927520973/12.pdf",journal:"https://sjce.journals.sharif.edu/article_22191.html",thumb:"https://bayanbox.ir/view/589751004582268423/12.jpg",abstract:"In this study, a direct time-domain numerical approach named the half-plane Boundary Element Method (BEM) is proposed based on the half-space Green’s functions for analyzing seismic Gaussian-shaped alluvial valley subjected to propagating obliquely incident SH-waves. In the use of the method, the meshes were only concentrated around the interface of the basin. First, the problem is decomposed into two parts including a half-plane Gaussian-shaped feature and a closed filled alluvium. Then, the method was applied to each part to obtain the considered matrices. Finally, by satisfying the boundary/continuity conditions at the interface, the coupled equation was transiently solved to determine the boundary values. All ground surface responses were also obtained in a secondary solution as internal points. After implementing the method in a general algorithm, several practical examples were analyzed to validate the responses. An advanced numerical study was performed to sensitize the surface motion of Gaussian-shaped alluvial valleys with variable shape/impedance ratios as synthetic seismograms and Three-Dimensional (3D) amplification patterns. Moreover, to complete the time-domain results, the transient response of the internal domain of the alluvium as well as the surrounding bed rock was shown by the snapshots views. In the following, the sensitivity analysis was carried out to obtain the seismic amplification pattern of the surface by considering the key parameters including impedance and shape ratios, incident wave angle, and response frequency. Finally, by collecting the maximum amplification of different scenarios and applying linear fit to the obtained values, the results were summarized as a series of linear equations and tables. The results showed that the mentioned factors were very effective in the seismic response of the surface. The results of the present study can be used to complete the accuracy of existing codes around the subject of near-filed site effects."},
+    {title:"On Subsurface Multiple Inclusions Model under Transient SH-Wave Propagation",authors:"Saeed Mojtabazadeh, Mehdi Panji & Mohsen Kamalian",year:"2020",href:"https://bayanbox.ir/download/2001310189698086179/11.pdf",journal:"https://www.tandfonline.com/doi/full/10.1080/17455030.2020.1842553",thumb:"https://bayanbox.ir/view/7880816896032681431/11.jpg",abstract:"In this paper, a homogeneous linear elastic half-plane model cluttered with multiple embedded arbitrarily-shaped inclusions is presented. The model was built based on the time-domain boundary element method established via the half-space Green’s functions, subjected to propagating obliquely incident SH-waves. Using this method, the discretization was performed only on the interfaces. The full-contact posture was assumed between the inclusions and the surrounding domain. First, the problem was disintegrated into two parts including a multi-pitted half-plane and a system of randomly shaped closed filled solids. Then, by applying the method to each part, the influence coefficients of the matrices were obtained. Finally, to form a coupled equation for determining unknown boundary values in each time-step, the boundary/continuity conditions were satisfied on the interfaces. By implementing the method in an advanced developed algorithm, its efficiency was investigated by comparing the responses with those of the published works. To complete the obtained results, the synthetic seismograms and three-dimensional amplification patterns of the surface were presented. Also, some snapshots were illustrated to reveal the dispersion of the waves. The proposed method is a powerful tool for modeling various structures at the nano-scale and can be recommended to engineers for transient analysis of composite materials."},
+    {title:"Transient Response of the Surface by Twin Underground Inclusions Subjected to SH-Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2020",href:"https://bayanbox.ir/download/7300305754743927050/10.pdf",journal:"https://www.bese.ir/article_241894.html",thumb:"https://bayanbox.ir/view/7000384748214894742/10.jpg",abstract:"In this study, step-by-step transient analysis of arbitrarily shaped twin elliptical inclusions are presented subjected to propagating obliquely incident plane SH-waves using the direct half-plane time-domain BEM approach. Based on the sub-structuring process, the model of twin subsurface inclusions was decomposed into a dual pitted half-plane and twin closed filled solids. By determining all the related matrices and applying the continuity conditions of the displacements and tractions at the interfaces, the coupled matrix was achieved to obtain all unknown boundary values. After developing the method to analyze the problem of twin inclusions, it was implemented in the general algorithm previously called DASBEM and its validity was evaluated by some practical examples. The key parameters of the shape ratio of inclusions and incident wave’s angle were considered to sensitize the response behavior. In order to complete the numerical results, some synthetic seismograms and 3D (three-dimensional) blanket amplification patterns were presented to illustrate the time and frequency-domain responses in the presence of twin inclusions. The results clearly demonstrate the significant role of the elliptical twin inclusions on the seismic response of surface and show that the maximum scattering and amplification are achieved in minimum shape ratio for vertical incident waves. It should be noted that the main objectives of the present study are presenting the ability of the proposed method in preparing simple twin inclusions models, transient analysis of complex engineering problems, obtaining high accuracy results, and illustrating a better view of subsurface irregularities interactions in the field of geotechnical earthquake engineering."},
+    {title:"Seismic Response of the Trapezoidal Alluvial Hill Located on a Circular Cavity: Incident SH-Wave",authors:"Mehdi Panji, Saeed Mojtabazadeh & Mohammad Habibivand",year:"2020",href:"https://bayanbox.ir/download/5368624359340546782/9.pdf",journal:"https://ceej.aut.ac.ir/article_4775.html?lang=en",thumb:"https://bayanbox.ir/view/6663159587069915831/9.jpg",abstract:"A direct time-domain numerical approach named the half-plane boundary element method is proposed based on the half-space Green’s functions for seismic analysis of trapezoidal alluvial hill located on a circular cavity, subjected to propagating vertical incident SH-waves. To analyze the assumed model, a half plane time-domain Boundary Element Method (BEM) was used which can concentrate the meshes only around the boundary of desired features. First, the problem is decomposed into two parts including a pitted half-plane and a trapezoidal filled solid on the surface. Then, the influence coefficients of the matrices are obtained by applying the method to each part. By satisfying the boundary/continuity conditions on the interfaces, a coupled equation is formed to determine unknown boundary values in each time-step. After implementing the method in an advanced developed algorithm, its efficiency is investigated by solving some practical examples and compared with those of the published works. To complete the results, the sensitivity analysis was carried out to obtain the seismic response of hill by considering the key parameters including impedance and shape ratios. In the meantime, the effect of subsurface cavity on the amplification pattern of surface has been studied as well. The results showed that the impedance and shape ratios of the trapezoidal alluvial hill were very effective on the seismic response of surface. The results of the present study can be used by geotechnical engineers to completing and increasing the accuracy of existing codes around the subject of ground surface zonation in presence of different topographic features."},
+    {title:"Impedance Ratio Effect of the Trapezoidal Alluvial Hill on the Seismic Response of Ground Surface",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2020",href:"https://bayanbox.ir/download/4398484613970449553/8.pdf",journal:"https://civilica.com/doc/1120496/",thumb:"https://bayanbox.ir/view/4646249185543564520/8.jpg",abstract:"In this paper, the seismic response of trapezoidal alluvial hills subjected to incident SH-waves is analyzed. To this end, a time-domain half-plane boundary element method (BEM) is employed for the seismic assessment of the model. Using this approach and based on a substructuring procedure, meshing is concentrated solely on the hill surface. First, the formulation of the proposed method is briefly introduced, and a validation example is presented to evaluate its accuracy and quality. Subsequently, the seismic response of the ground surface is investigated through a sensitivity analysis, considering key parameters such as the hill’s shape ratio and the impedance contrast of its alluvial materials. The results clearly highlight the significant role of the trapezoidal hill geometry, material impedance, and heterogeneity relative to the surrounding medium in surface seismic amplification. Finally, the practical implications of this study are emphasized, demonstrating that the findings can inform and refine existing seismic codes concerning earthquake engineering, geotechnical applications, and site-specific hazard assessment in areas with surface topography, particularly trapezoidal hills."},
+    {title:"A Half-Plane Time-Domain BEM for SH-Wave Scattering by a Subsurface Inclusion",authors:"Mehdi Panji, Saeed Mojtabazadeh & Farshid Yasemi",year:"2019",href:"https://bayanbox.ir/download/4315677266690868210/7.pdf",journal:"https://www.sciencedirect.com/science/article/abs/pii/S0098300419302997?via%3Dihub",thumb:"https://bayanbox.ir/view/1631301330230573384/7.jpg",abstract:"A direct time-domain numerical approach named the half-plane boundary element method is proposed based on the half-space Green's functions for seismic analysis of a homogeneous linear elastic half-plane in presence of arbitrarily shaped subsurface inclusions, subjected to propagating obliquely incident SH-waves. It is assumed that inclusion is completely connected to the surrounding domain. In the use of the method, only the interfaces need to be discretized to create the model. First, the problem is decomposed into two parts including a pitted half-plane and a closed filled solid. Then, the influence coefficients of the matrices are obtained by applying the method to each part. By satisfying the boundary/continuity conditions on the interfaces, a coupled equation is finally formed to determine unknown boundary values in each time-step. After implementing the method in an advanced developed algorithm, its efficiency is investigated by solving some practical examples and compared with those of the published works. The results show that the proposed method has an appropriate accuracy for analyzing seismic inclusion problems. To complete the results, the synthetic seismograms of the surface are presented for circular/elliptical subsurface inclusions. Then, three-dimensional amplification patterns are illustrated for some specific cases. The method can be recommended to geotechnical/mechanical engineers for transient analysis of different topographic features, seismic isolation and composite materials."},
+    {title:"Seismic Amplification Pattern of the Ground Surface in Presence of Twin Unlined Circular Tunnels Subjected to SH-Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2019",href:"https://bayanbox.ir/download/8651337416166060036/6.pdf",journal:"https://jtie.semnan.ac.ir/article_3994.html?lang=en",thumb:"https://bayanbox.ir/view/3140408388919363256/6.jpg",abstract:"In this paper, the amplification pattern of the ground surface is presented in presence of twin unlined circular tunnels subjected to SH-waves. To analyze the assumed seismic model, a half plane time-domain Boundary Element Method (BEM) was used which has been previously developed for single sub-surface tunnels. First, after presenting a brief formulation of the proposed method and displaying a verification example, the sensitivity analysis was carried out to obtain the seismic amplification pattern of the ground surface by considering the key parameters including tunnels buried depth, interval distance, incident wave angle and response frequency. Finally, by collecting the maximum amplification of different scenarios and applying linear fit on the obtained values, the results were summarized as series of linear equations and tables. The results showed that different situations of buried twin tunnels in urban fabric was very effective on the seismic response of surface. The results of this research can be used to completing and increasing the accuracy of existing codes around the subject of ground surface zonation in presence of twin tunnels."},
+    {title:"Transient Response of Irregular Surface by Periodically Distributed Semi-Sine Shaped Valleys: Incident SH Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2019",href:"https://bayanbox.ir/download/8124219501724352179/5.pdf",journal:"https://www.worldscientific.com/doi/10.1142/S1793431120500050",thumb:"https://bayanbox.ir/view/3218021891454769572/5.jpg",abstract:"An advanced direct half-plane time-domain boundary element method (BEM) was applied to obtain the seismic response of a linear elastic irregular surface including periodically distributed semi-sine shaped valleys subjected to propagating obliquely incident plane SH waves. After developing the method for complex multiple surface topographies, some verification examples were solved and compared with those of the published works. Then, the transient response of a rough surface with 2–16 semi-sine shaped valleys was determined as synthetic seismograms. In this regard, the depth ratio of the valleys was sensitized. Finally, amplification patterns of the surface were presented in some cases. The results showed that the method was able to analyze the multipart models in the time-domain. Moreover, the response of the sinusoidal corrugated surfaces was very effective against seismic waves in forming different patterns. The method was recommended to researchers for transient analysis of complex engineering structures and composite materials in nanoscale."},
+    {title:"The Effect of Depth Ratio on the Transient Response of Irregular Surface by Periodically Distributed Semi-Sine Shaped Valleys Subjected to Incident SH-Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2019",href:"https://bayanbox.ir/download/1158379025968434353/4.pdf",journal:"https://civilica.com/doc/917824/",thumb:"https://bayanbox.ir/view/2507880171317549300/4.jpg",abstract:"In this study, the seismic response of periodically alternating half-sine valleys subjected to incident SH-waves is investigated. To this end, a time-domain half-plane boundary element method (BEM) is employed for the seismic analysis of the model. Following a brief description of the formulation development for alternating half-sine valleys and its numerical implementation within a comprehensive algorithm previously named DASBEM, a validation example is presented to assess the accuracy of the proposed method. Subsequently, time-domain results are provided considering variations in valley depth ratios and incident wave angles. For selected cases, frequency-domain results are also shown to provide a clearer depiction of the surface motions. The findings clearly demonstrate the significant influence of valley presence, periodicity, and depth ratio variations on the surface seismic response. Accordingly, the proposed method can serve as a reliable approach for refining and enhancing existing codes regarding the seismic behavior of surface and subsurface topographical features."},
+    {title:"Time-History Responses on the Surface by Regularly Distributed Enormous Embedded Cavities: Incident SH-Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2018",href:"https://bayanbox.ir/download/7050831466408904062/3.pdf",journal:"https://www.equsci.org.cn/article/doi/10.29382/eqs-2018-0137-3?pageType=en",thumb:"https://bayanbox.ir/view/8045563318987990212/3.jpg",abstract:"The time-history responses of the surface were obtained for a linear elastic half-plane including regularly distributed enormous embedded circular cavities subjected to propagating obliquely incident plane SH-waves. An advanced numerical approach named half-plane time-domain boundary element method (BEM), which only located the meshes around the cavities, was used to create the model. By establishing the modified boundary integral equation (BIE) independently for each cavity and forming the matrices, the final coupled equation was solved step-by-step in the time-domain to obtain the boundary values. The responses were developed for a half-plane with 512 cavities. The amplification patterns were also obtained to illustrate the frequency-domain responses for some cases. According to the results, the presence of enormous cavities affects the scattering and diffraction of the waves arrived to the surface. The introduced method can be recommended for geotechnical/mechanical engineers to model structures in the fields of earthquake engineering and composite materials."}
+  ];
+
+  const list=document.getElementById('paperList');
+  const wizard=document.getElementById('wizard');
+  const wThumb=document.getElementById('w-thumb');
+  const wBody=document.getElementById('w-body');
+  const isMobile=window.innerWidth<=640;
+
+  function positionWizard(x,y){
+    const wRect=wizard.getBoundingClientRect();
+    let left=x, top=y;
+    if(isMobile){
+      left=Math.min(Math.max(10,left),window.innerWidth - wRect.width - 10);
+      top=Math.min(Math.max(50,top),window.innerHeight - wRect.height - 10);
+    } else {
+      if(left+wRect.width>window.innerWidth) left=x-wRect.width-10;
+      if(top+wRect.height>window.innerHeight) top=y-wRect.height-10;
+    }
+    wizard.style.left=left+'px';
+    wizard.style.top=top+'px';
+  }
+
+  papers.forEach(p=>{
+    const node=document.createElement('div'); node.className='paper';
+    node.innerHTML=`
+      <div class="thumb"><img src="${p.thumb}" alt=""></div>
+      <div class="meta">
+        <div class="p-title">${p.title}</div>
+        <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>
+      </div>
+      <div>
+        <a href="${p.href}" target="_blank" class="download-btn">📥 Download</a>
+        <a href="${p.journal}" target="_blank" class="journal-btn">🌐 Link</a>
+      </div>`;
+
+    const thumb=node.querySelector('.thumb');
+    const img = thumb.querySelector('img');
+    img.addEventListener('load',()=> img.classList.add('loaded'));
+
+    if(isMobile){
+      thumb.addEventListener('click',(ev)=>{
+        if(wizard.classList.contains('show')){
+          wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
+        } else {
+          wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+          wBody.textContent=p.abstract;
+          wBody.scrollTop = 0;
+          const rect=thumb.getBoundingClientRect();
+          positionWizard(rect.left, rect.top + window.scrollY);
+          wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+        }
+      });
+      wizard.addEventListener('click',()=>{
+        wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
+      });
+    } else {
+      thumb.addEventListener('mouseenter',(ev)=>{
+        wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+        wBody.textContent=p.abstract;
+        wBody.scrollTop = 0;
+        positionWizard(ev.clientX+18,ev.clientY+12);
+        wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+      });
+      thumb.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+      thumb.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+      thumb.addEventListener('wheel',(e)=>{
+        if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+      });
+    }
+
+    list.appendChild(node);
+  });
+})();
 </script>
 
 </body>
