@@ -5,236 +5,625 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>DASBEM.IR</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<!-- EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <style>
-:root {
-  --gold: #ffb347;
-  --orange: #ff7e5f;
-  --dark: #0a0a0a;
-  --light: #fff7e6;
+:root{
+  --bg-dark:#0b0b0b;
+  --panel-dark:#0f0f10;
+  --text-light:#fff;
+  --muted:#d9d6d0;
+
+  /* Main accent (gold/orange matching your header) */
+  --gold-1: #ffb347; /* lighter */
+  --gold-2: #ff7e5f; /* deeper orange */
+  --gold-3: #ffcc33; /* highlight */
+  --glass: rgba(255,255,255,0.06);
+
+  /* button */
+  --btn-bg: linear-gradient(180deg, rgba(255,126,95,0.12) 0%, rgba(255,179,71,0.06) 100%);
+  --btn-border: rgba(255,180,110,0.12);
+  --btn-glow: rgba(255,160,80,0.14);
+
+  /* overlay */
+  --overlay-bg: rgba(6,6,8,0.65);
+  --overlay-blur: 8px;
 }
 
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: var(--dark);
-  color: var(--light);
-  overflow-x: hidden;
+/* reset */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0;background:var(--bg-dark);color:var(--text-light);font-family:"Poppins",sans-serif;overflow-x:hidden;}
+
+/* ===== Page Loader (original, kept) ===== */
+#app{
+  position:fixed; inset:0; z-index:99999;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  background:#050505; color:#39ff14;
+  font-family:'Share Tech Mono', monospace;
+}
+#header{font-size:18px; color:var(--gold-2); margin-bottom:12px; user-select:none;}
+.viewport{flex:1; overflow-y:auto; padding:12px 14px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:8px; border:1px solid rgba(255,255,255,0.03); width:calc(100% - 60px); max-height:60%; word-break:break-word;}
+.logLine{font-size:13px; line-height:1.25; margin:4px 0;}
+.finalLine{color:var(--gold-3); font-weight:700; font-size:15px; margin-top:10px; padding:6px 10px; border-radius:6px; background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent); text-shadow:0 0 6px rgba(255,204,51,0.14);}
+.progressWrap{height:14px; background:rgba(255,255,255,0.04); border-radius:10px; overflow:hidden; margin-top:12px; border:1px solid rgba(255,255,255,0.03); width:calc(100% - 60px);}
+.progressBar{width:0%; height:100%; background:linear-gradient(90deg,var(--gold-2),var(--gold-3)); transition:width 50ms linear;}
+
+/* main content hidden until loader finishes */
+#mainSite{opacity:0; transition:opacity .9s ease;}
+
+/* Canvas background (original) */
+#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* Header styles (kept) */
+header.site-header{ position:relative;z-index:2;text-align:center;padding:80px 20px 60px; }
+header.site-header h1{
+  font-family:"Playfair Display",serif;font-size:3.6rem;font-weight:900;
+  margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--gold-1),var(--gold-3),var(--gold-2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 20px rgba(255,170,110,0.18);
+  display:inline-block;
+  animation: glow 6s ease-in-out infinite;
+}
+@keyframes glow{
+  0%,100%{text-shadow:0 0 18px rgba(255,170,110,0.18);}
+  50%{text-shadow:0 0 42px rgba(255,180,120,0.25);}
+}
+header.site-header p{ font-size:1.15rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5; }
+
+/* wrap/researchers/papers (kept mostly) */
+.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 10px;display:flex;flex-direction:column;align-items:center;}
+.header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.researcher{ position:relative;width:300px;min-width:260px; display:flex;flex-direction:column;align-items:center; backdrop-filter: blur(10px);padding:18px;border-radius:20px; background:var(--glass); box-shadow:0 10px 40px rgba(0,0,0,0.55); transition:transform .35s ease, box-shadow .35s ease, filter .35s ease; }
+.photo-frame{ position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden; padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.06), transparent 30%); display:flex;align-items:center;justify-content:center; box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.08) inset; margin-bottom:12px; border: 3px solid rgba(255,255,255,0.04); transition: transform 1.2s ease-in-out; }
+.name{ font-family:"Playfair Display",serif;font-size:1.2rem;font-weight:700;color:var(--text-light); letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out; }
+.name .title-small{ font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.45);width:100%;max-width:100%;}
+.papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
+
+/* ===== TOP FLOATING BUTTONS (final styling) ===== */
+.top-controls{
+  position:fixed; top:18px; left:0; right:0; z-index:10050; display:flex; justify-content:space-between; padding:0 20px; pointer-events:none;
 }
 
-/* ===== دکمه طلایی هماهنگ ===== */
-.btn-glow {
-  position: relative;
-  display: inline-block;
-  padding: 12px 30px;
-  margin: 10px;
-  border-radius: 50px;
-  background: linear-gradient(90deg, var(--orange), var(--gold));
-  color: #fff;
-  text-decoration: none;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  box-shadow: 0 0 15px rgba(255, 180, 70, 0.4);
-  transition: all 0.3s ease-in-out;
-  overflow: hidden;
-  cursor: pointer;
+/* main fancy button style, golden/orange and glass */
+.das-btn{
+  pointer-events:auto;
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 18px;
+  min-width:120px;
+  border-radius:999px;
+  border:1px solid rgba(255,180,110,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color:var(--text-light);
+  font-weight:700;
+  font-size:0.95rem;
+  letter-spacing:0.4px;
+  cursor:pointer;
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, background .28s ease;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  position:relative;
+  overflow:hidden;
 }
 
-.btn-glow::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -75%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-  transform: skewX(-25deg);
-  transition: 0.5s;
+/* gold border accent */
+.das-btn::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  padding:1px;
+  background: linear-gradient(90deg, rgba(255,179,71,0.06), rgba(255,126,95,0.04));
+  -webkit-mask: linear-gradient(#000,#000);
+  pointer-events:none;
+  mix-blend-mode:screen;
 }
 
-.btn-glow:hover::before {
-  left: 130%;
+/* shiny moving stripe (pseudo element) */
+.das-btn::before{
+  content:"";
+  position:absolute;
+  top:-40%; left:-60%;
+  width:40%; height:220%;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.38) 50%, rgba(255,255,255,0) 100%);
+  transform: rotate(12deg) translateX(-120%);
+  transition: transform 0.95s cubic-bezier(.2,.9,.2,1);
+  filter: blur(8px);
+  pointer-events:none;
+  opacity:0.95;
+}
+.das-btn:hover::before{ transform: rotate(12deg) translateX(300%); }
+
+/* glow on hover + lift */
+.das-btn:hover{
+  transform:translateY(-6px) scale(1.02);
+  box-shadow: 0 24px 60px rgba(255,150,80,0.12), 0 0 40px rgba(255,160,80,0.06);
 }
 
-.btn-glow:hover {
-  box-shadow: 0 0 25px rgba(255, 193, 70, 0.8), 0 0 50px rgba(255, 125, 70, 0.4);
-  transform: translateY(-3px);
+/* small gold icon or text accent inside button */
+.das-btn .dot{
+  width:10px;height:10px;border-radius:50%;
+  background: linear-gradient(90deg,var(--gold-1),var(--gold-2));
+  box-shadow: 0 0 12px rgba(255,150,70,0.5);
+  flex:0 0 10px;
 }
 
-.btn-glow:active {
-  transform: scale(0.95);
-}
+/* left vs right placement helpers */
+.das-btn.left{ margin-left:8px; }
+.das-btn.right{ margin-right:8px; }
 
-/* ===== افکت پاپ‌آپ ===== */
-.popup-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 10, 10, 0.7);
-  backdrop-filter: blur(10px);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: fadeIn 0.4s ease;
+/* ===== overlay + modal ===== */
+.modal-overlay{
+  position:fixed; inset:0; z-index:10040;
+  background:var(--overlay-bg); backdrop-filter: blur(var(--overlay-blur)); opacity:0; pointer-events:none;
+  transition: opacity .28s ease;
 }
+.modal-overlay.show{ opacity:1; pointer-events:auto; }
 
-.popup {
-  background: rgba(30, 30, 30, 0.9);
-  border-radius: 15px;
-  padding: 30px;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 0 30px rgba(255, 163, 60, 0.4);
-  color: #fff;
-  animation: scaleUp 0.4s ease;
-  position: relative;
+/* modal box */
+.modal{
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.96); z-index:10045;
+  width: calc(100% - 40px); max-width:640px; background: linear-gradient(180deg, rgba(12,12,12,0.98), rgba(18,18,18,0.96));
+  border-radius:16px; padding:22px; color:var(--text-light);
+  opacity:0; pointer-events:none; transition: all .28s cubic-bezier(.2,.9,.2,1);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,180,110,0.06);
 }
+.modal.show{ opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
 
-.popup h2 {
-  text-align: center;
-  color: var(--gold);
-  font-family: 'Playfair Display', serif;
-}
+/* modal header */
+.modal .m-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.modal h3{ margin:0; font-family:"Playfair Display",serif; font-size:1.25rem; color:var(--gold-1); background:linear-gradient(90deg,var(--gold-1),var(--gold-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.modal p{ color:var(--muted); line-height:1.6; margin-top:8px; text-align:justify; }
 
-.popup input, .popup textarea {
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  border: none;
-  outline: none;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  font-size: 14px;
-  transition: all 0.3s ease;
+/* form */
+.contact-form{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.contact-form input, .contact-form textarea{
+  background: rgba(255,255,255,0.02);
+  border:1px solid rgba(255,180,110,0.06);
+  padding:10px 12px; border-radius:10px; color:var(--text-light); font-size:0.95rem;
 }
+.contact-form input:focus, .contact-form textarea:focus{
+  border-color: rgba(255,180,80,0.14); box-shadow: 0 0 14px rgba(255,160,80,0.08); outline:none;
+}
+.contact-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:6px; }
+.btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:8px 12px; border-radius:8px; cursor:pointer; }
+.btn-primary{ background: linear-gradient(90deg,var(--gold-2),var(--gold-1)); color:#111; padding:10px 14px; border-radius:12px; border:none; cursor:pointer; font-weight:800; box-shadow: 0 8px 30px rgba(255,150,70,0.12); }
 
-.popup input:focus, .popup textarea:focus {
-  box-shadow: 0 0 10px rgba(255, 193, 70, 0.6);
-  background: rgba(255,255,255,0.12);
-}
+/* small status text */
+.form-status{ font-size:0.95rem; color:var(--muted); margin-top:8px; }
 
-.popup button {
-  margin-top: 15px;
-  width: 100%;
-  border: none;
-  outline: none;
-  padding: 12px;
-  border-radius: 50px;
-  background: linear-gradient(90deg, var(--orange), var(--gold));
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.popup button:hover {
-  box-shadow: 0 0 20px rgba(255, 180, 70, 0.7);
-}
-
-.close-popup {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  color: var(--gold);
-  font-size: 22px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.close-popup:hover {
-  transform: rotate(90deg);
-  color: var(--orange);
-}
-
-/* ===== انیمیشن‌ها ===== */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes scaleUp {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* ===== واکنش‌گرایی ===== */
-@media (max-width: 600px) {
-  .btn-glow {
-    padding: 10px 22px;
-    font-size: 14px;
-  }
-  .popup {
-    padding: 20px;
-  }
+/* responsive */
+@media (max-width:640px){
+  header.site-header{padding:48px 12px 34px;}
+  header.site-header h1{font-size:2.6rem;}
+  .das-btn{ padding:9px 12px; font-size:0.92rem; min-width:88px; border-radius:12px; }
+  .modal{ width:calc(100% - 28px); padding:16px; max-width:420px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ===== دکمه‌ها ===== -->
-<div style="text-align:center; margin-top:100px;">
-  <button class="btn-glow" onclick="openPopup('about')">About</button>
-  <button class="btn-glow" onclick="openPopup('contact')">Contact Us</button>
+<!-- Page loader -->
+<div id="app" aria-hidden="false">
+  <div id="header">Initializing The DASBEM Project Core...</div>
+  <div class="viewport" id="viewport" aria-hidden="false"></div>
+  <div class="progressWrap"><div class="progressBar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
 </div>
 
-<!-- ===== پاپ‌آپ‌ها ===== -->
-<div id="popup-overlay" class="popup-overlay">
-  <div class="popup" id="popup-content">
-    <span class="close-popup" onclick="closePopup()">&times;</span>
-    <h2 id="popup-title"></h2>
-    <div id="popup-body"></div>
+<!-- ===== Main Site ===== -->
+<div id="mainSite" aria-hidden="true">
+  <canvas id="waveCanvas" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <h1>The DASBEM Project</h1>
+    <p>Dynamic Analysis of Structures by Boundary Element Method</p>
+  </header>
+
+  <!-- Top floating controls -->
+  <div class="top-controls" aria-hidden="false">
+    <div style="display:flex; align-items:center;">
+      <button class="das-btn left" id="aboutBtn" aria-haspopup="dialog" aria-controls="aboutModal">
+        <span class="dot" aria-hidden="true"></span>
+        <span style="margin-left:6px">About</span>
+      </button>
+    </div>
+    <div style="display:flex; align-items:center;">
+      <button class="das-btn right" id="contactBtn" aria-haspopup="dialog" aria-controls="contactModal">
+        <span class="dot" aria-hidden="true"></span>
+        <span style="margin-left:6px">Contact Us</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="header" aria-label="Researchers">
+      <section class="researcher" id="r1" aria-labelledby="r1-name">
+        <div class="photo-frame" aria-hidden="true">
+          <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+        </div>
+        <div class="name" id="r1-name">
+          <span>Dr. Mehdi Panji</span>
+          <span class="title-small">Associate Professor</span>
+          <div class="contact">
+            <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
+            <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="researcher" id="r2" aria-labelledby="r2-name">
+        <div class="photo-frame" aria-hidden="true">
+          <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+        </div>
+        <div class="name" id="r2-name">
+          <span>Dr. Saeed Mojtabazadeh</span>
+          <span class="title-small">Postdoctoral Fellow</span>
+          <div class="contact">
+            <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
+            <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="papers" aria-label="Papers">
+      <h3>💡 Download Papers For Free</h3>
+      <div class="paper-list" id="paperList"></div>
+    </section>
+  </div>
+
+  <footer class="site-footer">The DASBEM Project ©</footer>
+</div><!-- end mainSite -->
+
+<!-- Modal overlay -->
+<div id="modalOverlay" class="modal-overlay" aria-hidden="true"></div>
+
+<!-- About Modal -->
+<div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="aboutTitle">
+  <div class="m-head">
+    <h3 id="aboutTitle">About DASBEM</h3>
+    <button class="btn-ghost" data-close="aboutModal" aria-label="Close about">Close</button>
+  </div>
+  <div class="m-body">
+    <p>
+      <strong>DASBEM</strong> (Dynamic Analysis of Structures by Boundary Element Method)
+      is an advanced computational framework focusing on transient elastodynamic
+      boundary-element formulations in semi-infinite domains. It emphasizes SH-wave
+      scattering, efficient time-domain solvers, and practical tools for
+      seismic and geotechnical engineering research.
+    </p>
+    <p style="color:var(--muted);font-size:0.95rem;margin-top:8px;">Tip: press ESC or click outside to close.</p>
   </div>
 </div>
 
+<!-- Contact Modal -->
+<div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactTitle">
+  <div class="m-head">
+    <h3 id="contactTitle">Contact Us</h3>
+    <button class="btn-ghost" data-close="contactModal" aria-label="Close contact">Close</button>
+  </div>
+  <div class="m-body">
+    <form id="contactForm" class="contact-form" autocomplete="on" novalidate>
+      <input type="text" id="cf_name" name="from_name" placeholder="Your name" required aria-label="Your name">
+      <input type="email" id="cf_email" name="reply_to" placeholder="Your email" required aria-label="Your email">
+      <input type="text" id="cf_subject" name="subject" placeholder="Subject (optional)" aria-label="Subject">
+      <textarea id="cf_message" name="message" placeholder="Your message" required aria-label="Your message"></textarea>
+
+      <div class="contact-actions">
+        <button type="button" class="btn-ghost" data-close="contactModal">Cancel</button>
+        <button type="submit" class="btn-primary" id="contactSendBtn">Send Message</button>
+      </div>
+      <div id="contactStatus" class="form-status" style="display:none;"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Wizard popup (original) -->
+<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+  <div class="w-thumb" id="w-thumb"></div>
+  <div class="w-body" id="w-body"></div>
+</div>
+
 <script>
-emailjs.init("IlTw12Nz7SSQucp4C");
+/* ===== Loader Script (kept original behavior) ===== */
+const TOTAL_DURATION = 4000;
+const TOTAL_LINES = 350;
+const viewport = document.getElementById('viewport');
+const progressBar = document.getElementById('progressBar');
 
-function openPopup(type) {
-  const overlay = document.getElementById('popup-overlay');
-  const title = document.getElementById('popup-title');
-  const body = document.getElementById('popup-body');
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pick(arr){ return arr[rnd(0,arr.length-1)]; }
 
-  if (type === 'about') {
-    title.innerHTML = "About DASBEM";
-    body.innerHTML = `
-      <p style="text-align:justify; line-height:1.7;">
-        DASBEM is a cutting-edge research environment focusing on the Boundary Element Method (BEM)
-        in semi-infinite domains, with emphasis on seismic SH-wave propagation. Our mission is to
-        advance scientific computation and make boundary-based analysis more powerful and intuitive.
-      </p>
-    `;
-  } else if (type === 'contact') {
-    title.innerHTML = "Contact Us";
-    body.innerHTML = `
-      <form id="contactForm">
-        <input type="text" name="from_name" placeholder="Your Name" required>
-        <input type="email" name="reply_to" placeholder="Your Email" required>
-        <textarea name="message" rows="4" placeholder="Your Message..." required></textarea>
-        <button type="submit">Send Message</button>
-      </form>
-    `;
+const stages = [
+  "Loading half-space Green’s function library [G_SH_Layered.bin]...",
+  "Initializing transient boundary element solver (HSTD-BEM)...",
+  "Parsing boundary topology file [geo_surface_topo.geo]...",
+  "Computing transient scattering coefficients [SC_SH.csv]...",
+  "Activating recursive solver checkpointing routine...",
+  "Applying radiation boundary condition at truncation plane...",
+  "Integrating traction kernel derivatives for energy flux...",
+  "Saving final boundary response history [Resp_SH_Final.bin]...",
+  "Exporting simulation metadata [meta_SH_run.json]...",
+  "Compressing output archives [run_SH_01.zip]...",
+  "Simulation sequence completed successfully."
+];
 
-    document.getElementById('contactForm').onsubmit = function(e) {
-      e.preventDefault();
-      emailjs.sendForm('mojtabazadeh', 'mojtabazadeh', this)
-        .then(() => {
-          alert("✅ Message sent successfully!");
-          closePopup();
-        }, (error) => {
-          alert("❌ Failed to send message: " + JSON.stringify(error));
-        });
-    };
+function makeLine(){
+  const stage = pick(stages);
+  let extra = "";
+  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
+  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
+  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
+  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
+  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
+  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
+  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
+  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
+
+  return stage + extra;
+}
+
+let loadedCount = 0;
+function pushLine(text, final=false){
+  const el = document.createElement('div');
+  el.className='logLine';
+  if(final) el.classList.add('finalLine');
+  el.textContent=text;
+  viewport.appendChild(el);
+  while(viewport.children.length>220) viewport.removeChild(viewport.children[0]);
+  viewport.scrollTop = viewport.scrollHeight;
+  loadedCount++;
+  const pct = Math.min(100, Math.round((loadedCount/TOTAL_LINES)*100));
+  if(progressBar) progressBar.style.width = pct+"%";
+}
+
+const timestamps = Array.from({length:TOTAL_LINES}, (_,i)=>{
+  const base = (i/TOTAL_LINES)*TOTAL_DURATION;
+  const jitter = (1 - Math.abs(i/TOTAL_LINES-0.5)*2)*30;
+  return base + (Math.random()*jitter*2 - jitter);
+});
+
+function startLoader(){
+  for(let i=0;i<TOTAL_LINES;i++){
+    setTimeout(((idx)=>{return function(){ pushLine(makeLine()); };})(i), timestamps[i]);
   }
 
-  overlay.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  setTimeout(()=>{
+    pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
+    setTimeout(()=>{
+      document.getElementById('app').style.transition="opacity 1s ease";
+      document.getElementById('app').style.opacity=0;
+      document.getElementById('mainSite').style.opacity=1;
+      document.getElementById('mainSite').setAttribute('aria-hidden','false');
+      setTimeout(()=>{document.getElementById('app').remove();},1000);
+    },1200);
+  }, TOTAL_DURATION+200);
 }
+startLoader();
 
-function closePopup() {
-  document.getElementById('popup-overlay').style.display = 'none';
-  document.body.style.overflow = 'auto';
-}
+/* ===== Background particles (kept original) ===== */
+(function(){
+  const canvas=document.getElementById('waveCanvas');
+  const ctx=canvas.getContext('2d');
+  let particles=[], isMobile=window.innerWidth<=640;
+  const mouse={x:-999,y:-999};
+  function resize(){canvas.width=innerWidth; canvas.height=innerHeight; initParticles();}
+  function initParticles(){
+    const count=isMobile?30:120;
+    particles=Array.from({length:count},()=>({
+      x:Math.random()*innerWidth,
+      y:Math.random()*innerHeight,
+      z:Math.random(),
+      r:Math.random()*3+1,
+      vx:(Math.random()-0.5)*(isMobile?0.3:0.6),
+      vy:(Math.random()-0.5)*(isMobile?0.3:0.6)
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for(let p of particles){
+      const dx=mouse.x-p.x, dy=mouse.y-p.y;
+      const dist=Math.hypot(dx,dy);
+      if(dist<80 && dist>0){p.x-=dx*0.003; p.y-=dy*0.003;}
+      const alpha = 0.2 + (1 - p.z) * 0.6;
+      const size = p.r * (1 + (1 - p.z) * 1.5);
+      ctx.fillStyle=`rgba(255,200,150,${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,size,0,Math.PI*2);
+      ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>innerWidth)p.vx*=-1;
+      if(p.y<0||p.y>innerHeight)p.vy*=-1;
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{
+    isMobile=window.innerWidth<=640;
+    resize();
+  });
+  window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+  window.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
+  resize(); draw();
+})();
+
+/* ===== Papers Wizard (kept) ===== */
+(function(){
+  const papers=[
+ {title:"Time-History Responses on the Surface by Regularly Distributed Enormous Embedded Cavities: Incident SH-Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2018",href:"https://bayanbox.ir/download/7050831466408904062/3.pdf",journal:"https://www.equsci.org.cn/article/doi/10.29382/eqs-2018-0137-3?pageType=en",thumb:"https://bayanbox.ir/view/8045563318987990212/3.jpg",abstract:"The time-history responses of the surface were obtained for a linear elastic half-plane including regularly distributed enormous embedded circular cavities subjected to propagating obliquely incident plane SH-waves. An advanced numerical approach named half-plane time-domain boundary element method (BEM), which only located the meshes around the cavities, was used to create the model. By establishing the modified boundary integral equation (BIE) independently for each cavity and forming the matrices, the final coupled equation was solved step-by-step in the time-domain to obtain the boundary values. The responses were developed for a half-plane with 512 cavities. The amplification patterns were also obtained to illustrate the frequency-domain responses for some cases. According to the results, the presence of enormous cavities affects the scattering and diffraction of the waves arrived to the surface. The introduced method can be recommended for geotechnical/mechanical engineers to model structures in the fields of earthquake engineering and composite materials."}
+  ];
+
+  const list=document.getElementById('paperList');
+  const wizard=document.getElementById('wizard');
+  const wThumb=document.getElementById('w-thumb');
+  const wBody=document.getElementById('w-body');
+  const isMobile=window.innerWidth<=640;
+
+  function positionWizard(x,y){
+    const wRect=wizard.getBoundingClientRect();
+    let left=x, top=y;
+    if(isMobile){
+      left=Math.min(Math.max(10,left),window.innerWidth - wRect.width - 10);
+      top=Math.min(Math.max(50,top),window.innerHeight - wRect.height - 10);
+    } else {
+      if(left+wRect.width>window.innerWidth) left=x-wRect.width-10;
+      if(top+wRect.height>window.innerHeight) top=y-wRect.height-10;
+    }
+    wizard.style.left=left+'px';
+    wizard.style.top=top+'px';
+  }
+
+  papers.forEach(p=>{
+    const node=document.createElement('div'); node.className='paper';
+    node.innerHTML=`
+      <div class="thumb"><img src="${p.thumb}" alt=""></div>
+      <div class="meta">
+        <div class="p-title">${p.title}</div>
+        <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>
+      </div>
+      <div>
+        <a href="${p.href}" target="_blank" class="download-btn">📥 Download</a>
+        <a href="${p.journal}" target="_blank" class="journal-btn">🌐 Link</a>
+      </div>`;
+
+    const thumb=node.querySelector('.thumb');
+    const img = thumb.querySelector('img');
+    img.addEventListener('load',()=> img.classList.add('loaded'));
+
+    if(isMobile){
+      thumb.addEventListener('click',(ev)=>{
+        if(wizard.classList.contains('show')){
+          wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
+        } else {
+          wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+          wBody.textContent=p.abstract;
+          wBody.scrollTop = 0;
+          const rect=thumb.getBoundingClientRect();
+          positionWizard(rect.left, rect.top + window.scrollY);
+          wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+        }
+      });
+      wizard.addEventListener('click',()=>{
+        wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
+      });
+    } else {
+      thumb.addEventListener('mouseenter',(ev)=>{
+        wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
+        wBody.textContent=p.abstract;
+        wBody.scrollTop = 0;
+        positionWizard(ev.clientX+18,ev.clientY+12);
+        wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
+      });
+      thumb.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
+      thumb.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
+      thumb.addEventListener('wheel',(e)=>{
+        if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
+      });
+    }
+
+    list.appendChild(node);
+  });
+})();
+
+/* ===== Modal & Contact logic ===== */
+document.addEventListener('DOMContentLoaded', function(){
+  // init EmailJS with public key
+  if(window.emailjs){
+    try{ emailjs.init('IlTw12Nz7SSQucp4C'); }catch(e){ console.warn('emailjs init failed', e); }
+  } else { console.warn('EmailJS not loaded'); }
+
+  const aboutBtn = document.getElementById('aboutBtn');
+  const contactBtn = document.getElementById('contactBtn');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const aboutModal = document.getElementById('aboutModal');
+  const contactModal = document.getElementById('contactModal');
+  const contactForm = document.getElementById('contactForm');
+  const contactStatus = document.getElementById('contactStatus');
+  const sendBtn = document.getElementById('contactSendBtn');
+
+  function openModal(modal){
+    modalOverlay.classList.add('show');
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+    const focusable = modal.querySelector('input,button,textarea,[tabindex]');
+    if(focusable) setTimeout(()=>focusable.focus(),80);
+  }
+  function closeModal(modal){
+    modalOverlay.classList.remove('show');
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  }
+
+  if(aboutBtn) aboutBtn.addEventListener('click', ()=> openModal(aboutModal));
+  if(contactBtn) contactBtn.addEventListener('click', ()=> openModal(contactModal));
+
+  // close controls
+  document.querySelectorAll('[data-close]').forEach(btn=>{
+    btn.addEventListener('click', function(){ const id=this.getAttribute('data-close'); const m=document.getElementById(id); if(m) closeModal(m); });
+  });
+
+  modalOverlay.addEventListener('click', function(){
+    [aboutModal,contactModal].forEach(m=>{ if(m.classList.contains('show')) closeModal(m); });
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' || e.key === 'Esc'){
+      [aboutModal,contactModal].forEach(m=>{ if(m.classList.contains('show')) closeModal(m); });
+    }
+  });
+
+  [aboutModal,contactModal].forEach(m=>{ if(m) m.addEventListener('click', e=>e.stopPropagation()); });
+
+  // Contact form submit via EmailJS
+  if(contactForm){
+    contactForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      contactStatus.style.display = 'none';
+
+      if(!window.emailjs){
+        contactStatus.style.display = 'block';
+        contactStatus.style.color = '#f4a8a8';
+        contactStatus.textContent = 'Email service unavailable.';
+        return;
+      }
+
+      const name = document.getElementById('cf_name').value.trim();
+      const email = document.getElementById('cf_email').value.trim();
+      const msg = document.getElementById('cf_message').value.trim();
+      if(!email || !msg){
+        contactStatus.style.display = 'block';
+        contactStatus.style.color = '#f4a8a8';
+        contactStatus.textContent = 'Please provide your email and a message.';
+        return;
+      }
+
+      if(sendBtn){ sendBtn.disabled=true; sendBtn.textContent='Sending...'; }
+
+      emailjs.sendForm('mojtabazadeh','mojtabazadeh','#contactForm')
+        .then(function(response){
+          contactStatus.style.display = 'block';
+          contactStatus.style.color = '#bff0c6';
+          contactStatus.textContent = '✅ Message sent successfully. Thank you!';
+          contactForm.reset();
+          setTimeout(()=>{ closeModal(contactModal); contactStatus.style.display='none'; },1200);
+        }, function(error){
+          console.error('EmailJS error:', error);
+          contactStatus.style.display = 'block';
+          contactStatus.style.color = '#f4a8a8';
+          contactStatus.textContent = '❌ Failed to send message. Please try again.';
+        })
+        .finally(()=>{ if(sendBtn){ sendBtn.disabled=false; sendBtn.textContent='Send Message'; } });
+    });
+  }
+});
 </script>
 
 </body>
