@@ -6,361 +6,214 @@
 <title>DASBEM.IR</title>
 
 <!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-<!-- EmailJS (CDN) -->
+<!-- EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
-<!-- Styles -->
-<style>
-:root{
-  --bg-dark:#111015;
-  --text-light:#f7f7f7;
-  --glass: rgba(255,255,255,0.06);
-  --accent:#ffb347;
-  --muted:#cfcfcf;
-}
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);min-height:100%;height:100%;overflow-x:hidden;}
-/* Loader */
-#app{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#000;color:#39ff14;font-family:'Share Tech Mono',monospace}
-#viewport{width:calc(100% - 60px);max-height:60%;overflow:auto;padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
-.progressWrap{width:calc(100% - 60px);height:12px;background:rgba(255,255,255,0.03);border-radius:10px;margin-top:12px;overflow:hidden}
-.progressBar{height:100%;width:0;background:linear-gradient(90deg,#ff9900,#ffcc33)}
-
-/* Top buttons container */
-.top-buttons{
-  position:fixed;top:18px;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 20px;z-index:1200;
-  pointer-events:none; /* allow underlying loader to block during initialization if needed */
-}
-.top-buttons .btn{
-  pointer-events:auto;
-  display:inline-flex;align-items:center;gap:10px;
-  padding:10px 18px;border-radius:28px;border:none;cursor:pointer;font-weight:700;font-size:0.95rem;
-  color:#fff;background:linear-gradient(135deg,#ff7e5f,#ffb347);box-shadow:0 10px 30px rgba(255,140,80,0.18);
-  transition:transform .22s ease, box-shadow .22s ease, filter .22s ease;
-}
-.top-buttons .btn.secondary{ background: linear-gradient(135deg,#6a11cb,#2575fc); box-shadow:0 10px 30px rgba(60,50,200,0.12) }
-.top-buttons .btn:active{ transform:translateY(1px) scale(.99); }
-.top-buttons .btn:hover{ transform:translateY(-4px) scale(1.02); filter:brightness(1.03); }
-
-/* Popup common */
-.popup{
-  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);opacity:0;pointer-events:none;
-  width:min(720px,94%);max-width:820px;background:linear-gradient(180deg, rgba(10,10,12,0.98), rgba(6,6,8,0.96));border-radius:14px;padding:20px;
-  box-shadow:0 24px 80px rgba(0,0,0,0.8);z-index:2000;transition:all .22s ease;backdrop-filter:blur(8px);
-}
-.popup.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
-.popup header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.popup h2{margin:0;font-family:"Playfair Display",serif;font-size:1.35rem;background:linear-gradient(90deg,#ffb347,#ffcc33);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.popup p{color:var(--muted);line-height:1.6;margin:12px 0;text-align:justify}
-.popup .close-x{background:transparent;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer}
-
-/* Contact form styles */
-form#contact-form{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-input[type="text"],input[type="email"],textarea{
-  background:var(--glass);border:none;padding:12px;border-radius:10px;color:var(--text-light);font-size:0.95rem;outline:none;
-}
-textarea{min-height:120px;resize:vertical}
-form#contact-form .actions{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:6px}
-button.btn-send{background:linear-gradient(135deg,#ff7e5f,#feb47b);border:none;padding:10px 16px;border-radius:10px;color:#111;font-weight:700;cursor:pointer}
-button.btn-cancel{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:9px 14px;border-radius:10px;color:var(--muted);cursor:pointer}
-
-/* Subtle responsive */
-@media (max-width:720px){
-  .popup{padding:16px;}
-  .top-buttons{padding:0 12px}
-  .top-buttons .btn{padding:8px 12px;font-size:0.9rem}
-}
-
-/* Keep main content (skeleton of your site) */
-#mainSite{opacity:0;transition:opacity .6s ease}
-header.site-header{padding:80px 20px 60px;text-align:center;z-index:10}
-.site-title{font-family:"Playfair Display",serif;font-size:3.2rem;margin:0;background:linear-gradient(90deg,#ffb347,#ffcc33);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.site-sub{color:var(--muted);margin-top:10px}
-</style>
-</head>
-<body>
-
-<!-- Loader -->
-<div id="app" role="status" aria-live="polite">
-  <div id="header">Initializing DASBEM Project Core...</div>
-  <div class="viewport" id="viewport" aria-hidden="false"></div>
-  <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
-</div>
-
-<!-- Top buttons -->
-<div class="top-buttons" aria-hidden="false">
-  <button id="aboutBtn" class="btn" aria-haspopup="dialog" aria-controls="aboutPopup">About</button>
-  <button id="contactBtn" class="btn secondary" aria-haspopup="dialog" aria-controls="contactPopup">Contact Us</button>
-</div>
-
-<!-- Main site placeholder -->
-<div id="mainSite" aria-hidden="true">
-  <header class="site-header">
-    <h1 class="site-title">The DASBEM Project</h1>
-    <p class="site-sub">Dynamic Analysis of Structures by Boundary Element Method</p>
-  </header>
-  <!-- Keep the rest of your page (researchers, papers, etc.) here -->
-</div>
-
-<!-- ABOUT POPUP -->
-<div class="popup" id="aboutPopup" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" aria-hidden="true">
-  <header>
-    <h2 id="aboutTitle">About the DASBEM Project</h2>
-    <button class="close-x" data-close="aboutPopup" aria-label="Close About">&times;</button>
-  </header>
-  <div class="content">
-    <p>
-      <strong>DASBEM</strong> — Dynamic Analysis of Structures by Boundary Element Method — is a focused
-      computational framework for modeling transient seismic responses (notably SH-wave scattering)
-      in half-space media. Developed by Dr. Mehdi Panji and Dr. Saeed Mojtabazadeh, DASBEM emphasizes
-      numerical efficiency (reduced memory footprint) and stability through time-domain boundary integral formulations,
-      recursive solvers, and advanced boundary discretization strategies.
-    </p>
-    <p>
-      Key applications: seismic wave scattering by embedded cavities/tunnels, dynamic soil-structure interaction,
-      and high-fidelity modeling for earthquake engineering and geotechnical simulations. The project pairs
-      rigorous theory with practical tools to help researchers and engineers examine complex wave-structure interactions.
-    </p>
-    <p style="font-size:0.92rem;color:var(--muted);margin-top:8px">Tip: press ESC or click outside the box to close.</p>
-  </div>
-</div>
-
-<!-- CONTACT POPUP -->
-<div class="popup" id="contactPopup" role="dialog" aria-modal="true" aria-labelledby="contactTitle" aria-hidden="true">
-  <header>
-    <h2 id="contactTitle">Contact Us</h2>
-    <button class="close-x" data-close="contactPopup" aria-label="Close Contact">&times;</button>
-  </header>
-  <div class="content">
-    <p style="color:var(--muted);margin-bottom:6px">Send us a message — we'll reply as soon as possible.</p>
-
-    <!-- Contact form: names must match your EmailJS template variables -->
-    <form id="contact-form" autocomplete="on" novalidate>
-      <input type="text" id="from_name" name="from_name" placeholder="Your name" required aria-label="Your name">
-      <input type="email" id="reply_to" name="reply_to" placeholder="Your email" required aria-label="Your email">
-      <input type="text" id="subject" name="subject" placeholder="Subject (optional)">
-      <textarea id="message" name="message" placeholder="Your message" required aria-label="Your message"></textarea>
-
-      <div class="actions">
-        <button type="button" class="btn-cancel" data-close="contactPopup">Cancel</button>
-        <button type="submit" class="btn-send" id="btnSend">Send Message</button>
-      </div>
-    </form>
-
-    <p id="contact-feedback" style="display:none;margin-top:10px;color:var(--muted)"></p>
-  </div>
-</div>
-
-<!-- Scripts -->
 <script>
-/*
-  Final robust script:
-  - DOMContentLoaded wrapper so all elements exist
-  - loader simulation then reveal main site
-  - popup open/close + ESC + click-outside handlers
-  - EmailJS integration (replace SERVICE_ID/TEMPLATE_ID/USER_ID as needed)
-*/
-
-/* === Replace these with your actual EmailJS IDs ===
-   IMPORTANT:
-   - serviceId    : your EmailJS service ID (e.g. "service_mojtabazadeh" or as provided)
-   - templateId   : your EmailJS template ID (e.g. "template_default")
-   - userId       : optional EmailJS user ID (starts with "user_..." if required by your account)
-*/
-const EMAILJS_SERVICE_ID = "service_mojtabazadeh"; // <- replace if your service id differs
-const EMAILJS_TEMPLATE_ID = "template_default";    // <- replace with your template id
-const EMAILJS_USER_ID = ""; /* optional: "user_XXXXXXXX" */
-
-/* Helper to safely select */
-function $id(id){return document.getElementById(id);}
-
-/* Wait until DOM ready */
-document.addEventListener('DOMContentLoaded', function(){
-
-  /* Initialize EmailJS - if you have a user id, put it in EMAILJS_USER_ID */
-  try{
-    if(typeof emailjs !== 'undefined'){
-      if(EMAILJS_USER_ID && EMAILJS_USER_ID.length>0){
-        emailjs.init(EMAILJS_USER_ID);
-      } else {
-        // some setups allow init with empty or not required; still call init if available
-        try{ emailjs.init(); }catch(e){ /* ignore if not needed */ }
-      }
-    } else {
-      console.warn("EmailJS library not loaded.");
-    }
-  }catch(err){
-    console.error("EmailJS init error:", err);
-  }
-
-  /* --- Loader simulation (safe) --- */
-  const TOTAL_LINES = 220;
-  const TOTAL_DURATION = 2200; // ms
-  const viewport = $id('viewport');
-  const progressBar = $id('progressBar');
-  const linesPool = [
-    "Loading transient solver modules...",
-    "Initializing boundary meshes...",
-    "Computing Green's functions...",
-    "Assembling global matrices...",
-    "Stabilizing time-domain kernels...",
-    "Finalizing computation..."
-  ];
-  function rnd(i){return Math.floor(Math.random()*i);}
-  function pushLine(text, final){
-    const el = document.createElement('div');
-    el.className = 'logLine';
-    if(final) el.classList.add('finalLine');
-    el.textContent = text;
-    viewport.appendChild(el);
-    if(viewport.children.length>220) viewport.removeChild(viewport.children[0]);
-    viewport.scrollTop = viewport.scrollHeight;
-  }
-  for(let i=0;i<TOTAL_LINES;i++){
-    const t = Math.round((i/TOTAL_LINES)*TOTAL_DURATION) + Math.round(Math.random()*80);
-    setTimeout(()=> {
-      pushLine(linesPool[rnd(linesPool.length)]);
-      const pct = Math.min(100, Math.round(((i+1)/TOTAL_LINES)*100));
-      if(progressBar) progressBar.style.width = pct + "%";
-    }, t);
-  }
-  setTimeout(()=> {
-    pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    // hide loader
-    const app = $id('app');
-    if(app) app.style.opacity = 0;
-    $id('mainSite').style.opacity = 1;
-    $id('mainSite').setAttribute('aria-hidden','false');
-    setTimeout(()=>{ if(app && app.parentNode) app.parentNode.removeChild(app); }, 900);
-  }, TOTAL_DURATION + 500);
-
-  /* --- Popup management --- */
-  const aboutBtn = $id('aboutBtn');
-  const contactBtn = $id('contactBtn');
-  const aboutPopup = $id('aboutPopup');
-  const contactPopup = $id('contactPopup');
-
-  function showPopup(popup){
-    if(!popup) return;
-    popup.classList.add('show');
-    popup.setAttribute('aria-hidden','false');
-    // focus first focusable element inside
-    const focusable = popup.querySelector('input,button,textarea,a,[tabindex]');
-    if(focusable) focusable.focus();
-  }
-  function hidePopup(popup){
-    if(!popup) return;
-    popup.classList.remove('show');
-    popup.setAttribute('aria-hidden','true');
-  }
-
-  /* Button click handlers */
-  if(aboutBtn) aboutBtn.addEventListener('click',()=> showPopup(aboutPopup));
-  if(contactBtn) contactBtn.addEventListener('click',()=> showPopup(contactPopup));
-
-  /* close buttons (x) and 'Cancel' */
-  document.querySelectorAll('[data-close]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const id = btn.getAttribute('data-close');
-      const popup = $id(id);
-      if(popup) hidePopup(popup);
-    });
-  });
-  document.querySelectorAll('.close-x').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const target = btn.getAttribute('data-close') || (btn.closest('.popup') && btn.closest('.popup').id);
-      if(target) hidePopup($id(target));
-    });
-  });
-
-  /* click outside to close */
-  document.addEventListener('click', function(e){
-    // if a popup is open and click target is outside it, close it
-    [aboutPopup, contactPopup].forEach(popup=>{
-      if(!popup) return;
-      if(popup.classList.contains('show')){
-        if(!popup.contains(e.target) && ![aboutBtn, contactBtn].includes(e.target)){
-          hidePopup(popup);
-        }
-      }
-    });
-  });
-
-  /* ESC key to close */
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape'){
-      [aboutPopup, contactPopup].forEach(popup=>{ if(popup && popup.classList.contains('show')) hidePopup(popup); });
-    }
-  });
-
-  /* Trap focus inside popup when opened (simple) */
-  document.addEventListener('focusin', function(e){
-    [aboutPopup, contactPopup].forEach(popup=>{
-      if(popup && popup.classList.contains('show')){
-        if(!popup.contains(e.target)){
-          // move focus back to popup
-          const first = popup.querySelector('input,button,textarea,a,[tabindex]');
-          if(first) first.focus();
-        }
-      }
-    });
-  });
-
-  /* --- EmailJS form handling --- */
-  const contactForm = $id('contact-form');
-  const feedback = $id('contact-feedback');
-  const btnSend = $id('btnSend');
-
-  if(contactForm){
-    contactForm.addEventListener('submit', function(ev){
-      ev.preventDefault();
-      if(!window.emailjs){
-        alert("Email service is not available. Please check your connection or configuration.");
-        return;
-      }
-      const name = ($id('from_name') && $id('from_name').value.trim()) || "Anonymous";
-      const reply_to = ($id('reply_to') && $id('reply_to').value.trim()) || "";
-      const subject = ($id('subject') && $id('subject').value.trim()) || "Contact from DASBEM site";
-      const message = ($id('message') && $id('message').value.trim()) || "";
-
-      if(!reply_to || !message){
-        alert("Please provide your email and a message before sending.");
-        return;
-      }
-
-      // prevent double submit
-      if(btnSend) { btnSend.disabled = true; btnSend.textContent = "Sending..."; }
-
-      const templateParams = {
-        from_name: name,
-        reply_to: reply_to,
-        subject: subject,
-        message: message,
-        timestamp: new Date().toISOString()
-      };
-
-      // Use EMAILJS_SERVICE_ID and EMAILJS_TEMPLATE_ID constants
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-        .then((resp) => {
-          // success
-          if(feedback){ feedback.style.display = 'block'; feedback.style.color = '#9fd89f'; feedback.textContent = "✅ Your message has been sent. Thank you!"; }
-          alert("✅ Your message has been sent successfully!");
-          contactForm.reset();
-          hidePopup(contactPopup);
-        }, (err) => {
-          console.error("EmailJS error:", err);
-          if(feedback){ feedback.style.display = 'block'; feedback.style.color = '#f2b1b1'; feedback.textContent = "❌ Failed to send. Please try again later."; }
-          alert("❌ Failed to send message. Please try again or contact the administrator.");
-        })
-        .finally(()=>{ if(btnSend){ btnSend.disabled = false; btnSend.textContent = "Send Message"; } });
-    });
-  }
-
-}); // DOMContentLoaded
+  (function() {
+    emailjs.init("mojtabazadeh");
+  })();
 </script>
 
+<style>
+:root {
+  --bg: #050505;
+  --text: #39ff14;
+  --accent: #00bfff;
+  --btn-hover: #1aff1a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Loader */
+#loader {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+/* Buttons */
+.top-buttons {
+  position: fixed;
+  top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 1000;
+}
+
+.top-buttons button {
+  background: rgba(0,255,100,0.1);
+  border: 2px solid var(--text);
+  color: var(--text);
+  padding: 10px 25px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+.top-buttons button:hover {
+  background: var(--text);
+  color: #000;
+  transform: scale(1.08);
+  box-shadow: 0 0 20px var(--text);
+}
+
+/* Popups */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(0,0,0,0.95);
+  border: 2px solid var(--text);
+  border-radius: 20px;
+  color: var(--text);
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  z-index: 2000;
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+.popup.active {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+.popup h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: var(--accent);
+}
+
+.popup form input,
+.popup form textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  background: transparent;
+  border: 1px solid var(--text);
+  border-radius: 6px;
+  color: var(--text);
+  resize: none;
+}
+.popup form button {
+  width: 100%;
+  padding: 10px;
+  background: var(--text);
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.popup form button:hover {
+  background: var(--btn-hover);
+}
+.close-btn {
+  display: block;
+  margin: 15px auto 0;
+  background: none;
+  color: var(--accent);
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: 0.3s;
+}
+.close-btn:hover {
+  color: var(--btn-hover);
+}
+</style>
+</head>
+
+<body>
+<!-- Loader -->
+<div id="loader">[ Initializing DASBEM Systems . . . ]</div>
+
+<!-- Buttons -->
+<div class="top-buttons">
+  <button id="aboutBtn">About</button>
+  <button id="contactBtn">Contact Us</button>
+</div>
+
+<!-- About Popup -->
+<div class="popup" id="aboutPopup">
+  <h2>About DASBEM</h2>
+  <p>
+    DASBEM (Dynamic Analysis using the Semi-infinite Boundary Element Method)  
+    is a research-based computational framework developed to simulate  
+    wave propagation and dynamic response of geological and structural  
+    systems in the time domain.  
+    <br><br>
+    This system combines precision in mathematical modeling with  
+    efficiency in boundary element computation, focusing on  
+    half-space elastodynamics, SH-wave scattering, and wave–structure interaction.  
+    <br><br>
+    Designed and developed by <b>Saeed Mojtabazadeh</b> and collaborators  
+    to push the limits of boundary-based seismic simulation methods.
+  </p>
+  <button class="close-btn" onclick="closePopup('aboutPopup')">Close</button>
+</div>
+
+<!-- Contact Popup -->
+<div class="popup" id="contactPopup">
+  <h2>Contact Us</h2>
+  <form id="contact-form">
+    <input type="text" name="from_name" placeholder="Your Name" required>
+    <input type="email" name="reply_to" placeholder="Your Email" required>
+    <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+  <button class="close-btn" onclick="closePopup('contactPopup')">Close</button>
+</div>
+
+<script>
+// Loader
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    document.getElementById("loader").style.display = "none";
+  }, 3000);
+});
+
+// Popup functions
+function openPopup(id) {
+  document.getElementById(id).classList.add("active");
+}
+function closePopup(id) {
+  document.getElementById(id).classList.remove("active");
+}
+
+document.getElementById('aboutBtn').onclick = () => openPopup('aboutPopup');
+document.getElementById('contactBtn').onclick = () => openPopup('contactPopup');
+
+// EmailJS
+document.getElementById('contact-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  emailjs.sendForm('mojtabazadeh', 'template_default', this)
+    .then(() => {
+      alert('Message sent successfully!');
+      closePopup('contactPopup');
+    }, (error) => {
+      alert('Failed to send message: ' + JSON.stringify(error));
+    });
+});
+</script>
 </body>
 </html>
