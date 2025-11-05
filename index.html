@@ -45,6 +45,10 @@ body {
   z-index: 9999;
   font-size: 1.4rem;
   color: var(--text);
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  50% { opacity: 0.5; }
 }
 
 /* Buttons */
@@ -68,12 +72,14 @@ body {
   font-size: 1rem;
   transition: all 0.3s ease;
   backdrop-filter: blur(4px);
+  text-shadow: 0 0 6px var(--text);
+  box-shadow: 0 0 10px rgba(0,255,0,0.2);
 }
 .top-buttons button:hover {
   background: var(--text);
   color: #000;
-  transform: scale(1.08);
-  box-shadow: 0 0 20px var(--text);
+  transform: scale(1.1);
+  box-shadow: 0 0 25px var(--text);
 }
 
 /* Popups */
@@ -92,6 +98,7 @@ body {
   z-index: 2000;
   opacity: 0;
   transition: all 0.4s ease;
+  box-shadow: 0 0 20px rgba(0,255,100,0.3);
 }
 .popup.active {
   transform: translate(-50%, -50%) scale(1);
@@ -101,6 +108,7 @@ body {
   text-align: center;
   margin-bottom: 15px;
   color: var(--accent);
+  text-shadow: 0 0 8px var(--accent);
 }
 
 .popup form input,
@@ -113,6 +121,7 @@ body {
   border-radius: 6px;
   color: var(--text);
   resize: none;
+  font-size: 1rem;
 }
 .popup form button {
   width: 100%;
@@ -123,6 +132,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: 0.3s;
+  font-weight: bold;
 }
 .popup form button:hover {
   background: var(--btn-hover);
@@ -158,16 +168,15 @@ body {
   <h2>About DASBEM</h2>
   <p>
     DASBEM (Dynamic Analysis using the Semi-infinite Boundary Element Method)  
-    is a research-based computational framework developed to simulate  
-    wave propagation and dynamic response of geological and structural  
-    systems in the time domain.  
+    is an advanced research framework for simulating the propagation  
+    and scattering of seismic SH waves in elastic half-space media.  
     <br><br>
-    This system combines precision in mathematical modeling with  
-    efficiency in boundary element computation, focusing on  
-    half-space elastodynamics, SH-wave scattering, and wave–structure interaction.  
+    Developed by <b>Saeed Mojtabazadeh</b>, the system focuses on  
+    accurate modeling of wave–structure interactions,  
+    boundary element formulation, and real-time computational visualization.  
     <br><br>
-    Designed and developed by <b>Saeed Mojtabazadeh</b> and collaborators  
-    to push the limits of boundary-based seismic simulation methods.
+    DASBEM combines scientific rigor and artistic precision  
+    — an elegant fusion of mathematics, mechanics, and imagination.
   </p>
   <button class="close-btn" onclick="closePopup('aboutPopup')">Close</button>
 </div>
@@ -192,7 +201,7 @@ window.addEventListener("load", () => {
   }, 3000);
 });
 
-// Popup functions
+// Popup control
 function openPopup(id) {
   document.getElementById(id).classList.add("active");
 }
@@ -203,15 +212,16 @@ function closePopup(id) {
 document.getElementById('aboutBtn').onclick = () => openPopup('aboutPopup');
 document.getElementById('contactBtn').onclick = () => openPopup('contactPopup');
 
-// EmailJS
+// EmailJS sending
 document.getElementById('contact-form').addEventListener('submit', function(e) {
   e.preventDefault();
-  emailjs.sendForm('mojtabazadeh', 'template_default', this)
+  emailjs.sendForm('mojtabazadeh', 'mojtabazadeh', this)
     .then(() => {
-      alert('Message sent successfully!');
+      alert('✅ Message sent successfully!');
       closePopup('contactPopup');
+      this.reset();
     }, (error) => {
-      alert('Failed to send message: ' + JSON.stringify(error));
+      alert('❌ Failed to send message: ' + JSON.stringify(error));
     });
 });
 </script>
