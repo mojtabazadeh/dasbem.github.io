@@ -6,161 +6,170 @@
 <title>DASBEM.IR</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/refs/heads/main/DASBEM.ico" sizes="48x48">
-
 <style>
 :root{
   --bg-dark:#1a1a1a;
   --text-light:#fff;
+  --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
   --muted:#ddd;
-  --glass: rgba(255,255,255,0.12);
-  --button-glass: rgba(255,255,255,0.08);
+
+  --btn-gradient: linear-gradient(145deg,#1a1a1a,#2a2a2a);
+  --btn-hover-gradient: linear-gradient(145deg,#222,#3a3a3a);
 }
 
-/* ===== Base ===== */
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
+body,html{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
 
-/* ===== Main Site ===== */
-#mainSite{opacity:1;transition:opacity .8s ease;}
+/* ===== Header ===== */
+header.site-header{position:relative;z-index:2;text-align:center;padding:80px 20px 60px;}
+header.site-header h1{
+  font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;margin:0 0 18px;
+  letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 25px rgba(255,200,150,0.35),0 0 40px rgba(255,180,120,0.45);
+}
+header.site-header p{font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;text-shadow:0 0 18px rgba(255,190,130,0.4);}
 
-/* ===== Buttons ===== */
-.top-button{
-  position:fixed; top:20px; padding:12px 28px; font-size:1rem; font-weight:700; text-transform:uppercase;
-  border:none; border-radius:14px; cursor:pointer; overflow:hidden;
-  backdrop-filter: blur(12px); background:var(--button-glass); color:#fff;
-  z-index:9999; box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 8px rgba(255,200,150,0.3) inset;
+/* ===== Glass Buttons ===== */
+.glass-btn{
+  position:fixed;
+  padding:12px 28px;
+  font-size:1rem;
+  font-weight:700;
+  border-radius:16px;
+  border:none;
+  cursor:pointer;
+  backdrop-filter: blur(12px);
+  background: var(--btn-gradient);
+  color:#fff;
+  z-index:999;
   transition: all 0.35s ease;
+  box-shadow:
+    0 6px 20px rgba(0,0,0,0.5),
+    inset 0 0 6px rgba(255,255,255,0.1),
+    0 0 8px rgba(255,180,120,0.2);
 }
-.top-button::before{
-  content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05), rgba(255,255,255,0.15));
-  transform: skewX(-20deg); transition: all 0.35s ease; z-index:1;
+.glass-btn::before{
+  content:"";position:absolute;inset:0;border-radius:16px;
+  background: linear-gradient(120deg,rgba(255,200,150,0.25),rgba(255,255,255,0.05),rgba(255,200,150,0.25));
+  opacity:0;
+  transition: opacity 0.4s ease;
 }
-.top-button:hover::before{
-  animation: shine 1s linear forwards;
+.glass-btn:hover::before{opacity:1;}
+.glass-btn:hover{
+  transform:translateY(-3px) scale(1.03);
+  background: var(--btn-hover-gradient);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.7),
+    inset 0 0 8px rgba(255,255,255,0.15),
+    0 0 12px rgba(255,180,120,0.3);
 }
-@keyframes shine{
-  0%{left:-100%;}
-  100%{left:200%;}
-}
-.top-button:hover{
-  box-shadow: 0 12px 28px rgba(255,180,100,0.6), 0 0 12px rgba(255,200,150,0.25) inset;
-  transform: translateY(-2px) scale(1.03);
-}
+.glass-btn:active{transform:translateY(0) scale(0.98);}
 
-/* Positions */
-#aboutBtn{left:20px;}
-#contactBtn{right:20px;}
+/* ===== Positions ===== */
+#aboutBtn{top:24px;left:24px;}
+#contactBtn{top:24px;right:24px;}
 
-/* ===== Overlay Blur Background ===== */
+/* ===== Overlay ===== */
 .overlay{
-  position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter: blur(6px);
-  opacity:0; pointer-events:none; transition: opacity .4s ease; z-index:9998;
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+  z-index:998;opacity:0;pointer-events:none;transition:opacity 0.35s ease;
 }
-.overlay.show{opacity:1; pointer-events:auto;}
+.overlay.show{opacity:1;pointer-events:auto;}
 
-/* ===== Popup Windows ===== */
-.popup{
-  position:fixed; top:50%; left:50%; transform: translate(-50%,-50%) scale(.95);
-  max-width:500px; width:90%; background: rgba(0,0,0,0.85);
-  border-radius:16px; padding:24px; box-shadow:0 16px 48px rgba(0,0,0,0.8);
-  opacity:0; pointer-events:none; transition: all .35s ease; z-index:9999;
-  display:flex; flex-direction:column; gap:14px;
+/* ===== Wizard Pop-up ===== */
+.wizard{
+  position:fixed;z-index:999;pointer-events:none;opacity:0;transform:scale(.95);
+  transition:all .25s ease;max-width:440px;background: rgba(0,0,0,0.88);
+  border-radius:14px;padding:18px;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.85);
+  display:flex;flex-direction:column;gap:12px;
 }
-.popup.show{opacity:1; transform: translate(-50%,-50%) scale(1); pointer-events:auto;}
-.popup h2{margin:0;font-family:"Playfair Display",serif;font-weight:700;font-size:1.6rem;color:#ffcc33;}
-.popup p{margin:0;font-size:0.95rem;color:#fff;text-align:justify;line-height:1.5;}
-.popup textarea{width:100%;height:100px;border-radius:8px;border:none;padding:10px;resize:none;background:rgba(255,255,255,0.08);color:#fff;}
-.popup input[type="email"]{width:100%;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#fff;margin-bottom:8px;}
-.popup button.sendBtn{
-  padding:10px 18px;font-weight:700;border:none;border-radius:12px;
-  background: linear-gradient(135deg,#ff7e5f,#feb47b); color:#fff; cursor:pointer;
-  transition: all 0.3s ease; box-shadow:0 6px 20px rgba(255,126,95,0.5);
-}
-.popup button.sendBtn:hover{transform:translateY(-2px) scale(1.03); box-shadow:0 12px 28px rgba(255,126,95,0.6);}
-.popup .closeBtn{
-  position:absolute; top:12px; right:12px; font-size:1.2rem; cursor:pointer; background:none;border:none;color:#fff;
-}
-
-/* ===== Responsive ===== */
-@media(max-width:640px){
-  .popup{padding:16px;}
-  .top-button{padding:10px 22px; font-size:0.9rem;}
-}
+.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
+.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
+.wizard .w-body{ font-size:0.95rem; color:#fff; line-height:1.6; max-height:240px; overflow-y:auto; padding-right:6px; text-align:justify; }
 </style>
 </head>
 <body>
 
-<!-- Buttons -->
-<button id="aboutBtn" class="top-button">About</button>
-<button id="contactBtn" class="top-button">Contact Us</button>
+<!-- Glass Buttons -->
+<button class="glass-btn" id="aboutBtn">About</button>
+<button class="glass-btn" id="contactBtn">Contact Us</button>
 
 <!-- Overlay -->
 <div class="overlay" id="overlay"></div>
 
-<!-- About Popup -->
-<div class="popup" id="aboutPopup">
-  <button class="closeBtn" onclick="closePopup('aboutPopup')">✕</button>
-  <h2>About DASBEM Project</h2>
-  <p>
-  The DASBEM (Dynamic Analysis of Structures by Boundary Element Method) project is an advanced software tool developed for over a decade, providing precise time-domain simulations of elastic and viscoelastic half-space structures under seismic SH-waves. Its sophisticated numerical algorithms allow engineers and researchers to model complex interactions with minimal meshing requirements, accurately predict surface responses, and optimize structural designs. DASBEM is widely recognized for its scientific rigor and high computational efficiency.
-  </p>
+<!-- Wizard / Pop-up -->
+<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
+  <div class="w-thumb" id="w-thumb"></div>
+  <div class="w-body" id="w-body"></div>
 </div>
 
-<!-- Contact Popup -->
-<div class="popup" id="contactPopup">
-  <button class="closeBtn" onclick="closePopup('contactPopup')">✕</button>
-  <h2>Send us a message</h2>
-  <input type="email" id="contactEmail" placeholder="Your Email">
-  <textarea id="contactMessage" placeholder="Your Message"></textarea>
-  <button class="sendBtn" onclick="sendEmail()">Send</button>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
-emailjs.init("IlTw12Nz7SSQucp4C");
+emailjs.init("IlTw12Nz7SSQucp4C"); // Public Key
 
-const overlay=document.getElementById('overlay');
-const aboutBtn=document.getElementById('aboutBtn');
-const contactBtn=document.getElementById('contactBtn');
-const aboutPopup=document.getElementById('aboutPopup');
-const contactPopup=document.getElementById('contactPopup');
+const overlay = document.getElementById('overlay');
+const wizard = document.getElementById('wizard');
+const wThumb = document.getElementById('w-thumb');
+const wBody = document.getElementById('w-body');
 
-function openPopup(popup){
+function openWizard(content, thumbUrl){
   overlay.classList.add('show');
-  popup.classList.add('show');
+  wizard.classList.add('show');
+  wBody.textContent = content;
+  wThumb.innerHTML = thumbUrl ? `<img src="${thumbUrl}" alt="">` : '';
+  const rect = wizard.getBoundingClientRect();
+  wizard.style.left = `calc(50% - ${rect.width/2}px)`;
+  wizard.style.top = `80px`;
 }
-function closePopup(popupId){
+function closeWizard(){
   overlay.classList.remove('show');
-  document.getElementById(popupId).classList.remove('show');
+  wizard.classList.remove('show');
 }
 
-aboutBtn.addEventListener('click',()=>openPopup(aboutPopup));
-contactBtn.addEventListener('click',()=>openPopup(contactPopup));
-overlay.addEventListener('click',()=>{closePopup('aboutPopup'); closePopup('contactPopup');});
+// About Button
+document.getElementById('aboutBtn').addEventListener('click',()=>{
+  openWizard(
+    `The DASBEM project (Dynamic Analysis of Structures by Boundary Element Method) is a state-of-the-art numerical tool developed over more than a decade. It enables engineers and researchers to perform high-precision simulations of seismic wave propagation and structural response in complex half-space environments. DASBEM leverages advanced boundary element formulations, time-domain analysis, and efficient computational algorithms to model the dynamic behavior of structures subjected to oblique SH-wave excitations. The software is designed for professional use in earthquake engineering, geotechnical modeling, and structural dynamics research, providing detailed visualizations, flexible mesh control, and accurate time-history results.`,
+    null
+  );
+});
 
-// ===== Send Email =====
-function sendEmail(){
-  const email=document.getElementById('contactEmail').value;
-  const message=document.getElementById('contactMessage').value;
-  if(email && message){
-    emailjs.send("service_xxxxx","template_xxxxx",{
-      from_email: email,
-      message: message,
-      to_email: "mojtabazadeh@outlook.com"
+// Contact Us Button
+document.getElementById('contactBtn').addEventListener('click',()=>{
+  openWizard(
+    `Please enter your message and it will be sent directly via email.`,
+    null
+  );
+  // Create simple contact form dynamically
+  wBody.innerHTML = `<form id="contactForm" style="display:flex;flex-direction:column;gap:8px;">
+    <input type="text" id="name" placeholder="Your Name" required style="padding:6px;border-radius:6px;border:none;">
+    <input type="email" id="email" placeholder="Your Email" required style="padding:6px;border-radius:6px;border:none;">
+    <textarea id="message" placeholder="Your Message" required style="padding:6px;border-radius:6px;border:none;resize:none;"></textarea>
+    <button type="submit" style="padding:8px 12px;border:none;border-radius:8px;background:#ffb347;color:#111;font-weight:700;cursor:pointer;">Send</button>
+  </form>`;
+  document.getElementById('contactForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    emailjs.send("service_xxx","template_xxx",{
+      from_name: document.getElementById('name').value,
+      from_email: document.getElementById('email').value,
+      message: document.getElementById('message').value
     }).then(()=>{
       alert("Message sent successfully!");
-      document.getElementById('contactEmail').value="";
-      document.getElementById('contactMessage').value="";
-      closePopup('contactPopup');
-    }).catch(err=>{
-      alert("Failed to send message. Try again.");
-      console.error(err);
+      closeWizard();
+    },(err)=>{
+      alert("Failed to send message: "+err.text);
     });
-  } else { alert("Please fill both fields."); }
-}
+  });
+});
+
+// Close overlay when clicked
+overlay.addEventListener('click',closeWizard);
 </script>
+
 </body>
 </html>
