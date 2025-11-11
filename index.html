@@ -6,169 +6,414 @@
 <title>DASBEM.IR</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/refs/heads/main/DASBEM.ico" sizes="48x48">
 <style>
 :root{
-  --bg-dark:#1a1a1a;
-  --text-light:#fff;
-  --glass: rgba(255,255,255,0.12);
+  --bg-dark:#0f0f10;
+  --text-light:#f7f7f7;
+  --glass: rgba(255,255,255,0.06);
   --accent:#ffb347;
-  --muted:#ddd;
-
-  --btn-gradient: linear-gradient(145deg,#1a1a1a,#2a2a2a);
-  --btn-hover-gradient: linear-gradient(145deg,#222,#3a3a3a);
+  --muted:#d6d6d6;
+  --gold-glow: 0 12px 40px rgba(255,170,85,0.12);
+  --glass-border: rgba(255,255,255,0.05);
+  --overlay-bg: rgba(7,7,7,0.46);
+  --accent-gradient: linear-gradient(90deg,#ffb347,#ffcc33);
+  --transition-fast: .18s cubic-bezier(.2,.9,.2,1);
 }
 
-*{box-sizing:border-box;}
-body,html{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
-/* ===== Header ===== */
-header.site-header{position:relative;z-index:2;text-align:center;padding:80px 20px 60px;}
+/* ===== Loader (kept minimal & sleek) ===== */
+#app{
+  position:fixed; inset:0; z-index:9998; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  background:#050505; color:#39ff14; font-family:'Share Tech Mono', monospace;
+}
+#app #loaderTitle{ font-size:16px; color:var(--accent); margin-bottom:10px; }
+#app .viewport{ width:calc(100% - 80px); max-height:40vh; overflow:auto; padding:12px 14px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border:1px solid rgba(255,255,255,0.02); color:#cfd8c6; font-size:13px }
+#app .progressWrap{ width:calc(100% - 80px); height:12px; background:rgba(255,255,255,0.04); border-radius:8px; margin-top:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.03) }
+#app .progressBar{ width:0%; height:100%; background:linear-gradient(90deg,#ff9900,#ffcc33); transition:width 60ms linear; }
+
+/* ===== Page content ===== */
+#mainSite{ opacity:0; transition:opacity .9s ease; position:relative; z-index:1; }
+
+/* Background canvas */
+#waveCanvas{ position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+/* Header */
+header.site-header{ position:relative; z-index:2; text-align:center; padding:88px 20px 56px; }
 header.site-header h1{
-  font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;margin:0 0 18px;
-  letter-spacing:2px;text-transform:uppercase;
-  background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  text-shadow:0 0 25px rgba(255,200,150,0.35),0 0 40px rgba(255,180,120,0.45);
+  font-family:"Playfair Display",serif; font-size:3.6rem; font-weight:900; margin:0 0 12px; letter-spacing:1.8px; text-transform:uppercase;
+  background:var(--accent-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  text-shadow:0 0 28px rgba(255,180,120,0.28);
 }
-header.site-header p{font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;text-shadow:0 0 18px rgba(255,190,130,0.4);}
+header.site-header p{ font-size:1.12rem; color:var(--muted); max-width:780px; margin:0 auto; line-height:1.5; }
 
-/* ===== Glass Buttons ===== */
-.glass-btn{
-  position:fixed;
-  padding:12px 28px;
-  font-size:1rem;
-  font-weight:700;
-  border-radius:16px;
-  border:none;
-  cursor:pointer;
-  backdrop-filter: blur(12px);
-  background: var(--btn-gradient);
-  color:#fff;
-  z-index:999;
-  transition: all 0.35s ease;
-  box-shadow:
-    0 6px 20px rgba(0,0,0,0.5),
-    inset 0 0 6px rgba(255,255,255,0.1),
-    0 0 8px rgba(255,180,120,0.2);
-}
-.glass-btn::before{
-  content:"";position:absolute;inset:0;border-radius:16px;
-  background: linear-gradient(120deg,rgba(255,200,150,0.25),rgba(255,255,255,0.05),rgba(255,200,150,0.25));
-  opacity:0;
-  transition: opacity 0.4s ease;
-}
-.glass-btn:hover::before{opacity:1;}
-.glass-btn:hover{
-  transform:translateY(-3px) scale(1.03);
-  background: var(--btn-hover-gradient);
-  box-shadow:
-    0 12px 30px rgba(0,0,0,0.7),
-    inset 0 0 8px rgba(255,255,255,0.15),
-    0 0 12px rgba(255,180,120,0.3);
-}
-.glass-btn:active{transform:translateY(0) scale(0.98);}
+/* Layout */
+.wrap{ position:relative; z-index:2; max-width:1200px; margin:20px auto; padding:0 14px; display:flex; flex-direction:column; align-items:center; }
 
-/* ===== Positions ===== */
-#aboutBtn{top:24px;left:24px;}
-#contactBtn{top:24px;right:24px;}
+/* Researcher cards / papers (kept from original but subtle) */
+.header{ display:flex; gap:28px; align-items:flex-start; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
+.researcher{ position:relative; width:300px; min-width:260px; display:flex; flex-direction:column; align-items:center; backdrop-filter: blur(8px); padding:18px; border-radius:20px; background:var(--glass); box-shadow:0 10px 40px rgba(0,0,0,0.55); border:1px solid var(--glass-border); transition:transform .35s ease, box-shadow .35s ease; }
+.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.7); }
+.photo-frame{ width:168px; height:168px; border-radius:50%; overflow:hidden; padding:6px; background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.04), transparent 30%); box-shadow:0 6px 24px rgba(0,0,0,0.45), inset 0 0 18px rgba(255,255,255,0.06); margin-bottom:12px; border:3px solid rgba(255,255,255,0.06); }
+.photo-frame img{ width:100%; height:100%; border-radius:50%; object-fit:cover; transition: transform 1.2s ease-in-out; }
 
-/* ===== Overlay ===== */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
-  z-index:998;opacity:0;pointer-events:none;transition:opacity 0.35s ease;
-}
-.overlay.show{opacity:1;pointer-events:auto;}
+/* Papers */
+.papers{ margin-top:28px; padding:18px; border-radius:12px; background:var(--glass); box-shadow:0 12px 30px rgba(0,0,0,0.45); width:100%; max-width:100%; border:1px solid var(--glass-border); }
+.papers h3{ margin:0 0 12px 0; font-size:1.3rem; font-family:"Playfair Display",serif; }
 
-/* ===== Wizard Pop-up ===== */
-.wizard{
-  position:fixed;z-index:999;pointer-events:none;opacity:0;transform:scale(.95);
-  transition:all .25s ease;max-width:440px;background: rgba(0,0,0,0.88);
-  border-radius:14px;padding:18px;
-  box-shadow: 0 16px 50px rgba(0,0,0,0.85);
-  display:flex;flex-direction:column;gap:12px;
+/* ===== Glassy corner buttons (EN) ===== */
+.corner-btn{
+  position:fixed; z-index:10005; display:flex; align-items:center; gap:12px; padding:12px 16px; min-width:170px;
+  border-radius:14px; backdrop-filter: blur(10px) saturate(120%); background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border:1px solid var(--glass-border); box-shadow:var(--gold-glow), 0 6px 18px rgba(0,0,0,0.6); cursor:pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  color:var(--text-light); text-decoration:none; font-weight:700; font-size:0.97rem;
 }
-.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
-.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.95rem; color:#fff; line-height:1.6; max-height:240px; overflow-y:auto; padding-right:6px; text-align:justify; }
+.btn-about{ left:18px; top:18px; transform-origin:left top; }
+.btn-contact{ right:18px; top:18px; transform-origin:right top; }
+
+.btn-icon{ width:40px; height:40px; border-radius:10px; display:grid; place-items:center; font-size:18px; background:linear-gradient(180deg, rgba(255,200,140,0.08), rgba(255,180,120,0.03)); border:1px solid rgba(255,255,255,0.04); box-shadow: 0 6px 18px rgba(255,160,80,0.06) inset; }
+.corner-btn:hover{ transform:translateY(-8px) scale(1.02); box-shadow:0 20px 60px rgba(255,160,80,0.14); }
+.corner-btn:active{ transform:translateY(-2px) scale(.995); }
+
+/* shine effect */
+.corner-btn::after{
+  content:""; position:absolute; left:0; top:0; width:40%; height:100%; background:linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0)); transform:skewX(-18deg) translateX(-120%); transition:transform .9s cubic-bezier(.2,.9,.2,1); border-radius:14px; pointer-events:none;
+}
+.corner-btn:hover::after{ transform:skewX(-18deg) translateX(40%); }
+
+/* ripple */
+.ripple{ position:absolute; border-radius:50%; transform:scale(0); animation:ripple .6s linear; background:rgba(255,200,120,0.12); }
+@keyframes ripple { to { transform:scale(4); opacity:0; } }
+
+/* ===== Overlay that blurs the page when modal open ===== */
+.site-overlay{
+  position:fixed; inset:0; z-index:10000; pointer-events:none; opacity:0; transition:opacity .28s ease;
+  background:var(--overlay-bg); backdrop-filter: blur(6px) saturate(120%) brightness(.86);
+}
+.site-overlay.active{ pointer-events:auto; opacity:1; }
+
+/* ===== Modal (centered glass panels) ===== */
+.modal{
+  position:fixed; z-index:10006; inset:0; display:grid; place-items:center; padding:20px; pointer-events:none; opacity:0; transition:opacity .2s ease;
+}
+.modal.open{ pointer-events:auto; opacity:1; }
+
+.modal-panel{
+  width: min(920px, 96%); max-height:86vh; overflow:auto;
+  background: linear-gradient(180deg, rgba(12,12,12,0.92), rgba(8,8,8,0.88));
+  border-radius:18px; padding:22px; box-shadow:0 30px 100px rgba(0,0,0,0.8);
+  border:1px solid rgba(255,255,255,0.03); backdrop-filter: blur(8px) saturate(120%);
+  transform: translateY(10px); transition: transform .22s ease;
+}
+.modal.open .modal-panel{ transform: translateY(0); }
+
+/* header inside modal */
+.modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.modal-title{ display:flex; gap:14px; align-items:center; }
+.modal-title h3{ margin:0; font-family:"Playfair Display",serif; font-size:1.4rem; color:var(--text-light); }
+.modal-sub{ color:var(--muted); font-size:0.95rem; margin-top:4px; }
+
+/* close */
+.modal-close{ background:transparent; border:1px solid var(--glass-border); padding:8px 10px; border-radius:10px; cursor:pointer; color:var(--text-light); font-weight:700; box-shadow:var(--gold-glow); }
+
+/* About body (JUSTIFIED!) */
+.about-body{ color:var(--muted); line-height:1.75; text-align:justify; font-size:0.98rem; }
+.about-highlight{ margin-top:12px; padding:12px; border-radius:12px; background:linear-gradient(90deg, rgba(255,190,110,0.035), transparent); border:1px solid rgba(255,190,110,0.03); color:#ffeccf; }
+
+/* Contact form */
+.form-row{ display:flex; gap:12px; margin-bottom:12px; }
+.field{ flex:1; display:flex; flex-direction:column; gap:8px; }
+.input, textarea{
+  background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); color:var(--text-light);
+  padding:12px 14px; border-radius:10px; font-size:0.95rem; outline:none; transition: box-shadow .14s ease, transform .12s ease;
+}
+.input:focus, textarea:focus{ box-shadow: 0 10px 30px rgba(255,160,90,0.06); transform:translateY(-2px); }
+textarea{ min-height:140px; resize:vertical; }
+
+/* submit */
+.btn-submit{
+  display:inline-flex; gap:10px; align-items:center; padding:12px 18px; border-radius:12px; background:linear-gradient(135deg,#ff7e5f,#feb47b); border:none; color:#111; font-weight:800; cursor:pointer; box-shadow:0 14px 40px rgba(255,126,95,0.14);
+}
+.form-note{ color:var(--muted); font-size:0.9rem; margin-top:8px; }
+
+/* small screens */
+@media (max-width:760px){
+  header.site-header h1{ font-size:2.4rem; }
+  .corner-btn{ min-width:150px; padding:10px 12px; font-size:0.95rem; border-radius:12px; }
+  .btn-icon{ width:36px; height:36px; }
+  .modal-panel{ width:96%; padding:16px; border-radius:14px; }
+  .form-row{ flex-direction:column; }
+}
 </style>
 </head>
 <body>
 
-<!-- Glass Buttons -->
-<button class="glass-btn" id="aboutBtn">About</button>
-<button class="glass-btn" id="contactBtn">Contact Us</button>
-
-<!-- Overlay -->
-<div class="overlay" id="overlay"></div>
-
-<!-- Wizard / Pop-up -->
-<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
-  <div class="w-thumb" id="w-thumb"></div>
-  <div class="w-body" id="w-body"></div>
+<!-- ===== Loader ===== -->
+<div id="app" aria-hidden="true">
+  <div id="loaderTitle">Initializing DASBEM Core...</div>
+  <div class="viewport" id="viewport"></div>
+  <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<!-- ===== Main site content (kept intact) ===== -->
+<div id="mainSite">
+  <canvas id="waveCanvas" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <h1>The DASBEM Project</h1>
+    <p>Dynamic Analysis of Structures by Boundary Element Method</p>
+  </header>
+
+  <div class="wrap">
+    <div class="header" aria-label="Researchers">
+      <section class="researcher" id="r1" aria-labelledby="r1-name">
+        <div class="photo-frame" aria-hidden="true">
+          <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+        </div>
+        <div class="name" id="r1-name">
+          <span>Dr. Mehdi Panji</span>
+          <span class="title-small">Associate Professor</span>
+          <div class="contact">
+            <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
+            <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="researcher" id="r2" aria-labelledby="r2-name">
+        <div class="photo-frame" aria-hidden="true">
+          <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+        </div>
+        <div class="name" id="r2-name">
+          <span>Dr. Saeed Mojtabazadeh</span>
+          <span class="title-small">Postdoctoral Fellow</span>
+          <div class="contact">
+            <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
+            <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="papers" aria-label="Papers">
+      <h3>💡 Download Papers For Free</h3>
+      <div class="paper-list" id="paperList"></div>
+    </section>
+  </div>
+
+  <footer class="site-footer">The DASBEM Project ©</footer>
+</div>
+
+<!-- ===== Overlay (for blur/darken when modal open) ===== -->
+<div id="siteOverlay" class="site-overlay" aria-hidden="true"></div>
+
+<!-- ===== Corner buttons (English) ===== -->
+<button id="aboutBtn" class="corner-btn btn-about" aria-haspopup="dialog" aria-controls="aboutModal" title="About DASBEM">
+  <span class="btn-icon" aria-hidden="true">ℹ️</span>
+  <span>About</span>
+</button>
+
+<button id="contactBtn" class="corner-btn btn-contact" aria-haspopup="dialog" aria-controls="contactModal" title="Contact Us">
+  <span class="btn-icon" aria-hidden="true">✉️</span>
+  <span>Contact Us</span>
+</button>
+
+<!-- ===== About Modal ===== -->
+<div id="aboutModal" class="modal" role="dialog" aria-hidden="true" aria-labelledby="aboutTitle">
+  <div class="modal-panel" role="document">
+    <div class="modal-head">
+      <div class="modal-title">
+        <div style="width:50px;height:50px;border-radius:12px;background:var(--accent-gradient);display:grid;place-items:center;font-weight:900;color:#111">DB</div>
+        <div>
+          <h3 id="aboutTitle">About the DASBEM Project</h3>
+          <div class="modal-sub">Advanced boundary-element analysis for time-domain SH-wave propagation</div>
+        </div>
+      </div>
+      <button class="modal-close" id="aboutClose" aria-label="Close">✕</button>
+    </div>
+
+    <div class="about-body" id="aboutBody">
+      <p>
+        DASBEM is the culmination of over a decade of focused research and numerical development in wave propagation and boundary-element computation.
+        The core framework implements a time-domain half-space boundary element methodology tailored to model the propagation and scattering of shear-horizontal (SH) waves
+        in complex geological settings, including media with large embedded cavities, discontinuities, and heterogeneous boundaries.
+      </p>
+
+      <p class="about-highlight">
+        Key highlights:
+        <ul style="margin:8px 0 0 18px">
+          <li>High-fidelity time-history surface and subsurface response computation with computationally efficient formulations.</li>
+          <li>Scalable treatment of large ensembles of cavities and inclusions to capture amplification and scattering effects.</li>
+          <li>Modular architecture for parametric studies in geotechnical and structural design scenarios.</li>
+        </ul>
+      </p>
+
+      <p style="margin-top:12px">
+        DASBEM provides researchers and engineers in earthquake engineering and geomechanics with a robust toolset for simulating dynamic interactions between seismic wave fields and engineered or natural subsurface features.
+        If you would like, we can extend this description with numerical examples, published results, or small schematic figures that summarize typical outputs.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Contact Modal ===== -->
+<div id="contactModal" class="modal" role="dialog" aria-hidden="true" aria-labelledby="contactTitle">
+  <div class="modal-panel" role="document">
+    <div class="modal-head">
+      <div class="modal-title">
+        <div style="width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,#6a11cb,#2575fc);display:grid;place-items:center;font-weight:900;color:#fff">✉</div>
+        <div>
+          <h3 id="contactTitle">Contact Us</h3>
+          <div class="modal-sub">Send us a message — we will reply as soon as possible</div>
+        </div>
+      </div>
+      <button class="modal-close" id="contactClose" aria-label="Close">✕</button>
+    </div>
+
+    <form id="contactForm" class="contact-form" autocomplete="on">
+      <div class="form-row">
+        <div class="field">
+          <label for="fullname" style="color:var(--muted);font-size:0.92rem">Full name</label>
+          <input id="fullname" name="from_name" class="input" type="text" placeholder="e.g. John Doe" required>
+        </div>
+        <div class="field">
+          <label for="email" style="color:var(--muted);font-size:0.92rem">Email</label>
+          <input id="email" name="reply_to" class="input" type="email" placeholder="you@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-row" style="flex-direction:column">
+        <label for="message" style="color:var(--muted);font-size:0.92rem">Message</label>
+        <textarea id="message" name="message" placeholder="Write your message..." required></textarea>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column">
+          <button type="submit" class="btn-submit">Send Message</button>
+          <div class="form-note">Message will be sent to <strong>mojtabazadeh@outlook.com</strong></div>
+        </div>
+        <div id="formStatus" style="color:var(--muted);font-size:0.95rem"></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+
 <script>
-emailjs.init("IlTw12Nz7SSQucp4C"); // Public Key
-
-const overlay = document.getElementById('overlay');
-const wizard = document.getElementById('wizard');
-const wThumb = document.getElementById('w-thumb');
-const wBody = document.getElementById('w-body');
-
-function openWizard(content, thumbUrl){
-  overlay.classList.add('show');
-  wizard.classList.add('show');
-  wBody.textContent = content;
-  wThumb.innerHTML = thumbUrl ? `<img src="${thumbUrl}" alt="">` : '';
-  const rect = wizard.getBoundingClientRect();
-  wizard.style.left = `calc(50% - ${rect.width/2}px)`;
-  wizard.style.top = `80px`;
+/* ===== Minimal loader simulation (kept for UX continuity) ===== */
+const TOTAL_DURATION = 3800;
+const TOTAL_LINES = 180;
+const viewport = document.getElementById('viewport');
+const progressBar = document.querySelector('.progressBar');
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pushLine(text, final=false){
+  const el=document.createElement('div'); el.className='logLine'; if(final) el.classList.add('finalLine'); el.textContent=text; viewport.appendChild(el);
+  while(viewport.children.length>100) viewport.removeChild(viewport.children[0]);
+  viewport.scrollTop = viewport.scrollHeight;
+  const pct = Math.min(100, Math.round((viewport.children.length/TOTAL_LINES)*100));
+  progressBar.style.width = pct + '%';
 }
-function closeWizard(){
-  overlay.classList.remove('show');
-  wizard.classList.remove('show');
+for(let i=0;i<TOTAL_LINES;i++){ setTimeout(()=>{ pushLine(["Initializing modules...","Loading kernels...","Preparing time integrator..."][Math.floor(Math.random()*3)]); }, (i/TOTAL_LINES)*TOTAL_DURATION + Math.random()*140 ); }
+setTimeout(()=>{ pushLine("DASBEM Core initialized. Entering interface.", true); setTimeout(()=>{ document.getElementById('app').style.opacity=0; document.getElementById('mainSite').style.opacity=1; setTimeout(()=>document.getElementById('app').remove(),900); },900); }, TOTAL_DURATION+280);
+
+/* ===== Particles canvas (kept light) ===== */
+(function(){
+  const canvas=document.getElementById('waveCanvas'); if(!canvas) return; const ctx=canvas.getContext('2d');
+  let particles=[], isMobile=window.innerWidth<=640;
+  const mouse={x:-999,y:-999};
+  function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; init(); }
+  function init(){ const count=isMobile?28:110; particles=Array.from({length:count},()=>({ x:Math.random()*innerWidth, y:Math.random()*innerHeight, z:Math.random(), r:Math.random()*3+1, vx:(Math.random()-0.5)*(isMobile?0.3:0.6), vy:(Math.random()-0.5)*(isMobile?0.3:0.6) })); }
+  function draw(){ ctx.clearRect(0,0,innerWidth,innerHeight); for(let p of particles){ const dx=mouse.x-p.x, dy=mouse.y-p.y, dist=Math.hypot(dx,dy); if(dist<80 && dist>0){ p.x-=dx*0.003; p.y-=dy*0.003; } const alpha = 0.18 + (1 - p.z) * 0.6; const size = p.r * (1 + (1 - p.z) * 1.5); ctx.beginPath(); ctx.fillStyle=`rgba(255,200,150,${alpha})`; ctx.arc(p.x,p.y,size,0,Math.PI*2); ctx.fill(); p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>innerWidth)p.vx*=-1; if(p.y<0||p.y>innerHeight)p.vy*=-1; } requestAnimationFrame(draw); }
+  window.addEventListener('resize',()=>{ isMobile=window.innerWidth<=640; resize(); }); window.addEventListener('mousemove',(e)=>{ mouse.x=e.clientX; mouse.y=e.clientY; }); window.addEventListener('mouseleave',()=>{ mouse.x=-999; mouse.y=-999; });
+  resize(); draw();
+})();
+
+/* ===== Button interactions (ripple + modal open + overlay) ===== */
+function createRipple(e, el){ const r=document.createElement('span'); r.className='ripple'; const rect=el.getBoundingClientRect(); r.style.left=(e.clientX-rect.left-12)+'px'; r.style.top=(e.clientY-rect.top-12)+'px'; el.appendChild(r); setTimeout(()=>r.remove(),650); }
+
+const aboutBtn = document.getElementById('aboutBtn');
+const contactBtn = document.getElementById('contactBtn');
+const aboutModal = document.getElementById('aboutModal');
+const contactModal = document.getElementById('contactModal');
+const aboutClose = document.getElementById('aboutClose');
+const contactClose = document.getElementById('contactClose');
+const siteOverlay = document.getElementById('siteOverlay');
+
+function openModal(modal){
+  modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+  siteOverlay.classList.add('active'); siteOverlay.setAttribute('aria-hidden','false');
+  // prevent body scroll
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(modal){
+  modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
+  siteOverlay.classList.remove('active'); siteOverlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
 }
 
-// About Button
-document.getElementById('aboutBtn').addEventListener('click',()=>{
-  openWizard(
-    `The DASBEM project (Dynamic Analysis of Structures by Boundary Element Method) is a state-of-the-art numerical tool developed over more than a decade. It enables engineers and researchers to perform high-precision simulations of seismic wave propagation and structural response in complex half-space environments. DASBEM leverages advanced boundary element formulations, time-domain analysis, and efficient computational algorithms to model the dynamic behavior of structures subjected to oblique SH-wave excitations. The software is designed for professional use in earthquake engineering, geotechnical modeling, and structural dynamics research, providing detailed visualizations, flexible mesh control, and accurate time-history results.`,
-    null
-  );
-});
+// About
+aboutBtn.addEventListener('click',(e)=>{ createRipple(e, aboutBtn); if(aboutModal.classList.contains('open')) closeModal(aboutModal); else openModal(aboutModal); setTimeout(()=>{ if(aboutModal.classList.contains('open')) document.getElementById('aboutBody').focus(); },260); });
+aboutClose.addEventListener('click',()=>closeModal(aboutModal));
+aboutModal.addEventListener('click',(ev)=>{ if(ev.target===aboutModal) closeModal(aboutModal); });
 
-// Contact Us Button
-document.getElementById('contactBtn').addEventListener('click',()=>{
-  openWizard(
-    `Please enter your message and it will be sent directly via email.`,
-    null
-  );
-  // Create simple contact form dynamically
-  wBody.innerHTML = `<form id="contactForm" style="display:flex;flex-direction:column;gap:8px;">
-    <input type="text" id="name" placeholder="Your Name" required style="padding:6px;border-radius:6px;border:none;">
-    <input type="email" id="email" placeholder="Your Email" required style="padding:6px;border-radius:6px;border:none;">
-    <textarea id="message" placeholder="Your Message" required style="padding:6px;border-radius:6px;border:none;resize:none;"></textarea>
-    <button type="submit" style="padding:8px 12px;border:none;border-radius:8px;background:#ffb347;color:#111;font-weight:700;cursor:pointer;">Send</button>
-  </form>`;
-  document.getElementById('contactForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    emailjs.send("service_xxx","template_xxx",{
-      from_name: document.getElementById('name').value,
-      from_email: document.getElementById('email').value,
-      message: document.getElementById('message').value
-    }).then(()=>{
-      alert("Message sent successfully!");
-      closeWizard();
-    },(err)=>{
-      alert("Failed to send message: "+err.text);
-    });
+// Contact
+contactBtn.addEventListener('click',(e)=>{ createRipple(e, contactBtn); if(contactModal.classList.contains('open')) closeModal(contactModal); else openModal(contactModal); setTimeout(()=>{ if(contactModal.classList.contains('open')) document.getElementById('fullname').focus(); },260); });
+contactClose.addEventListener('click',()=>closeModal(contactModal));
+contactModal.addEventListener('click',(ev)=>{ if(ev.target===contactModal) closeModal(contactModal); });
+
+// escape to close
+window.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ closeModal(aboutModal); closeModal(contactModal); } });
+
+/* ===== EmailJS integration: initialize with provided Public Key ===== */
+(function(){
+  emailjs.init('IlTw12Nz7SSQucp4C'); // Public key provided
+
+  const SERVICE_ID = 'YOUR_SERVICE_ID';   // <-- replace with your EmailJS Service ID
+  const TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // <-- replace with your EmailJS Template ID
+
+  const contactForm = document.getElementById('contactForm');
+  const formStatus = document.getElementById('formStatus');
+
+  contactForm.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    formStatus.textContent = 'Sending message… please wait';
+    const sendBtn = contactForm.querySelector('.btn-submit');
+    sendBtn.disabled = true;
+
+    const templateParams = {
+      from_name: document.getElementById('fullname').value || 'Anonymous',
+      reply_to: document.getElementById('email').value || '',
+      message: document.getElementById('message').value || '',
+      to_email: 'mojtabazadeh@outlook.com' // destination
+    };
+
+    if(SERVICE_ID === 'YOUR_SERVICE_ID' || TEMPLATE_ID === 'YOUR_TEMPLATE_ID'){
+      formStatus.innerHTML = 'To enable email sending: replace <code>SERVICE_ID</code> and <code>TEMPLATE_ID</code> with values from your EmailJS dashboard.';
+      sendBtn.disabled = false;
+      return;
+    }
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+      .then(function(response) {
+        formStatus.innerHTML = '<strong style="color:#bfffbf">Message sent successfully — thank you!</strong>';
+        contactForm.reset();
+        sendBtn.disabled = false;
+        setTimeout(()=>{ closeModal(contactModal); formStatus.textContent=''; },1400);
+      }, function(error) {
+        console.error('EmailJS error:', error);
+        formStatus.innerHTML = '<strong style="color:#ffb3b3">Failed to send — please try again or email directly: mojtabazadeh@outlook.com</strong>';
+        sendBtn.disabled = false;
+      });
   });
-});
+})();
 
-// Close overlay when clicked
-overlay.addEventListener('click',closeWizard);
+/* Optional: keep paper wizard script from original file if needed.
+   If you want, I can merge it here too — but I left core UI additions separate to avoid collisions. */
 </script>
 
 </body>
