@@ -13,6 +13,7 @@
   --text-light:#fff;
   --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
+  --accent-2:#ff7e5f;
   --muted:#ddd;
 
   /* Loader Colors */
@@ -24,7 +25,7 @@
 
 /* Reset & base */
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
+html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
 
 /* ===== Page Loader ===== */
 #app{
@@ -138,42 +139,127 @@ header.site-header p{
 .paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
 .paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
 
-/* ===== Buttons =====
-   Glass-style corner buttons that remain hidden while loader runs.
-*/
+/* ===== Glass Buttons v2 (improved) ===== */
 .corner-btn {
   position: fixed;
   top: 20px;
-  padding: 10px 18px;
-  font-size: 0.95rem;
+  padding: 12px 18px;
+  font-size: 0.98rem;
   font-weight: 700;
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
   background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-  backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(12px) saturate(120%);
   cursor: pointer;
   z-index: 6000;
-  transition: transform 320ms cubic-bezier(.2,.9,.3,1), box-shadow 320ms ease, background 320ms ease, opacity 320ms ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  transition: transform 240ms cubic-bezier(.2,.9,.3,1), box-shadow 240ms ease, background 240ms ease, opacity 240ms ease;
+  text-transform: none;
+  letter-spacing: 0.6px;
   display: inline-flex;
   align-items: center;
-  gap:8px;
+  gap:10px;
   opacity: 0;
-  transform: translateY(-6px) scale(.98);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+  min-height:44px;
+  line-height:1;
+  overflow: visible;
+  position: fixed;
+  will-change: transform, box-shadow;
+  -webkit-tap-highlight-color: transparent;
 }
-.corner-btn.visible { opacity:1; transform: translateY(0) scale(1); }
+.corner-btn.visible { opacity:1; transform: translateY(0); }
 
-.corner-btn:hover {
-  background: linear-gradient(135deg,#ffb347,#ff7e5f);
-  box-shadow: 0 14px 40px rgba(255,140,60,0.22);
-  transform: translateY(-3px) scale(1.02);
-}
-
+/* position corners (top:20px per request) */
 #aboutBtn { left: 20px; }
 #contactBtn { right: 20px; }
+
+/* internal text wrapper (to control text-only effects) */
+.corner-btn .label {
+  position: relative;
+  z-index: 3;
+  display:inline-block;
+  transform-origin:center;
+  transition: text-shadow 240ms ease, color 240ms ease;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.95rem;
+  padding:0 2px;
+  letter-spacing:0.8px;
+}
+
+/* subtle icon circle (left of text) */
+.corner-btn .icon {
+  width:34px; height:34px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.04);
+  box-shadow: inset 0 -6px 18px rgba(0,0,0,0.35);
+  font-size:0.95rem;
+  color:var(--accent);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+/* hover / focus / touch styles: no text resize, only glow and light sweep */
+.corner-btn:not(.disabled):hover,
+.corner-btn:not(.disabled):focus,
+.corner-btn:not(.disabled).active {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.6), 0 8px 30px rgba(255,150,60,0.08);
+}
+
+/* keep text stable but add glow */
+.corner-btn:not(.disabled):hover .label,
+.corner-btn:not(.disabled):focus .label,
+.corner-btn:not(.disabled).active .label {
+  color: #fff;
+  text-shadow: 0 6px 18px rgba(255,180,110,0.12), 0 0 18px rgba(255,200,130,0.06);
+}
+
+/* icon subtle pop */
+.corner-btn:not(.disabled):hover .icon,
+.corner-btn:not(.disabled).active .icon {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(255,150,60,0.06);
+  color:#fff;
+  background: linear-gradient(135deg,var(--accent),var(--accent-2));
+}
+
+/* light sweep pseudo-element: smooth left-to-right, does NOT scale text */
+.corner-btn::before{
+  content: "";
+  position: absolute;
+  z-index:2;
+  top:0; left:0; right:0; bottom:0;
+  border-radius:14px;
+  background: linear-gradient(120deg, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.03) 35%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 65%, rgba(255,255,255,0.00) 100%);
+  transform: translateX(-120%);
+  opacity:0;
+  transition: transform 650ms cubic-bezier(.2,.9,.3,1), opacity 320ms ease;
+  pointer-events:none;
+  mix-blend-mode: overlay;
+}
+/* trigger sweep on hover/focus/touch — subtle and quick */
+.corner-btn:hover::before,
+.corner-btn:focus::before,
+.corner-btn.active::before {
+  transform: translateX(120%);
+  opacity:1;
+}
+
+/* touch/active visual feedback */
+.corner-btn:active,
+.corner-btn.active {
+  transform: translateY(-2px) scale(0.998);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+}
+
+/* ensure small screens buttons are accessible and slightly larger */
+@media (max-width:640px){
+  .corner-btn { padding: 10px 14px; font-size: 0.95rem; top: 16px; border-radius:12px; min-height:48px; }
+  .corner-btn .icon{ width:36px; height:36px; border-radius:10px; }
+  #aboutBtn { left:12px; }
+  #contactBtn { right:12px; }
+}
 
 /* ===== Overlay (shared) ===== */
 .overlay {
@@ -246,8 +332,6 @@ header.site-header p{
   header.site-header h1{font-size:2.6rem;}
   header.site-header p{font-size:1.05rem;}
   .popup { padding:18px; border-radius:12px; width:94%; max-width:640px; }
-  .corner-btn { padding:10px 14px; font-size:0.9rem; top:14px; }
-  #aboutBtn { left:12px; } #contactBtn { right:12px; }
 }
 
 /* Footer */
@@ -258,22 +342,22 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 <body>
 
 <!-- Page loader -->
-<div id="app">
+<div id="app" aria-hidden="false">
   <div id="header">Initializing The DASBEM Project Core...</div>
-  <div class="viewport" id="viewport"></div>
-  <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
+  <div class="viewport" id="viewport" aria-live="polite"></div>
+  <div class="progressWrap" aria-hidden="true"><div class="progressBar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
 </div>
 
 <!-- ===== Main Site ===== -->
-<div id="mainSite">
+<div id="mainSite" aria-hidden="true">
   <canvas id="waveCanvas" aria-hidden="true"></canvas>
 
-  <header class="site-header">
+  <header class="site-header" role="banner">
     <h1>The DASBEM Project</h1>
     <p>Dynamic Analysis of Structures by Boundary Element Method</p>
   </header>
 
-  <div class="wrap">
+  <div class="wrap" role="main">
     <div class="header" aria-label="Researchers">
       <section class="researcher" id="r1" aria-labelledby="r1-name">
         <div class="photo-frame" aria-hidden="true">
@@ -316,8 +400,15 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 </div>
 
 <!-- ===== Corner Buttons (hidden until loader finishes) ===== -->
-<button id="aboutBtn" class="corner-btn" aria-haspopup="dialog" aria-controls="aboutPopup">DASBEM Protocol</button>
-<button id="contactBtn" class="corner-btn" aria-haspopup="dialog" aria-controls="contactPopup">Contact Portal</button>
+<button id="aboutBtn" class="corner-btn" aria-haspopup="dialog" aria-controls="aboutPopup" aria-label="Open DASBEM Protocol">
+  <span class="icon">⟐</span>
+  <span class="label">DASBEM Protocol</span>
+</button>
+
+<button id="contactBtn" class="corner-btn" aria-haspopup="dialog" aria-controls="contactPopup" aria-label="Open Contact Portal">
+  <span class="label">Contact Portal</span>
+  <span class="icon">✉</span>
+</button>
 
 <!-- ===== About Popup (Method-focused scientific content) ===== -->
 <div id="aboutOverlay" class="overlay" aria-hidden="true" role="presentation">
@@ -446,10 +537,15 @@ function startLoader(){
   setTimeout(()=>{
     pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
     setTimeout(()=>{
-      document.getElementById('app').style.transition="opacity 1s ease";
-      document.getElementById('app').style.opacity=0;
-      document.getElementById('mainSite').style.opacity=1;
-      setTimeout(()=>{document.getElementById('app').remove();},1000);
+      const app = document.getElementById('app');
+      if(app){
+        app.style.transition="opacity 1s ease";
+        app.style.opacity=0;
+        document.getElementById('mainSite').style.opacity=1;
+        setTimeout(()=>{ app.remove(); },1000);
+      } else {
+        document.getElementById('mainSite').style.opacity=1;
+      }
     },1200);
   }, TOTAL_DURATION+200);
 }
@@ -626,42 +722,58 @@ document.addEventListener('keydown',(e)=>{
   }
 });
 
-/* Show corner buttons only after loader removed */
+/* Show corner buttons only after loader removed (robust) */
 function revealCornerButtonsWhenReady(){
-  // wait until #app is removed or hidden
-  const interval = setInterval(()=>{
+  const check = setInterval(()=>{
     const app = document.getElementById('app');
-    if(!app){ // loader removed
+    if(!app){
       document.getElementById('aboutBtn').classList.add('visible');
       document.getElementById('contactBtn').classList.add('visible');
-      clearInterval(interval);
+      document.getElementById('aboutBtn').setAttribute('aria-hidden','false');
+      document.getElementById('contactBtn').setAttribute('aria-hidden','false');
+      clearInterval(check);
+    } else {
+      // If app exists but almost invisible, still reveal after fade
+      const style = window.getComputedStyle(app);
+      if(style && style.opacity === '0'){
+        document.getElementById('aboutBtn').classList.add('visible');
+        document.getElementById('contactBtn').classList.add('visible');
+        clearInterval(check);
+      }
     }
-  },250);
+  },200);
 
-  // safety timeout after which buttons are shown anyway
+  // safety fallback
   setTimeout(()=>{
     if(!document.getElementById('aboutBtn').classList.contains('visible')){
       document.getElementById('aboutBtn').classList.add('visible');
       document.getElementById('contactBtn').classList.add('visible');
     }
-  }, 8000);
+  }, 7000);
 }
 revealCornerButtonsWhenReady();
 
-/* ===== EmailJS integration (contact form) =====
-   - Public Key provided by you is initialized below.
-   - Replace SERVICE_ID / TEMPLATE_ID with your EmailJS service and template ids if you created them.
-   - The template should expect parameters: from_name, reply_to, subject, message, to_email (optional)
-*/
+/* ===== Improved touch behavior: add 'active' class on touchstart to simulate hover + keep text stable ===== */
+function bindTouchFeedback(btn){
+  let touchTimer = null;
+  btn.addEventListener('touchstart', ()=>{
+    btn.classList.add('active');
+    if(touchTimer) clearTimeout(touchTimer);
+    touchTimer = setTimeout(()=>{ btn.classList.remove('active'); }, 900);
+  }, {passive:true});
+  btn.addEventListener('touchend', ()=>{ btn.classList.remove('active'); if(touchTimer){clearTimeout(touchTimer); touchTimer=null;} });
+  btn.addEventListener('touchcancel', ()=>{ btn.classList.remove('active'); if(touchTimer){clearTimeout(touchTimer); touchTimer=null;} });
+}
+bindTouchFeedback(aboutBtn);
+bindTouchFeedback(contactBtn);
+
+/* ===== EmailJS integration (contact form) ===== */
 (function initEmail(){
-  // load emailjs script (CDN)
   const s = document.createElement('script');
   s.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
   s.onload = ()=> {
     if(window.emailjs){
-      try {
-        emailjs.init("IlTw12Nz7SSQucp4C"); // your public key
-      } catch(e){ console.warn("EmailJS init failed:", e); }
+      try { emailjs.init("IlTw12Nz7SSQucp4C"); } catch(e){ console.warn("EmailJS init failed:", e); }
     }
   };
   document.head.appendChild(s);
@@ -676,9 +788,8 @@ document.getElementById('contactForm').addEventListener('submit', function(e){
   sendBtn.disabled = true;
   sendBtn.textContent = 'Sending...';
 
-  // EMAILJS settings — replace these IDs if you have custom service/template
-  const SERVICE_ID = 'default_service'; // common default; change if you created a service
-  const TEMPLATE_ID = 'template_contact'; // change to your template id if needed
+  const SERVICE_ID = 'default_service'; // replace if you have a custom service
+  const TEMPLATE_ID = 'template_contact'; // replace if you have a custom template
 
   const templateParams = {
     from_name: form.from_name.value || 'Anonymous',
@@ -688,7 +799,6 @@ document.getElementById('contactForm').addEventListener('submit', function(e){
     to_email: "mojtabazadeh@outlook.com"
   };
 
-  // try sending (EmailJS uses the service/template you configure on dashboard)
   if(window.emailjs && emailjs.send){
     emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
       .then(()=>{
@@ -710,8 +820,9 @@ document.getElementById('contactForm').addEventListener('submit', function(e){
   }
 });
 
-/* Optional: progressive enhancement — focus trap simple version for popup accessibility */
+/* Optional: simple focus trap to keep keyboard focus within modal (small helper) */
 function trapFocusIn(element){
+  if(!element) return;
   const focusable = element.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
   if(!focusable.length) return;
   const first = focusable[0], last = focusable[focusable.length - 1];
@@ -727,8 +838,7 @@ trapFocusIn(contactPopup);
 
 </script>
 
-<!-- ===== Papers Wizard (the floating paper tooltip wizard element referenced earlier) ===== -->
-<!-- original wizard element kept for compatibility -->
+<!-- ===== Papers Wizard (kept for compatibility) ===== -->
 <div id="wizard" class="wizard" role="dialog" aria-hidden="true" style="display:none;">
   <div class="w-thumb" id="w-thumb"></div>
   <div class="w-body" id="w-body"></div>
