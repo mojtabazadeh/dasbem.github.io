@@ -14,6 +14,7 @@
   --accent:#ffb347;
   --muted:#ddd;
 }
+/* ===== Reset ===== */
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
 
@@ -25,78 +26,11 @@ html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--b
   font-family:'Share Tech Mono', monospace;
 }
 #header{font-size:18px; color:#ff9900; margin-bottom:12px;}
-.viewport{flex:1; overflow-y:auto; padding:12px 14px; background:rgba(255,255,255,0.01); border-radius:8px; width:calc(100% - 60px);}
-.logLine{font-size:13px; line-height:1.25; margin:4px 0;}
-.finalLine{color:#ffcc33; font-weight:700; font-size:15px; margin-top:10px; padding:6px 10px; border-radius:6px; background:rgba(255,204,51,0.08);}
-.progressWrap{height:16px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03); width:calc(100% - 60px);}
-.progressBar{width:0%; height:100%; background:linear-gradient(90deg,#ff9900,#ffcc33); transition:width 50ms linear;}
+.progressWrap{height:16px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden; width:80%; margin-top:16px;}
+.progressBar{width:0%; height:100%; background:linear-gradient(90deg,#ff9900,#ffcc33); transition:width 0.2s linear;}
 
-/* ===== Main Site Hidden Initially ===== */
+/* ===== Main Site ===== */
 #mainSite{opacity:0; transition:opacity 1s ease;}
-
-/* ===== Background ===== */
-#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
-
-/* ===== Header ===== */
-header.site-header{text-align:center;padding:80px 20px 60px;position:relative;z-index:2;}
-header.site-header h1{font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 25px rgba(255,200,150,0.35),0 0 40px rgba(255,180,120,0.45);display:inline-block;}
-header.site-header p{font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;}
-
-/* ===== Wrap ===== */
-.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 10px;display:flex;flex-direction:column;align-items:center;}
-
-/* ===== Researchers ===== */
-.header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
-.researcher{position:relative;width:300px;min-width:260px;display:flex;flex-direction:column;align-items:center;backdrop-filter: blur(10px);padding:18px;border-radius:20px;background:var(--glass);box-shadow:0 10px 40px rgba(0,0,0,0.55);transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;}
-.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.7); }
-.photo-frame{position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,0.45),0 0 18px rgba(255,255,255,0.15) inset;margin-bottom:12px;border:3px solid rgba(255,255,255,0.09);}
-.photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
-.name{font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;color:var(--text-light);letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;}
-.name .title-small{font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
-.contact{margin-top:6px;font-size:0.9rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:2px;}
-.contact a{color:var(--accent);text-decoration:none;font-weight:600;}
-.contact a:hover{text-decoration:underline;}
-
-/* ===== Papers ===== */
-.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.45);width:100%;max-width:100%;}
-.papers h3{margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
-.paper-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
-.paper{background:rgba(255,255,255,0.12);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:10px;align-items:center;transition:transform .4s ease, box-shadow .4s ease;cursor:pointer;width:100%;}
-.paper:hover{transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.5);}
-.paper .thumb{width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
-.paper .thumb img {filter: blur(8px); transition: filter 0.4s ease-out, transform 0.4s ease-out; transform: scale(1.05);}
-.paper .thumb img.loaded { filter: blur(0); transform: scale(1);}
-.paper .thumb img{width:100%;height:100%;object-fit:cover;}
-.paper .meta{flex:1; text-align:center;margin-top:6px;}
-.paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
-.paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
-.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
-.download-btn, .journal-btn{
-  display:inline-block;
-  padding:8px 18px;
-  font-size:0.9rem;
-  font-weight:600;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  text-decoration:none;
-  transition:all 0.3s ease;
-  margin:4px 4px 0 0;
-}
-.download-btn{background: linear-gradient(135deg,#ff7e5f,#feb47b);box-shadow:0 4px 15px rgba(255,126,95,0.4);}
-.download-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(255,126,95,0.6);}
-.download-btn:active{transform:translateY(0) scale(0.98);box-shadow:0 4px 12px rgba(255,126,95,0.5);}
-.journal-btn{background: linear-gradient(135deg,#6a11cb,#2575fc);box-shadow:0 4px 15px rgba(106,17,203,0.4);}
-.journal-btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(106,17,203,0.6);}
-.journal-btn:active{transform:translateY(0) scale(0.98);box-shadow:0 4px 12px rgba(106,17,203,0.5);}
-
-/* ===== Wizard popup ===== */
-.wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
-.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
-.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
 
 /* ===== Top Buttons ===== */
 #aboutBtn, #contactBtn{
@@ -108,30 +42,32 @@ header.site-header p{font-size:1.3rem;color:var(--muted);max-width:780px;margin:
   cursor:pointer;
   border:none;
   font-size:0.9rem;
-  backdrop-filter:blur(8px);
-  background:rgba(255,255,255,0.08);
   color:#fff;
-  transition: all .3s ease;
   z-index:10000;
+  transition: all .3s ease;
 }
 #aboutBtn{left:16px; background: linear-gradient(135deg,#ff7e5f,#feb47b);}
 #contactBtn{right:16px; background: linear-gradient(135deg,#ffb347,#ffcc33);}
 #aboutBtn:hover,#contactBtn:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 6px 18px rgba(255,180,120,0.5);}
 #aboutBtn:active,#contactBtn:active{transform:translateY(0) scale(0.97);}
 
+/* ===== Wizard popup ===== */
+.wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
+.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
+.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
+.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
+
+/* ===== Header ===== */
+header.site-header{text-align:center;padding:80px 20px 60px;position:relative;z-index:2;}
+header.site-header h1{font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 25px rgba(255,200,150,0.35),0 0 40px rgba(255,180,120,0.45);display:inline-block;}
+header.site-header p{font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;}
+
+/* ===== Wrap ===== */
+.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 10px;display:flex;flex-direction:column;align-items:center;}
+
 /* ===== Footer ===== */
 footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(--text-light);}
-
-/* ===== Responsive ===== */
-@media (max-width:640px){
-  header.site-header{padding:50px 10px 40px;}
-  header.site-header h1{font-size:2.8rem;}
-  header.site-header p{font-size:1.1rem;}
-  .researcher{width:100%;flex-direction:row;align-items:center;padding:12px;justify-content:center;}
-  .photo-frame{width:120px;height:120px;margin-right:12px;}
-  .name{align-items:flex-start;font-size:1rem;}
-  .paper .thumb{height:180px;}
-}
 </style>
 </head>
 <body>
@@ -139,7 +75,6 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 <!-- Loader -->
 <div id="app">
   <div id="header">Initializing The DASBEM Project Core...</div>
-  <div class="viewport" id="viewport"></div>
   <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
@@ -157,10 +92,6 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 </header>
 
 <div class="wrap">
-  <div class="header" aria-label="Researchers">
-    <!-- Researchers here (same as previous) -->
-  </div>
-
   <section class="papers" aria-label="Papers">
     <h3>💡 Download Papers For Free</h3>
     <div class="paper-list" id="paperList"></div>
@@ -175,25 +106,41 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 </div>
 
 <script>
-// Loader, particles, papers same as before ...
+// ===== Simple Loader =====
+const progressBar = document.getElementById('progressBar');
+const mainSite = document.getElementById('mainSite');
+let width = 0;
+const loaderInterval = setInterval(()=>{
+  width += Math.random()*5 + 1;
+  if(width>=100) width=100;
+  progressBar.style.width = width+'%';
+  if(width>=100){
+    clearInterval(loaderInterval);
+    setTimeout(()=>{
+      document.getElementById('app').style.opacity=0;
+      mainSite.style.opacity=1;
+      setTimeout(()=>{document.getElementById('app').remove();},500);
+    },500);
+  }
+},50);
 
-// Wizard for About & Contact buttons
+// ===== Wizard Buttons =====
 const wizard = document.getElementById('wizard');
 const wThumb = document.getElementById('w-thumb');
 const wBody = document.getElementById('w-body');
 
 document.getElementById('aboutBtn').addEventListener('click', ()=>{
-  wThumb.innerHTML = '';
+  wThumb.innerHTML='';
   wBody.textContent = "The DASBEM Project is a software tool developed over a decade for advanced boundary element analysis in half-space problems, focused on seismic SH wave simulations and dynamic structure analysis.";
-  wizard.style.left = (window.innerWidth/2 - 190)+"px";
-  wizard.style.top = (window.innerHeight/2 - 150)+"px";
+  wizard.style.left=(window.innerWidth/2-190)+'px';
+  wizard.style.top=(window.innerHeight/2-150)+'px';
   wizard.classList.add('show');
 });
 document.getElementById('contactBtn').addEventListener('click', ()=>{
-  wThumb.innerHTML = '';
-  wBody.textContent = "Contact us via email at mojtabazade@gmail.com or visit our homepage for more info.";
-  wizard.style.left = (window.innerWidth/2 - 190)+"px";
-  wizard.style.top = (window.innerHeight/2 - 150)+"px";
+  wThumb.innerHTML='';
+  wBody.textContent = "Contact us via email at mojtabazadeh@outlook.com or visit our homepage for more info.";
+  wizard.style.left=(window.innerWidth/2-190)+'px';
+  wizard.style.top=(window.innerHeight/2-150)+'px';
   wizard.classList.add('show');
 });
 wizard.addEventListener('click',()=>{ wizard.classList.remove('show'); });
