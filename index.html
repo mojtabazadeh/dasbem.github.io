@@ -14,8 +14,6 @@
   --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
   --muted:#ddd;
-
-  /* Loader Colors */
   --loader-bg:#050505;
   --loader-text:#39ff14;
   --loader-accent:#ff9900;
@@ -103,6 +101,9 @@ header.site-header p{
   100%{opacity:0.8;transform:translateY(0);}
 }
 
+/* ===== Wrap ===== */
+.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 10px;display:flex;flex-direction:column;align-items:center;}
+
 /* ===== Researchers ===== */
 .header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
 .researcher{
@@ -158,81 +159,82 @@ header.site-header p{
 .paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
 .paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
 
-/* ===== Warm Golden Glass Buttons ===== */
-#topButtons {
-  position: fixed;
-  top: 20px;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 9999;
-  pointer-events: none;
-}
-.glass-btn {
-  position: relative;
-  pointer-events: auto;
-  font-family: "Poppins", sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 204, 51, 0.4);
-  background: linear-gradient(145deg, rgba(255,183,71,0.15), rgba(255,204,51,0.25));
+/* ===== Buttons ===== */
+.glassy-btn{
+  position:fixed;
+  top:20px;
+  padding:12px 20px;
+  font-size:1rem;
+  font-weight:600;
+  color:#ffeb99;
+  border:none;
+  border-radius:12px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(255,183,71,0.3), 0 0 15px rgba(255,204,51,0.2) inset;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.35s ease;
+  background: linear-gradient(145deg, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
+  box-shadow: 0 4px 25px rgba(255, 184, 0, 0.3), 0 0 20px rgba(255,184,0,0.1) inset;
+  cursor:pointer;
+  z-index:10000;
+  overflow:hidden;
+  transition: all 0.4s ease;
 }
-.glass-btn::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.1) 100%);
-  transform: rotate(25deg) translateX(-150%);
+#aboutBtn{ left:20px; }
+#contactBtn{ right:20px; }
+
+.glassy-btn::before{
+  content:'';
+  position:absolute;
+  top:-50%;
+  left:-50%;
+  width:200%;
+  height:200%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.25), rgba(255,255,255,0));
+  transform: rotate(45deg) translate(-100%, -100%);
   transition: all 0.6s ease;
 }
-.glass-btn:hover::before {
-  transform: rotate(25deg) translateX(150%);
+.glassy-btn:hover::before{
+  transform: rotate(45deg) translate(100%, 100%);
 }
-.glass-btn span {
-  position: relative;
-  z-index: 2;
-  transition: all 0.35s ease;
+.glassy-btn:hover{
+  box-shadow: 0 6px 35px rgba(255,184,0,0.6), 0 0 25px rgba(255,184,0,0.2) inset;
+  transform: scale(1.05);
+  color:#fff;
 }
-.glass-btn:hover span {
-  color: #fff;
-  text-shadow: 0 0 8px rgba(255,204,51,0.8), 0 0 16px rgba(255,183,71,0.7);
-}
-@media (max-width:640px) {
-  #topButtons {
-    padding: 0 12px;
-  }
-  .glass-btn {
-    padding: 10px 18px;
-    font-size: 0.85rem;
+
+@media (max-width:640px){
+  .glassy-btn{
+    font-size:0.95rem;
+    padding:10px 16px;
   }
 }
 
 /* ===== Wizard popup ===== */
-.wizard{
-  position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
-  transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
-  border-radius:12px;padding:12px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;
+#popupOverlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;z-index:9998;
 }
-.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
-.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
+#popupContent{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  max-width:400px;width:90%;background:rgba(20,20,20,0.95);border-radius:12px;padding:18px;
+  color:#fff;box-shadow:0 12px 40px rgba(0,0,0,0.8);display:none;z-index:9999;
+}
+#popupBody{font-size:0.95rem;line-height:1.5;max-height:300px;overflow-y:auto;}
+#closePopup{
+  margin-top:12px;padding:10px 16px;border:none;border-radius:8px;
+  background:#ffb347;color:#000;font-weight:600;cursor:pointer;transition:all 0.3s;
+}
 
 /* ===== Footer ===== */
 footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(--text-light);}
+
+/* ===== Responsive ===== */
+@media (max-width:640px){
+  header.site-header{padding:50px 10px 40px;}
+  header.site-header h1{font-size:2.8rem;}
+  header.site-header p{font-size:1.1rem;}
+  .researcher{width:100%;flex-direction:row;align-items:center;padding:12px;justify-content:center;}
+  .photo-frame{width:120px;height:120px;margin-right:12px;}
+  .name{align-items:flex-start;font-size:1rem;}
+  .paper .thumb{height:180px;}
+}
 </style>
 </head>
 <body>
@@ -244,13 +246,7 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
   <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
-<!-- ===== Warm Golden Glass Buttons ===== -->
-<div id="topButtons">
-  <button id="aboutBtn" class="glass-btn"><span>DASBEM Protocol</span></button>
-  <button id="contactBtn" class="glass-btn"><span>Contact Us</span></button>
-</div>
-
-<!-- ===== Main Site ===== -->
+<!-- Main Site -->
 <div id="mainSite">
 <canvas id="waveCanvas" aria-hidden="true"></canvas>
 
@@ -264,7 +260,7 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
     <section class="researcher" id="r1" aria-labelledby="r1-name">
       <div class="photo-frame" aria-hidden="true">
         <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
-            </div>
+      </div>
       <div class="name" id="r1-name">
         <span>Dr. Mehdi Panji</span>
         <span class="title-small">Associate Professor</span>
@@ -300,103 +296,130 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
   The DASBEM Project ©
 </footer>
 
-<!-- ===== Popup Overlay ===== -->
-<div id="popupOverlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); display:none; z-index:9998;"></div>
-
-<div id="popupContent" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); max-width:400px; width:90%; background:rgba(0,0,0,0.88); color:#fff; border-radius:12px; padding:18px; box-shadow:0 12px 40px rgba(255,204,51,0.5); display:none; z-index:9999; font-family:'Poppins',sans-serif; line-height:1.5;">
+<!-- Popups -->
+<div id="popupOverlay"></div>
+<div id="popupContent">
   <div id="popupBody"></div>
-  <button id="closePopup" style="margin-top:12px; padding:8px 14px; border:none; border-radius:8px; background:#ffb347; color:#000; font-weight:600; cursor:pointer;">Close</button>
+  <button id="closePopup">Close</button>
 </div>
+
+<!-- Buttons -->
+<button id="aboutBtn" class="glassy-btn">DASBEM Protocol</button>
+<button id="contactBtn" class="glassy-btn">Contact Us</button>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
 emailjs.init("IlTw12Nz7SSQucp4C");
 
-/* ===== Loader simulation ===== */
-const app = document.getElementById('app');
+/* ===== Loader Script ===== */
+const TOTAL_DURATION = 4000;
+const TOTAL_LINES = 350;
 const viewport = document.getElementById('viewport');
 const progressBar = document.getElementById('progressBar');
-let logCount = 0;
-const logs = [
-  "Initializing core modules...",
-  "Loading boundary element datasets...",
-  "Setting up SH-wave propagation algorithms...",
-  "Preparing numerical solvers...",
-  "Optimizing simulation parameters...",
-  "Finalizing DASBEM engine..."
+
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pick(arr){ return arr[rnd(0,arr.length-1)]; }
+
+const logMsgs = [
+  'Compiling boundary matrices...',
+  'Initializing SH wave solver...',
+  'Analyzing damping parameters...',
+  'Loading computational nodes...',
+  'Optimizing mesh density...',
+  'Launching virtual solver engine...',
+  'Integrating time domain responses...',
+  'Finalizing core structures...',
 ];
 
-function loadApp(){
-  if(logCount<logs.length){
-    const line = document.createElement('div');
-    line.className = 'logLine';
-    line.textContent = logs[logCount];
-    viewport.appendChild(line);
-    progressBar.style.width = ((logCount+1)/logs.length*100) + '%';
-    logCount++;
-    setTimeout(loadApp,800);
-  }else{
-    const finalLine = document.createElement('div');
+let current = 0;
+let loaderInterval = setInterval(()=>{
+  let line = pick(logMsgs);
+  let div = document.createElement('div');
+  div.className='logLine';
+  div.textContent = line;
+  viewport.appendChild(div);
+  viewport.scrollTop = viewport.scrollHeight;
+  current++;
+  progressBar.style.width = (current/TOTAL_LINES*100)+'%';
+  if(current>=TOTAL_LINES){
+    clearInterval(loaderInterval);
+    let finalLine = document.createElement('div');
     finalLine.className='finalLine';
-    finalLine.textContent="✅ Ready to Explore DASBEM!";
+    finalLine.textContent='DASBEM Core Ready!';
     viewport.appendChild(finalLine);
-    setTimeout(()=>{ app.style.display='none'; document.getElementById('mainSite').style.opacity='1'; },800);
+    setTimeout(()=>{ document.getElementById('app').style.display='none'; document.getElementById('mainSite').style.opacity=1; },500);
   }
-}
-loadApp();
+},TOTAL_DURATION/TOTAL_LINES);
 
-/* ===== Buttons popup ===== */
+/* ===== Wave Canvas ===== */
+const canvas=document.getElementById('waveCanvas');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+let particles=[];
+for(let i=0;i<120;i++){
+  particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5,r:Math.random()*2+0.5});
+}
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let p of particles){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255, 196, 55, 0.22)';
+    ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x>canvas.width||p.x<0) p.dx*=-1;
+    if(p.y>canvas.height||p.y<0) p.dy*=-1;
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight;});
+
+/* ===== About / Contact Popup ===== */
 const aboutBtn = document.getElementById('aboutBtn');
 const contactBtn = document.getElementById('contactBtn');
-const popupOverlay = document.getElementById('popupOverlay');
-const popupContent = document.getElementById('popupContent');
+const popup = document.getElementById('popupContent');
+const overlay = document.getElementById('popupOverlay');
 const popupBody = document.getElementById('popupBody');
 const closePopup = document.getElementById('closePopup');
 
-function openPopup(contentHTML){
-  popupBody.innerHTML = contentHTML;
-  popupOverlay.style.display = 'block';
-  popupContent.style.display = 'block';
+aboutBtn.onclick = ()=>{
+  overlay.style.display='block'; popup.style.display='block';
+  popupBody.innerHTML=`<h2>DASBEM Protocol</h2>
+  <p>The DASBEM Project provides a comprehensive numerical method for simulating dynamic wave propagation in semi-infinite domains. It combines time-domain Boundary Element Method with advanced damping and SH-wave analysis to allow precise prediction of seismic responses in complex structures.</p>`;
 }
-
-function closePopupFunc(){
-  popupOverlay.style.display = 'none';
-  popupContent.style.display = 'none';
-}
-
-aboutBtn.addEventListener('click', ()=>{
-  openPopup(`
-    <h2 style="color:#ffb347; margin-bottom:8px;">Welcome to DASBEM Protocol</h2>
-    <p>The DASBEM project is a cutting-edge numerical analysis platform for dynamic response of structures using the Boundary Element Method in the time domain. Explore advanced simulations, SH-wave propagation studies, and precise structural modeling with intuitive and interactive tools. DASBEM provides engineers and researchers a powerful interface to visualize, analyze, and optimize structural responses under complex conditions.</p>
-  `);
-});
-
-contactBtn.addEventListener('click', ()=>{
-  openPopup(`
-    <h2 style="color:#ffb347; margin-bottom:8px;">Contact Us</h2>
-    <form id="contactForm">
-      <input type="text" name="user_name" placeholder="Your Name" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:none;">
-      <input type="email" name="user_email" placeholder="Your Email" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:none;">
-      <textarea name="message" placeholder="Your Message" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:none; resize:none; height:80px;"></textarea>
-      <button type="submit" style="padding:10px 18px; background:#ffb347; border:none; border-radius:8px; font-weight:600; cursor:pointer; margin-top:6px;">Send</button>
-    </form>
-    <div id="contactStatus" style="margin-top:6px;"></div>
-  `);
-
+contactBtn.onclick = ()=>{
+  overlay.style.display='block'; popup.style.display='block';
+  popupBody.innerHTML=`<h2>Contact Us</h2>
+  <form id="contactForm">
+    <input type="text" name="user_name" placeholder="Your Name" style="width:100%;padding:8px;margin:6px 0;border-radius:6px;border:none;" required>
+    <input type="email" name="user_email" placeholder="Your Email" style="width:100%;padding:8px;margin:6px 0;border-radius:6px;border:none;" required>
+    <textarea name="message" placeholder="Your Message" style="width:100%;padding:8px;margin:6px 0;border-radius:6px;border:none;" required></textarea>
+    <button type="submit" style="width:100%;padding:10px;margin-top:6px;border:none;border-radius:6px;background:#ffb347;color:#000;font-weight:600;">Send</button>
+  </form>`;
   const form = document.getElementById('contactForm');
-  const status = document.getElementById('contactStatus');
-
-  form.addEventListener('submit', function(e){
+  form.onsubmit = (e)=>{
     e.preventDefault();
-    emailjs.sendForm('default_service', 'template_xxx', this)
-      .then(()=>{status.innerHTML="<span style='color:#0f0'>Message sent!</span>"; form.reset();})
-      .catch(()=>{status.innerHTML="<span style='color:#f66'>Error sending message.</span>";});
-  });
-});
+    emailjs.sendForm('service_xxx','template_xxx','#contactForm').then(()=>{
+      alert('Message sent successfully!');
+      overlay.style.display='none'; popup.style.display='none';
+    }).catch(err=>{ alert('Failed to send: '+err.text); });
+  }
+}
+closePopup.onclick=()=>{ overlay.style.display='none'; popup.style.display='none'; };
+overlay.onclick=()=>{ overlay.style.display='none'; popup.style.display='none'; };
 
-closePopup.addEventListener('click', closePopupFunc);
-popupOverlay.addEventListener('click', closePopupFunc);
+/* ===== Load Papers Dynamically ===== */
+const papers=[{title:'Optimizing Stope Pillar Design',author:'S. Mojtabazadeh',year:'2025',thumb:'https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/main/paper1.png'},{title:'Arching Pressure Analysis',author:'M. Panji',year:'2024',thumb:'https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/main/paper2.png'}];
+
+const paperList=document.getElementById('paperList');
+for(const p of papers){
+  const div=document.createElement('div');
+  div.className='paper';
+  div.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt="${p.title}"></div>
+  <div class="meta"><div class="p-title">${p.title}</div><div class="p-auth">${p.author}<span class="year">${p.year}</span></div></div>`;
+  paperList.appendChild(div);
+}
 </script>
-
 </body>
 </html>
