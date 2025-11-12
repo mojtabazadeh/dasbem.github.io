@@ -13,7 +13,6 @@
   --text-light:#fff;
   --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
-  --accent-2:#ff7e5f;
   --muted:#ddd;
 
   /* Loader Colors */
@@ -23,9 +22,8 @@
   --loader-gold:#ffcc33;
 }
 
-/* Reset & base */
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
 
 /* ===== Page Loader ===== */
 #app{
@@ -34,12 +32,36 @@ html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--b
   background:var(--loader-bg); color:var(--loader-text);
   font-family:'Share Tech Mono', monospace;
 }
-#header{font-size:18px; color:var(--loader-accent); margin-bottom:12px; user-select:none; -webkit-user-select:none;}
-.viewport{flex:1; overflow-y:auto; padding:12px 14px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:8px; border:1px solid rgba(255,255,255,0.03); width:calc(100% - 60px); max-height:60%; word-break:break-word;}
-.logLine{font-size:13px; line-height:1.25; margin:4px 0;}
-.finalLine{color:var(--loader-gold); font-weight:700; font-size:15px; margin-top:10px; padding:6px 10px; border-radius:6px; background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent); text-shadow:0 0 6px rgba(255,204,51,0.14);}
-.progressWrap{height:16px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03); width:calc(100% - 60px);}
-.progressBar{width:0%; height:100%; background:linear-gradient(90deg,#ff9900,#ffcc33); transition:width 50ms linear;}
+#header{
+  font-size:18px; color:var(--loader-accent); margin-bottom:12px; user-select:none; -webkit-user-select:none;
+}
+.viewport{
+  flex:1; overflow-y:auto; padding:12px 14px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-radius:8px; border:1px solid rgba(255,255,255,0.03);
+  width:calc(100% - 60px);
+  max-height:60%;
+  word-break:break-word;
+}
+.logLine{
+  font-size:13px; line-height:1.25; margin:4px 0;
+}
+.finalLine{
+  color:var(--loader-gold); font-weight:700; font-size:15px;
+  margin-top:10px; padding:6px 10px; border-radius:6px;
+  background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
+  text-shadow:0 0 6px rgba(255,204,51,0.14);
+}
+.progressWrap{
+  height:16px; background:rgba(255,255,255,0.06);
+  border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03);
+  width:calc(100% - 60px);
+}
+.progressBar{
+  width:0%; height:100%;
+  background:linear-gradient(90deg,#ff9900,#ffcc33);
+  transition:width 50ms linear;
+}
 @media(max-width:640px){
   #header{font-size:16px;}
   .logLine{font-size:12px;}
@@ -80,9 +102,6 @@ header.site-header p{
   50%{opacity:1;transform:translateY(-3px);}
   100%{opacity:0.8;transform:translateY(0);}
 }
-
-/* ===== Wrap ===== */
-.wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 10px;display:flex;flex-direction:column;align-items:center;}
 
 /* ===== Researchers ===== */
 .header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
@@ -139,710 +158,245 @@ header.site-header p{
 .paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
 .paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
 
-/* ===== Glass Buttons v2 (improved) ===== */
-.corner-btn {
+/* ===== Warm Golden Glass Buttons ===== */
+#topButtons {
   position: fixed;
   top: 20px;
-  padding: 12px 18px;
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-  backdrop-filter: blur(12px) saturate(120%);
-  cursor: pointer;
-  z-index: 6000;
-  transition: transform 240ms cubic-bezier(.2,.9,.3,1), box-shadow 240ms ease, background 240ms ease, opacity 240ms ease;
-  text-transform: none;
-  letter-spacing: 0.6px;
-  display: inline-flex;
-  align-items: center;
-  gap:10px;
-  opacity: 0;
-  transform: translateY(-6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
-  min-height:44px;
-  line-height:1;
-  overflow: visible;
-  position: fixed;
-  will-change: transform, box-shadow;
-  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 9999;
+  pointer-events: none;
 }
-.corner-btn.visible { opacity:1; transform: translateY(0); }
-
-/* position corners (top:20px per request) */
-#aboutBtn { left: 20px; }
-#contactBtn { right: 20px; }
-
-/* internal text wrapper (to control text-only effects) */
-.corner-btn .label {
+.glass-btn {
   position: relative;
-  z-index: 3;
-  display:inline-block;
-  transform-origin:center;
-  transition: text-shadow 240ms ease, color 240ms ease;
+  pointer-events: auto;
   font-family: "Poppins", sans-serif;
+  font-weight: 700;
   font-size: 0.95rem;
-  padding:0 2px;
-  letter-spacing:0.8px;
-}
-
-/* subtle icon circle (left of text) */
-.corner-btn .icon {
-  width:34px; height:34px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.04);
-  box-shadow: inset 0 -6px 18px rgba(0,0,0,0.35);
-  font-size:0.95rem;
-  color:var(--accent);
-  transition: transform 220ms ease, box-shadow 220ms ease;
-}
-
-/* hover / focus / touch styles: no text resize, only glow and light sweep */
-.corner-btn:not(.disabled):hover,
-.corner-btn:not(.disabled):focus,
-.corner-btn:not(.disabled).active {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 55px rgba(0,0,0,0.6), 0 8px 30px rgba(255,150,60,0.08);
-}
-
-/* keep text stable but add glow */
-.corner-btn:not(.disabled):hover .label,
-.corner-btn:not(.disabled):focus .label,
-.corner-btn:not(.disabled).active .label {
   color: #fff;
-  text-shadow: 0 6px 18px rgba(255,180,110,0.12), 0 0 18px rgba(255,200,130,0.06);
+  padding: 12px 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 204, 51, 0.4);
+  background: linear-gradient(145deg, rgba(255,183,71,0.15), rgba(255,204,51,0.25));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(255,183,71,0.3), 0 0 15px rgba(255,204,51,0.2) inset;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.35s ease;
 }
-
-/* icon subtle pop */
-.corner-btn:not(.disabled):hover .icon,
-.corner-btn:not(.disabled).active .icon {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 8px 20px rgba(255,150,60,0.06);
-  color:#fff;
-  background: linear-gradient(135deg,var(--accent),var(--accent-2));
-}
-
-/* light sweep pseudo-element: smooth left-to-right, does NOT scale text */
-.corner-btn::before{
+.glass-btn::before {
   content: "";
   position: absolute;
-  z-index:2;
-  top:0; left:0; right:0; bottom:0;
-  border-radius:14px;
-  background: linear-gradient(120deg, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.03) 35%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 65%, rgba(255,255,255,0.00) 100%);
-  transform: translateX(-120%);
-  opacity:0;
-  transition: transform 650ms cubic-bezier(.2,.9,.3,1), opacity 320ms ease;
-  pointer-events:none;
-  mix-blend-mode: overlay;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.1) 100%);
+  transform: rotate(25deg) translateX(-150%);
+  transition: all 0.6s ease;
 }
-/* trigger sweep on hover/focus/touch — subtle and quick */
-.corner-btn:hover::before,
-.corner-btn:focus::before,
-.corner-btn.active::before {
-  transform: translateX(120%);
-  opacity:1;
+.glass-btn:hover::before {
+  transform: rotate(25deg) translateX(150%);
 }
-
-/* touch/active visual feedback */
-.corner-btn:active,
-.corner-btn.active {
-  transform: translateY(-2px) scale(0.998);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+.glass-btn span {
+  position: relative;
+  z-index: 2;
+  transition: all 0.35s ease;
 }
-
-/* ensure small screens buttons are accessible and slightly larger */
-@media (max-width:640px){
-  .corner-btn { padding: 10px 14px; font-size: 0.95rem; top: 16px; border-radius:12px; min-height:48px; }
-  .corner-btn .icon{ width:36px; height:36px; border-radius:10px; }
-  #aboutBtn { left:12px; }
-  #contactBtn { right:12px; }
-}
-
-/* ===== Overlay (shared) ===== */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.70);
-  backdrop-filter: blur(6px) saturate(120%);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.36s ease;
-  z-index: 6500;
-}
-.overlay.show { opacity: 1; pointer-events: auto; }
-
-/* ===== Popup Base ===== */
-.popup {
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) scale(0.98);
-  background: linear-gradient(180deg, rgba(14,14,14,0.98), rgba(20,20,20,0.96));
+.glass-btn:hover span {
   color: #fff;
-  padding: 28px;
-  border-radius: 16px;
-  box-shadow: 0 30px 90px rgba(0,0,0,0.8);
-  width: 92%;
-  max-width: 780px;
-  max-height: 86vh;
-  overflow-y: auto;
-  opacity: 0;
-  transition: all 0.36s cubic-bezier(.2,.9,.3,1);
-  z-index: 6600;
+  text-shadow: 0 0 8px rgba(255,204,51,0.8), 0 0 16px rgba(255,183,71,0.7);
 }
-.popup.show { opacity:1; transform: translate(-50%, -50%) scale(1); }
-
-/* popup structural */
-.popup .close-popup {
-  position:absolute; top:14px; right:16px;
-  font-size:1.15rem; color:var(--accent); cursor:pointer;
-  background:rgba(255,255,255,0.02); padding:6px; border-radius:8px;
-  border:1px solid rgba(255,255,255,0.03);
-}
-.popup h2 {
-  font-family:"Playfair Display",serif;
-  font-size:1.6rem; margin:0 0 10px 0;
-  background: linear-gradient(90deg,#ffb347,#ffcc33);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.popup .lead { color:#e6e6e6; margin-bottom:12px; font-size:0.98rem; }
-.popup p { font-size:0.95rem; color:#d6d6d6; line-height:1.6; text-align:justify; margin:0 0 12px 0; }
-
-/* code block / badges */
-.tech-list { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 14px; }
-.tech-list .tag { padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.04); color:#fff; font-size:0.85rem; border:1px solid rgba(255,255,255,0.03); }
-
-/* Contact form styles */
-.popup form { margin-top:8px; display:flex; flex-direction:column; gap:10px; }
-.popup form input, .popup form textarea {
-  width:100%; padding:10px 12px; border-radius:10px; border:none; background:rgba(255,255,255,0.04); color:#fff; font-size:0.95rem;
-}
-.popup form button {
-  align-self:flex-start; padding:10px 18px; border-radius:10px; border:none;
-  background: linear-gradient(135deg,#6a11cb,#2575fc); color:#fff; font-weight:700; cursor:pointer;
-  box-shadow:0 10px 30px rgba(37,117,252,0.15); transition: transform .18s ease;
-}
-.popup form button:active { transform: translateY(1px); }
-
-/* small screen adjustments */
-@media (max-width:640px){
-  header.site-header{padding:50px 10px 40px;}
-  header.site-header h1{font-size:2.6rem;}
-  header.site-header p{font-size:1.05rem;}
-  .popup { padding:18px; border-radius:12px; width:94%; max-width:640px; }
+@media (max-width:640px) {
+  #topButtons {
+    padding: 0 12px;
+  }
+  .glass-btn {
+    padding: 10px 18px;
+    font-size: 0.85rem;
+  }
 }
 
-/* Footer */
+/* ===== Wizard popup ===== */
+.wizard{
+  position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);
+  transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);
+  border-radius:12px;padding:12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;
+}
+.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
+.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
+.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
+.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
+
+/* ===== Footer ===== */
 footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(--text-light);}
-
 </style>
 </head>
 <body>
 
 <!-- Page loader -->
-<div id="app" aria-hidden="false">
+<div id="app">
   <div id="header">Initializing The DASBEM Project Core...</div>
-  <div class="viewport" id="viewport" aria-live="polite"></div>
-  <div class="progressWrap" aria-hidden="true"><div class="progressBar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
+  <div class="viewport" id="viewport"></div>
+  <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
+</div>
+
+<!-- ===== Warm Golden Glass Buttons ===== -->
+<div id="topButtons">
+  <button id="aboutBtn" class="glass-btn"><span>DASBEM Protocol</span></button>
+  <button id="contactBtn" class="glass-btn"><span>Contact Us</span></button>
 </div>
 
 <!-- ===== Main Site ===== -->
-<div id="mainSite" aria-hidden="true">
-  <canvas id="waveCanvas" aria-hidden="true"></canvas>
+<div id="mainSite">
+<canvas id="waveCanvas" aria-hidden="true"></canvas>
 
-  <header class="site-header" role="banner">
-    <h1>The DASBEM Project</h1>
-    <p>Dynamic Analysis of Structures by Boundary Element Method</p>
-  </header>
+<header class="site-header">
+  <h1>The DASBEM Project</h1>
+  <p>Dynamic Analysis of Structures by Boundary Element Method</p>
+</header>
 
-  <div class="wrap" role="main">
-    <div class="header" aria-label="Researchers">
-      <section class="researcher" id="r1" aria-labelledby="r1-name">
-        <div class="photo-frame" aria-hidden="true">
-          <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+<div class="wrap">
+  <div class="header" aria-label="Researchers">
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+            </div>
+      <div class="name" id="r1-name">
+        <span>Dr. Mehdi Panji</span>
+        <span class="title-small">Associate Professor</span>
+        <div class="contact">
+          <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
+          <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
         </div>
-        <div class="name" id="r1-name">
-          <span>Dr. Mehdi Panji</span>
-          <span class="title-small">Associate Professor</span>
-          <div class="contact">
-            <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
-            <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
-          </div>
-        </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="researcher" id="r2" aria-labelledby="r2-name">
-        <div class="photo-frame" aria-hidden="true">
-          <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+      </div>
+      <div class="name" id="r2-name">
+        <span>Dr. Saeed Mojtabazadeh</span>
+        <span class="title-small">Postdoctoral Fellow</span>
+        <div class="contact">
+          <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
+          <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
         </div>
-        <div class="name" id="r2-name">
-          <span>Dr. Saeed Mojtabazadeh</span>
-          <span class="title-small">Postdoctoral Fellow</span>
-          <div class="contact">
-            <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
-            <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <section class="papers" aria-label="Papers">
-      <h3>💡 Download Papers For Free</h3>
-      <div class="paper-list" id="paperList"></div>
+      </div>
     </section>
   </div>
 
-  <footer class="site-footer">
-    The DASBEM Project ©
-  </footer>
+  <section class="papers" aria-label="Papers">
+    <h3>💡 Download Papers For Free</h3>
+    <div class="paper-list" id="paperList"></div>
+  </section>
 </div>
 
-<!-- ===== Corner Buttons (hidden until loader finishes) ===== -->
-<button id="aboutBtn" class="corner-btn" aria-haspopup="dialog" aria-controls="aboutPopup" aria-label="Open DASBEM Protocol">
-  <span class="icon">⟐</span>
-  <span class="label">DASBEM Protocol</span>
-</button>
+<footer class="site-footer">
+  The DASBEM Project ©
+</footer>
 
-<button id="contactBtn" class="corner-btn" aria-haspopup="dialog" aria-controls="contactPopup" aria-label="Open Contact Portal">
-  <span class="label">Contact Portal</span>
-  <span class="icon">✉</span>
-</button>
+<!-- ===== Popup Overlay ===== -->
+<div id="popupOverlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); display:none; z-index:9998;"></div>
 
-<!-- ===== About Popup (Method-focused scientific content) ===== -->
-<div id="aboutOverlay" class="overlay" aria-hidden="true" role="presentation">
-  <div class="popup" id="aboutPopup" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" tabindex="-1">
-    <button class="close-popup" aria-label="Close about" onclick="closePopup('about')">✕</button>
-    <h2 id="aboutTitle">The DASBEM Protocol — Method & Theory</h2>
-    <div class="lead">A concise technical summary of the numerical method powering DASBEM.</div>
-
-    <p>
-      The <strong>Time-Domain Half-Space Boundary Element Method (TD-HSBEM)</strong> implemented in DASBEM is a non-local boundary integral formulation
-      that models dynamic wave propagation in an elastic half-space without meshing the entire domain.
-      By combining exact half-space Green's functions with a robust transient boundary integral solver,
-      DASBEM computes scattered and transmitted SH-wave fields produced by complex buried or surface structures with high fidelity.
-    </p>
-
-    <p>
-      Key methodological features:
-    </p>
-    <div class="tech-list" aria-hidden="false">
-      <span class="tag">Half-space Green's functions</span>
-      <span class="tag">Time-domain convolution</span>
-      <span class="tag">High-order temporal integration</span>
-      <span class="tag">Adaptive spatial discretization</span>
-    </div>
-
-    <p>
-      The solver assembles time-history integral operators and advances the solution using stable explicit/implicit time-stepping
-      combined with efficient convolution evaluation (memory compression where applicable). Special quadrature handles near-field singularities,
-      while domain reduction through boundary-only discretization yields large reductions in degrees of freedom compared to volumetric methods.
-    </p>
-
-    <p>
-      Applications include seismic site response, soil-structure interaction, wave scattering by cavities and inclusions, and the precise evaluation
-      of surface motions for engineering and research scenarios. Solutions produced by DASBEM are validated against analytical solutions
-      and independent numerical benchmarks to ensure numerical stability, energy consistency, and convergence.
-    </p>
-
-    <p>
-      To learn more about algorithms, solver architecture, or validation cases, contact the team via the Contact Portal.
-    </p>
-  </div>
+<div id="popupContent" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); max-width:400px; width:90%; background:rgba(0,0,0,0.88); color:#fff; border-radius:12px; padding:18px; box-shadow:0 12px 40px rgba(255,204,51,0.5); display:none; z-index:9999; font-family:'Poppins',sans-serif; line-height:1.5;">
+  <div id="popupBody"></div>
+  <button id="closePopup" style="margin-top:12px; padding:8px 14px; border:none; border-radius:8px; background:#ffb347; color:#000; font-weight:600; cursor:pointer;">Close</button>
 </div>
 
-<!-- ===== Contact Popup (EmailJS) ===== -->
-<div id="contactOverlay" class="overlay" aria-hidden="true" role="presentation">
-  <div class="popup" id="contactPopup" role="dialog" aria-modal="true" aria-labelledby="contactTitle" tabindex="-1">
-    <button class="close-popup" aria-label="Close contact" onclick="closePopup('contact')">✕</button>
-    <h2 id="contactTitle">Contact Portal</h2>
-    <div class="lead">Send a message to the DASBEM team. We typically respond within a few business days.</div>
-
-    <form id="contactForm">
-      <input type="text" id="name" name="from_name" placeholder="Your Name" required>
-      <input type="email" id="email" name="reply_to" placeholder="Your Email" required>
-      <input type="text" id="subject" name="subject" placeholder="Subject (optional)">
-      <textarea id="message" name="message" placeholder="Your message..." rows="6" required></textarea>
-      <button type="submit" id="sendBtn">Send Message</button>
-    </form>
-    <div id="contactStatus" aria-live="polite" style="margin-top:10px;color:#d6d6d6;font-size:0.95rem;"></div>
-  </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
-/* ===== Loader Script (original) ===== */
-const TOTAL_DURATION = 4000;
-const TOTAL_LINES = 350;
+emailjs.init("IlTw12Nz7SSQucp4C");
+
+/* ===== Loader simulation ===== */
+const app = document.getElementById('app');
 const viewport = document.getElementById('viewport');
 const progressBar = document.getElementById('progressBar');
-
-function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-function pick(arr){ return arr[rnd(0,arr.length-1)]; }
-
-const stages = [
-  "Loading half-space Green’s function library [G_SH_Layered.bin]...",
-  "Initializing transient boundary element solver (HSTD-BEM)...",
-  "Compressing output archives [run_SH_01.zip]...",
-  "Simulation sequence completed successfully."
+let logCount = 0;
+const logs = [
+  "Initializing core modules...",
+  "Loading boundary element datasets...",
+  "Setting up SH-wave propagation algorithms...",
+  "Preparing numerical solvers...",
+  "Optimizing simulation parameters...",
+  "Finalizing DASBEM engine..."
 ];
 
-function makeLine(){
-  const stage = pick(stages);
-  let extra = "";
-  if(stage.includes("coefficients") || stage.includes("matrices")) extra = " [F"+rnd(1000,9999)+".bin]";
-  if(stage.includes("snapshots") || stage.includes("response")) extra = " [S"+rnd(100,999)+"]";
-  if(stage.includes("convolution") || stage.includes("memory")) extra = " window="+rnd(10,500)+"ms";
-  if(stage.includes("displacement") || stage.includes("stress") || stage.includes("SH-wave")) extra = " Node"+rnd(10,999);
-  if(stage.includes("Green's functions")) extra = " [G"+rnd(1000,9999)+".dat]";
-  if(stage.includes("spectral amplification")) extra = " [AMP"+rnd(10,99)+"]";
-  if(stage.includes("motion history")) extra = " [MH"+rnd(1000,9999)+".out]";
-  if(stage.includes("recursive time-domain solver")) extra = " Module-"+pick(["kern","conv","io","solver","post"]);
-
-  return stage.replace(/\{rnd\}/g,()=>rnd(1000,9999))
-              .replace(/\{sub\}/g,()=> "K"+rnd(1,99))
-              .replace(/\{blk\}/g,()=> rnd(1,24))
-              .replace(/\{totalBlk\}/g,()=> rnd(24,128))
-              .replace(/\{edge\}/g,()=> rnd(0,7))
-              .replace(/\{coordSys\}/g,()=> pick(["local","global","geo"]))
-              .replace(/\{tol\}/g,()=> (Math.random()*1e-3).toExponential(2))
-              + extra;
+function loadApp(){
+  if(logCount<logs.length){
+    const line = document.createElement('div');
+    line.className = 'logLine';
+    line.textContent = logs[logCount];
+    viewport.appendChild(line);
+    progressBar.style.width = ((logCount+1)/logs.length*100) + '%';
+    logCount++;
+    setTimeout(loadApp,800);
+  }else{
+    const finalLine = document.createElement('div');
+    finalLine.className='finalLine';
+    finalLine.textContent="✅ Ready to Explore DASBEM!";
+    viewport.appendChild(finalLine);
+    setTimeout(()=>{ app.style.display='none'; document.getElementById('mainSite').style.opacity='1'; },800);
+  }
 }
+loadApp();
 
-let loadedCount = 0;
-function pushLine(text, final=false){
-  const el = document.createElement('div');
-  el.className='logLine';
-  if(final) el.classList.add('finalLine');
-  el.textContent=text;
-  viewport.appendChild(el);
-  while(viewport.children.length>220) viewport.removeChild(viewport.children[0]);
-  viewport.scrollTop = viewport.scrollHeight;
-  loadedCount++;
-  const pct = Math.min(100, Math.round((loadedCount/TOTAL_LINES)*100));
-  progressBar.style.width = pct+"%";
-}
-
-const timestamps = Array.from({length:TOTAL_LINES}, (_,i)=>{
-  const base = (i/TOTAL_LINES)*TOTAL_DURATION;
-  const jitter = (1 - Math.abs(i/TOTAL_LINES-0.5)*2)*30;
-  return base + (Math.random()*jitter*2 - jitter);
-});
-
-function startLoader(){
-  for(let i=0;i<TOTAL_LINES;i++){
-    setTimeout(((idx)=>{return function(){ pushLine(makeLine()); };})(i), timestamps[i]);
-  }
-
-  setTimeout(()=>{
-    pushLine("DASBEM Core successfully initialized. Entering Main Interface.", true);
-    setTimeout(()=>{
-      const app = document.getElementById('app');
-      if(app){
-        app.style.transition="opacity 1s ease";
-        app.style.opacity=0;
-        document.getElementById('mainSite').style.opacity=1;
-        setTimeout(()=>{ app.remove(); },1000);
-      } else {
-        document.getElementById('mainSite').style.opacity=1;
-      }
-    },1200);
-  }, TOTAL_DURATION+200);
-}
-
-startLoader();
-
-/* ===== Particles Background (original) ===== */
-(function(){
-  const canvas=document.getElementById('waveCanvas');
-  const ctx=canvas.getContext('2d');
-  let particles=[], isMobile=window.innerWidth<=640;
-  const mouse={x:-999,y:-999};
-  function resize(){canvas.width=innerWidth; canvas.height=innerHeight; initParticles();}
-  function initParticles(){
-    const count=isMobile?30:120;
-    particles=Array.from({length:count},()=>({
-      x:Math.random()*innerWidth,
-      y:Math.random()*innerHeight,
-      z:Math.random(),
-      r:Math.random()*3+1,
-      vx:(Math.random()-0.5)*(isMobile?0.3:0.6),
-      vy:(Math.random()-0.5)*(isMobile?0.3:0.6)
-    }));
-  }
-  function draw(){
-    ctx.clearRect(0,0,innerWidth,innerHeight);
-    for(let p of particles){
-      const dx=mouse.x-p.x, dy=mouse.y-p.y;
-      const dist=Math.hypot(dx,dy);
-      if(dist<80 && dist>0){p.x-=dx*0.003; p.y-=dy*0.003;}
-      const alpha = 0.2 + (1 - p.z) * 0.6;
-      const size = p.r * (1 + (1 - p.z) * 1.5);
-      ctx.fillStyle=`rgba(255,200,150,${alpha})`;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,size,0,Math.PI*2);
-      ctx.fill();
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0||p.x>innerWidth)p.vx*=-1;
-      if(p.y<0||p.y>innerHeight)p.vy*=-1;
-    }
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener('resize',()=>{
-    isMobile=window.innerWidth<=640;
-    resize();
-  });
-  window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;});
-  window.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
-  resize(); draw();
-})();
-
-/* ===== Papers wizard (original) ===== */
-(function(){
-  const papers=[
-{title:"Time-History Responses on the Surface by Regularly Distributed Enormous Embedded Cavities: Incident SH-Waves",authors:"Mehdi Panji & Saeed Mojtabazadeh",year:"2018",href:"https://bayanbox.ir/download/7050831466408904062/3.pdf",journal:"https://www.equsci.org.cn/article/doi/10.29382/eqs-2018-0137-3?pageType=en",thumb:"https://bayanbox.ir/view/8045563318987990212/3.jpg",abstract:"The time-history responses of the surface were obtained for a linear elastic half-plane including regularly distributed enormous embedded circular cavities subjected to propagating obliquely incident plane SH-waves. An advanced numerical approach named half-plane time-domain boundary element method (BEM), which only located the meshes around the cavities, was used to create the model. By establishing the modified boundary integral equation (BIE) independently for each cavity and forming the matrices, the final coupled equation was solved step-by-step in the time-domain to obtain the boundary values. The responses were developed for a half-plane with 512 cavities. The amplification patterns were also obtained to illustrate the frequency-domain responses for some cases. According to the results, the presence of enormous cavities affects the scattering and diffraction of the waves arrived to the surface. The introduced method can be recommended for geotechnical/mechanical engineers to model structures in the fields of earthquake engineering and composite materials."}
-  ];
-
-  const list=document.getElementById('paperList');
-  const wizard=document.getElementById('wizard');
-  const wThumb=document.getElementById('w-thumb');
-  const wBody=document.getElementById('w-body');
-  const isMobile=window.innerWidth<=640;
-
-  function positionWizard(x,y){
-    const wRect=wizard.getBoundingClientRect();
-    let left=x, top=y;
-    if(isMobile){
-      left=Math.min(Math.max(10,left),window.innerWidth - wRect.width - 10);
-      top=Math.min(Math.max(50,top),window.innerHeight - wRect.height - 10);
-    } else {
-      if(left+wRect.width>window.innerWidth) left=x-wRect.width-10;
-      if(top+wRect.height>window.innerHeight) top=y-wRect.height-10;
-    }
-    wizard.style.left=left+'px';
-    wizard.style.top=top+'px';
-  }
-
-  papers.forEach(p=>{
-    const node=document.createElement('div'); node.className='paper';
-    node.innerHTML=`
-      <div class="thumb"><img src="${p.thumb}" alt=""></div>
-      <div class="meta">
-        <div class="p-title">${p.title}</div>
-        <div class="p-auth">${p.authors}<span class="year">${p.year}</span></div>
-      </div>
-      <div>
-        <a href="${p.href}" target="_blank" class="download-btn">📥 Download</a>
-        <a href="${p.journal}" target="_blank" class="journal-btn">🌐 Link</a>
-      </div>`;
-
-    const thumb=node.querySelector('.thumb');
-    const img = thumb.querySelector('img');
-    img.addEventListener('load',()=> img.classList.add('loaded'));
-
-    if(isMobile){
-      thumb.addEventListener('click',(ev)=>{
-        if(wizard.classList.contains('show')){
-          wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
-        } else {
-          wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-          wBody.textContent=p.abstract;
-          wBody.scrollTop = 0;
-          const rect=thumb.getBoundingClientRect();
-          positionWizard(rect.left, rect.top + window.scrollY);
-          wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-        }
-      });
-      wizard.addEventListener('click',()=>{
-        wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');
-      });
-    } else {
-      thumb.addEventListener('mouseenter',(ev)=>{
-        wThumb.innerHTML=`<img src="${p.thumb}" alt="">`;
-        wBody.textContent=p.abstract;
-        wBody.scrollTop = 0;
-        positionWizard(ev.clientX+18,ev.clientY+12);
-        wizard.classList.add('show'); wizard.setAttribute('aria-hidden','false');
-      });
-      thumb.addEventListener('mousemove',(ev)=>positionWizard(ev.clientX+18,ev.clientY+12));
-      thumb.addEventListener('mouseleave',()=>{wizard.classList.remove('show'); wizard.setAttribute('aria-hidden','true');});
-      thumb.addEventListener('wheel',(e)=>{
-        if(wizard.classList.contains('show')){e.preventDefault(); wBody.scrollTop+=e.deltaY;}
-      });
-    }
-
-    list.appendChild(node);
-  });
-})();
-
-/* ===== Popups: show/hide + keyboard + overlay click ===== */
+/* ===== Buttons popup ===== */
 const aboutBtn = document.getElementById('aboutBtn');
 const contactBtn = document.getElementById('contactBtn');
-const aboutOverlay = document.getElementById('aboutOverlay');
-const contactOverlay = document.getElementById('contactOverlay');
-const aboutPopup = document.getElementById('aboutPopup');
-const contactPopup = document.getElementById('contactPopup');
+const popupOverlay = document.getElementById('popupOverlay');
+const popupContent = document.getElementById('popupContent');
+const popupBody = document.getElementById('popupBody');
+const closePopup = document.getElementById('closePopup');
 
-function openPopup(type){
-  if(type==='about'){
-    aboutOverlay.classList.add('show'); aboutPopup.classList.add('show');
-    aboutOverlay.setAttribute('aria-hidden','false'); aboutPopup.setAttribute('aria-hidden','false');
-    aboutPopup.focus();
-    document.body.style.overflow = 'hidden';
-  } else if(type==='contact'){
-    contactOverlay.classList.add('show'); contactPopup.classList.add('show');
-    contactOverlay.setAttribute('aria-hidden','false'); contactPopup.setAttribute('aria-hidden','false');
-    contactPopup.focus();
-    document.body.style.overflow = 'hidden';
-  }
+function openPopup(contentHTML){
+  popupBody.innerHTML = contentHTML;
+  popupOverlay.style.display = 'block';
+  popupContent.style.display = 'block';
 }
-function closePopup(type){
-  if(type==='about'){
-    aboutOverlay.classList.remove('show'); aboutPopup.classList.remove('show');
-    aboutOverlay.setAttribute('aria-hidden','true'); aboutPopup.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-  } else if(type==='contact'){
-    contactOverlay.classList.remove('show'); contactPopup.classList.remove('show');
-    contactOverlay.setAttribute('aria-hidden','true'); contactPopup.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-  }
+
+function closePopupFunc(){
+  popupOverlay.style.display = 'none';
+  popupContent.style.display = 'none';
 }
-aboutBtn.addEventListener('click',()=>openPopup('about'));
-contactBtn.addEventListener('click',()=>openPopup('contact'));
 
-/* overlay click to close */
-aboutOverlay.addEventListener('click',(e)=>{ if(e.target===aboutOverlay) closePopup('about'); });
-contactOverlay.addEventListener('click',(e)=>{ if(e.target===contactOverlay) closePopup('contact'); });
-
-/* Escape key to close popups */
-document.addEventListener('keydown',(e)=>{
-  if(e.key==='Escape'){
-    if(aboutOverlay.classList.contains('show')) closePopup('about');
-    if(contactOverlay.classList.contains('show')) closePopup('contact');
-  }
+aboutBtn.addEventListener('click', ()=>{
+  openPopup(`
+    <h2 style="color:#ffb347; margin-bottom:8px;">Welcome to DASBEM Protocol</h2>
+    <p>The DASBEM project is a cutting-edge numerical analysis platform for dynamic response of structures using the Boundary Element Method in the time domain. Explore advanced simulations, SH-wave propagation studies, and precise structural modeling with intuitive and interactive tools. DASBEM provides engineers and researchers a powerful interface to visualize, analyze, and optimize structural responses under complex conditions.</p>
+  `);
 });
 
-/* Show corner buttons only after loader removed (robust) */
-function revealCornerButtonsWhenReady(){
-  const check = setInterval(()=>{
-    const app = document.getElementById('app');
-    if(!app){
-      document.getElementById('aboutBtn').classList.add('visible');
-      document.getElementById('contactBtn').classList.add('visible');
-      document.getElementById('aboutBtn').setAttribute('aria-hidden','false');
-      document.getElementById('contactBtn').setAttribute('aria-hidden','false');
-      clearInterval(check);
-    } else {
-      // If app exists but almost invisible, still reveal after fade
-      const style = window.getComputedStyle(app);
-      if(style && style.opacity === '0'){
-        document.getElementById('aboutBtn').classList.add('visible');
-        document.getElementById('contactBtn').classList.add('visible');
-        clearInterval(check);
-      }
-    }
-  },200);
+contactBtn.addEventListener('click', ()=>{
+  openPopup(`
+    <h2 style="color:#ffb347; margin-bottom:8px;">Contact Us</h2>
+    <form id="contactForm">
+      <input type="text" name="user_name" placeholder="Your Name" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:none;">
+      <input type="email" name="user_email" placeholder="Your Email" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:none;">
+      <textarea name="message" placeholder="Your Message" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:none; resize:none; height:80px;"></textarea>
+      <button type="submit" style="padding:10px 18px; background:#ffb347; border:none; border-radius:8px; font-weight:600; cursor:pointer; margin-top:6px;">Send</button>
+    </form>
+    <div id="contactStatus" style="margin-top:6px;"></div>
+  `);
 
-  // safety fallback
-  setTimeout(()=>{
-    if(!document.getElementById('aboutBtn').classList.contains('visible')){
-      document.getElementById('aboutBtn').classList.add('visible');
-      document.getElementById('contactBtn').classList.add('visible');
-    }
-  }, 7000);
-}
-revealCornerButtonsWhenReady();
-
-/* ===== Improved touch behavior: add 'active' class on touchstart to simulate hover + keep text stable ===== */
-function bindTouchFeedback(btn){
-  let touchTimer = null;
-  btn.addEventListener('touchstart', ()=>{
-    btn.classList.add('active');
-    if(touchTimer) clearTimeout(touchTimer);
-    touchTimer = setTimeout(()=>{ btn.classList.remove('active'); }, 900);
-  }, {passive:true});
-  btn.addEventListener('touchend', ()=>{ btn.classList.remove('active'); if(touchTimer){clearTimeout(touchTimer); touchTimer=null;} });
-  btn.addEventListener('touchcancel', ()=>{ btn.classList.remove('active'); if(touchTimer){clearTimeout(touchTimer); touchTimer=null;} });
-}
-bindTouchFeedback(aboutBtn);
-bindTouchFeedback(contactBtn);
-
-/* ===== EmailJS integration (contact form) ===== */
-(function initEmail(){
-  const s = document.createElement('script');
-  s.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-  s.onload = ()=> {
-    if(window.emailjs){
-      try { emailjs.init("IlTw12Nz7SSQucp4C"); } catch(e){ console.warn("EmailJS init failed:", e); }
-    }
-  };
-  document.head.appendChild(s);
-})();
-
-document.getElementById('contactForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const form = this;
-  const sendBtn = document.getElementById('sendBtn');
+  const form = document.getElementById('contactForm');
   const status = document.getElementById('contactStatus');
 
-  sendBtn.disabled = true;
-  sendBtn.textContent = 'Sending...';
-
-  const SERVICE_ID = 'default_service'; // replace if you have a custom service
-  const TEMPLATE_ID = 'template_contact'; // replace if you have a custom template
-
-  const templateParams = {
-    from_name: form.from_name.value || 'Anonymous',
-    reply_to: form.reply_to.value || '',
-    subject: form.subject.value || '(no subject)',
-    message: form.message.value || '',
-    to_email: "mojtabazadeh@outlook.com"
-  };
-
-  if(window.emailjs && emailjs.send){
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
-      .then(()=>{
-        sendBtn.disabled = false;
-        sendBtn.textContent = 'Send Message';
-        status.textContent = "Message sent — thank you. We'll be in touch.";
-        form.reset();
-        setTimeout(()=>{ status.textContent = ""; closePopup('contact'); },1500);
-      }, (err)=>{
-        console.error('EmailJS error:', err);
-        sendBtn.disabled = false;
-        sendBtn.textContent = 'Send Message';
-        status.textContent = "Failed to send message. If the problem persists, email directly to mojtabazadeh@outlook.com.";
-      });
-  } else {
-    sendBtn.disabled = false;
-    sendBtn.textContent = 'Send Message';
-    status.textContent = "Messaging unavailable (EmailJS not loaded). Please email: mojtabazadeh@outlook.com";
-  }
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    emailjs.sendForm('default_service', 'template_xxx', this)
+      .then(()=>{status.innerHTML="<span style='color:#0f0'>Message sent!</span>"; form.reset();})
+      .catch(()=>{status.innerHTML="<span style='color:#f66'>Error sending message.</span>";});
+  });
 });
 
-/* Optional: simple focus trap to keep keyboard focus within modal (small helper) */
-function trapFocusIn(element){
-  if(!element) return;
-  const focusable = element.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
-  if(!focusable.length) return;
-  const first = focusable[0], last = focusable[focusable.length - 1];
-  element.addEventListener('keydown', function(e){
-    if(e.key === 'Tab'){
-      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-    }
-  });
-}
-trapFocusIn(aboutPopup);
-trapFocusIn(contactPopup);
-
+closePopup.addEventListener('click', closePopupFunc);
+popupOverlay.addEventListener('click', closePopupFunc);
 </script>
-
-<!-- ===== Papers Wizard (kept for compatibility) ===== -->
-<div id="wizard" class="wizard" role="dialog" aria-hidden="true" style="display:none;">
-  <div class="w-thumb" id="w-thumb"></div>
-  <div class="w-body" id="w-body"></div>
-</div>
 
 </body>
 </html>
