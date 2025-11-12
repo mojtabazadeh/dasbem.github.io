@@ -6,6 +6,8 @@
 <title>DASBEM.IR</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/mojtabazadeh/dasbem.github.io/refs/heads/main/DASBEM.ico" sizes="48x48">
+
 <style>
 :root{
   --bg-dark:#1a1a1a;
@@ -13,78 +15,226 @@
   --glass: rgba(255,255,255,0.12);
   --accent:#ffb347;
   --muted:#ddd;
+  --loader-bg:#050505;
+  --loader-text:#39ff14;
+  --loader-accent:#ff9900;
+  --loader-gold:#ffcc33;
 }
-/* ===== Reset ===== */
+
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;font-family:"Poppins",sans-serif;background:var(--bg-dark);color:var(--text-light);overflow-x:hidden;width:100%;}
 
-/* ===== Loader ===== */
+/* ===== Page Loader ===== */
 #app{
   position:fixed; inset:0; z-index:9999;
   display:flex; flex-direction:column; justify-content:center; align-items:center;
-  background:#050505; color:#39ff14;
+  background:var(--loader-bg); color:var(--loader-text);
   font-family:'Share Tech Mono', monospace;
 }
-#header{font-size:18px; color:#ff9900; margin-bottom:12px;}
-.progressWrap{height:16px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden; width:80%; margin-top:16px;}
-.progressBar{width:0%; height:100%; background:linear-gradient(90deg,#ff9900,#ffcc33); transition:width 0.2s linear;}
+#header{
+  font-size:18px; color:var(--loader-accent); margin-bottom:12px; user-select:none; -webkit-user-select:none;
+}
+.viewport{
+  flex:1; overflow-y:auto; padding:12px 14px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border-radius:8px; border:1px solid rgba(255,255,255,0.03);
+  width:calc(100% - 60px);
+  max-height:60%;
+  word-break:break-word;
+}
+.logLine{
+  font-size:13px; line-height:1.25; margin:4px 0;
+}
+.finalLine{
+  color:var(--loader-gold); font-weight:700; font-size:15px;
+  margin-top:10px; padding:6px 10px; border-radius:6px;
+  background:linear-gradient(90deg, rgba(255,204,51,0.04), transparent);
+  text-shadow:0 0 6px rgba(255,204,51,0.14);
+}
+.progressWrap{
+  height:16px; background:rgba(255,255,255,0.06);
+  border-radius:10px; overflow:hidden; margin-top:16px; border:1px solid rgba(255,255,255,0.03);
+  width:calc(100% - 60px);
+}
+.progressBar{
+  width:0%; height:100%;
+  background:linear-gradient(90deg,#ff9900,#ffcc33);
+  transition:width 50ms linear;
+}
+@media(max-width:640px){
+  #header{font-size:16px;}
+  .logLine{font-size:12px;}
+  .progressWrap{height:14px;}
+}
 
-/* ===== Main Site ===== */
+/* ===== Main Site Hidden Initially ===== */
 #mainSite{opacity:0; transition:opacity 1s ease;}
 
-/* ===== Top Buttons ===== */
-#aboutBtn, #contactBtn{
-  position:fixed;
-  top:16px;
-  padding:10px 20px;
-  font-weight:600;
-  border-radius:12px;
-  cursor:pointer;
-  border:none;
-  font-size:0.9rem;
-  color:#fff;
-  z-index:10000;
-  transition: all .3s ease;
-}
-#aboutBtn{left:16px; background: linear-gradient(135deg,#ff7e5f,#feb47b);}
-#contactBtn{right:16px; background: linear-gradient(135deg,#ffb347,#ffcc33);}
-#aboutBtn:hover,#contactBtn:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 6px 18px rgba(255,180,120,0.5);}
-#aboutBtn:active,#contactBtn:active{transform:translateY(0) scale(0.97);}
-
-/* ===== Wizard popup ===== */
-.wizard{position:fixed;z-index:9999;pointer-events:none;opacity:0;transform:scale(.95);transition:all .16s ease;max-width:380px;background: rgba(0,0,0,0.85);border-radius:12px;padding:12px;box-shadow: 0 12px 40px rgba(0,0,0,0.8);display:flex;gap:10px;flex-direction:column;}
-.wizard.show{ opacity:1; transform:scale(1); pointer-events:auto; }
-.wizard .w-thumb{ width:100%;height:200px;border-radius:12px;overflow:hidden;background:#111; }
-.wizard .w-thumb img{width:100%;height:100%;object-fit:cover;}
-.wizard .w-body{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:200px; overflow-y:auto; padding-right:6px; text-align:justify; }
+/* ===== Background canvas ===== */
+#waveCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 
 /* ===== Header ===== */
-header.site-header{text-align:center;padding:80px 20px 60px;position:relative;z-index:2;}
-header.site-header h1{font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 25px rgba(255,200,150,0.35),0 0 40px rgba(255,180,120,0.45);display:inline-block;}
-header.site-header p{font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;}
+header.site-header{
+  position:relative;z-index:2;text-align:center;padding:80px 20px 60px;
+}
+header.site-header h1{
+  font-family:"Playfair Display",serif;font-size:3.8rem;font-weight:900;
+  margin:0 0 18px;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(90deg,#ffb347,#ffcc33,#ff7e5f);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 25px rgba(255,200,150,0.35), 0 0 40px rgba(255,180,120,0.45);
+  display:inline-block;
+  animation: glow 6s ease-in-out infinite;
+  transition: transform .35s ease;
+}
+@keyframes glow{
+  0%,100%{text-shadow:0 0 20px rgba(255,200,150,0.3), 0 0 35px rgba(255,180,120,0.4);}
+  50%{text-shadow:0 0 45px rgba(255,200,150,0.6), 0 0 70px rgba(255,180,120,0.7);}
+}
+header.site-header p{
+  font-size:1.3rem;color:var(--muted);max-width:780px;margin:0 auto;line-height:1.5;
+  text-shadow:0 0 18px rgba(255,190,130,0.4), 0 0 30px rgba(255,160,100,0.25);
+  animation: pulse 5s ease-in-out infinite alternate;
+}
+@keyframes pulse{
+  0%{opacity:0.8;transform:translateY(0);}
+  50%{opacity:1;transform:translateY(-3px);}
+  100%{opacity:0.8;transform:translateY(0);}
+}
 
 /* ===== Wrap ===== */
 .wrap{position:relative;z-index:2;max-width:1200px;margin:20px auto;padding:0 10px;display:flex;flex-direction:column;align-items:center;}
 
+/* ===== Researchers ===== */
+.header{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.researcher{
+  position:relative;width:300px;min-width:260px;
+  display:flex;flex-direction:column;align-items:center;
+  backdrop-filter: blur(10px);padding:18px;border-radius:20px;
+  background:var(--glass);
+  box-shadow:0 10px 40px rgba(0,0,0,0.55);
+  transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;
+}
+.researcher:hover{ transform:translateY(-8px); box-shadow:0 18px 50px rgba(0,0,0,0.7); }
+.photo-frame{
+  position:relative;width:168px;height:168px;border-radius:50%;overflow:hidden;
+  padding:6px;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 30%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.15) inset;
+  margin-bottom:12px;
+  border: 3px solid rgba(255,255,255,0.09);
+  transition: transform 1.2s ease-in-out;
+}
+.photo-frame img{width:100%;height:100%;border-radius:50%;object-fit:cover;transition: transform 1.2s ease-in-out;}
+.name{
+  font-family:"Playfair Display",serif;font-size:1.3rem;font-weight:700;color:var(--text-light);
+  letter-spacing:0.6px;text-align:center;display:flex;flex-direction:column;align-items:center;transition: transform 1s ease-in-out;
+}
+.name .title-small{ font-size:1rem;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+.contact{margin-top:6px;font-size:0.9rem;color:var(--accent);text-align:center;display:flex;flex-direction:column;gap:2px;}
+.contact a{color:var(--accent);text-decoration:none;font-weight:600;}
+.contact a:hover{text-decoration:underline;}
+.researcher:hover .photo-frame{ transform: translateY(-2px);}
+.researcher:hover .name{ transform: translateY(2px);}
+
+/* ===== Papers ===== */
+.papers{margin-top:28px;padding:18px;border-radius:12px;background:var(--glass);box-shadow:0 12px 30px rgba(0,0,0,0.45);width:100%;max-width:100%;}
+.papers h3{ margin:0 0 12px 0;font-size:1.5rem;font-family:"Playfair Display",serif;}
+.paper-list{ display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px; }
+.paper{
+  background: rgba(255,255,255,0.12);
+  padding:12px;border-radius:12px;display:flex;flex-direction:column;
+  gap:10px;align-items:center;transition:transform .4s ease, box-shadow .4s ease;
+  cursor:pointer;
+  width:100%;
+}
+.paper:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.5); }
+.paper .thumb{ width:100%;height:160px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center;color:#222;}
+.paper .thumb img { filter: blur(8px); transition: filter 0.4s ease-out, transform 0.4s ease-out; transform: scale(1.05);}
+.paper .thumb img.loaded { filter: blur(0); transform: scale(1);}
+.paper .thumb img{width:100%;height:100%;object-fit:cover;}
+.paper .meta{ flex:1; text-align:center;margin-top:6px; }
+.paper .meta .p-title{ font-weight:700; font-size:1rem; color:var(--text-light); margin-bottom:4px; }
+.paper .meta .p-auth{ font-size:0.9rem; color:var(--muted);}
+.paper .meta .p-auth span.year{ display:block; font-style:italic; color:var(--accent); margin-top:2px;}
+
+/* ===== Floating Buttons ===== */
+.fab {
+  position:fixed; z-index:9998; padding:12px 22px;
+  border-radius:12px; font-weight:700; cursor:pointer;
+  backdrop-filter: blur(12px); background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15); color:var(--accent);
+  text-transform:uppercase; letter-spacing:1px;
+  transition:all 0.3s ease, transform 0.2s ease-in-out;
+}
+.fab:hover{ transform:translateY(-2px) scale(1.05); background:rgba(255,255,255,0.14); }
+#fab-about{top:20px; left:20px;}
+#fab-contact{top:20px; right:20px;}
+
+/* ===== Popup Overlay ===== */
+.popup-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(8px); z-index:9997;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.popup-overlay.show{opacity:1; pointer-events:auto;}
+
+/* ===== Popup Window ===== */
+.popup {
+  position:fixed; z-index:9999; max-width:420px;
+  top:50%; left:50%; transform:translate(-50%, -50%) scale(0.95);
+  background:rgba(0,0,0,0.9); border-radius:14px; padding:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.8);
+  opacity:0; pointer-events:none; transition:all 0.25s ease;
+  display:flex; flex-direction:column; gap:12px;
+}
+.popup.show{ opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+.popup h2{ margin:0; color:var(--accent); font-size:1.2rem; letter-spacing:1px; text-align:center; }
+.popup p{ font-size:0.9rem; color:#fff; line-height:1.5; max-height:250px; overflow-y:auto; }
+
+/* Contact Form */
+.contact-form{ display:flex; flex-direction:column; gap:8px; }
+.contact-form input, .contact-form textarea{
+  padding:8px 10px; border-radius:8px; border:none;
+  background:rgba(255,255,255,0.08); color:#fff;
+  resize:none; font-size:0.9rem;
+}
+.contact-form button{
+  padding:8px 14px; border:none; border-radius:10px;
+  background:linear-gradient(135deg,#ff7e5f,#feb47b);
+  font-weight:700; color:#fff; cursor:pointer;
+  transition:all 0.3s ease;
+}
+.contact-form button:hover{ transform:scale(1.05); }
+
 /* ===== Footer ===== */
 footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(--text-light);}
+
+/* ===== Responsive ===== */
+@media (max-width:640px){
+  header.site-header{padding:50px 10px 40px;}
+  header.site-header h1{font-size:2.8rem;}
+  header.site-header p{font-size:1.1rem;}
+  .researcher{width:100%;flex-direction:row;align-items:center;padding:12px;justify-content:center;}
+  .photo-frame{width:120px;height:120px;margin-right:12px;}
+  .name{align-items:flex-start;font-size:1rem;}
+  .paper .thumb{height:180px;}
+}
 </style>
 </head>
 <body>
 
-<!-- Loader -->
+<!-- Page loader -->
 <div id="app">
   <div id="header">Initializing The DASBEM Project Core...</div>
+  <div class="viewport" id="viewport"></div>
   <div class="progressWrap"><div class="progressBar" id="progressBar"></div></div>
 </div>
 
-<!-- Main Site -->
+<!-- ===== Main Site ===== -->
 <div id="mainSite">
 <canvas id="waveCanvas" aria-hidden="true"></canvas>
-
-<!-- Top Buttons -->
-<button id="aboutBtn">About</button>
-<button id="contactBtn">Contact</button>
 
 <header class="site-header">
   <h1>The DASBEM Project</h1>
@@ -92,58 +242,171 @@ footer.site-footer{text-align:center;font-size:0.9rem;padding:14px 0;color:var(-
 </header>
 
 <div class="wrap">
+  <div class="header" aria-label="Researchers">
+    <section class="researcher" id="r1" aria-labelledby="r1-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Mehdi%20Panji.jpg?raw=true" alt="Dr. Mehdi Panji photo">
+      </div>
+      <div class="name" id="r1-name">
+        <span>Dr. Mehdi Panji</span>
+        <span class="title-small">Associate Professor</span>
+        <div class="contact">
+          <a href="https://www.researchgate.net/profile/Mehdi-Panji">🌍 Homepage</a>
+          <a href="mailto:m.panji@iau.ac.ir">📧 m.panji@iau.ac.ir</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="researcher" id="r2" aria-labelledby="r2-name">
+      <div class="photo-frame" aria-hidden="true">
+        <img src="https://github.com/mojtabazadeh/dasbem.github.io/blob/main/Dr.%20Saeed%20Mojtabazadeh.jpg?raw=true" alt="Dr. Saeed Mojtabazadeh photo">
+      </div>
+      <div class="name" id="r2-name">
+        <span>Dr. Saeed Mojtabazadeh</span>
+        <span class="title-small">Postdoctoral Fellow</span>
+        <div class="contact">
+          <a href="https://saeedmojtabazadeh.ir/">🌍 Homepage</a>
+          <a href="mailto:saeed@mojtabazadeh.ir">📧 saeed@mojtabazadeh.ir</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <section class="papers" aria-label="Papers">
     <h3>💡 Download Papers For Free</h3>
     <div class="paper-list" id="paperList"></div>
   </section>
 </div>
 
-<footer class="site-footer">The DASBEM Project ©</footer>
+<footer class="site-footer">
+  The DASBEM Project ©
+</footer>
 
-<div id="wizard" class="wizard" role="dialog" aria-hidden="true">
-  <div class="w-thumb" id="w-thumb"></div>
-  <div class="w-body" id="w-body"></div>
+<!-- ===== Floating Buttons ===== -->
+<div id="fab-about" class="fab">DASBEM Protocol</div>
+<div id="fab-contact" class="fab">Contact Us</div>
+
+<div id="popup-overlay" class="popup-overlay"></div>
+
+<div id="popup-about" class="popup" role="dialog" aria-hidden="true">
+  <h2>DASBEM Protocol</h2>
+  <p>
+    The DASBEM Project is an advanced numerical framework for analyzing dynamic responses of structures using the Boundary Element Method in the time domain.
+    It enables precise simulation of seismic SH-wave propagation, scattering by cavities, and interaction with complex geometries.
+    Explore research insights and cutting-edge simulations that push the boundaries of structural engineering.
+  </p>
 </div>
 
+<div id="popup-contact" class="popup" role="dialog" aria-hidden="true">
+  <h2>Send Us a Message</h2>
+  <form id="contactForm" class="contact-form">
+    <input type="text" name="user_name" placeholder="Your Name" required>
+    <input type="email" name="user_email" placeholder="Your Email" required>
+    <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+    <button type="submit">📩 Send</button>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
-// ===== Simple Loader =====
-const progressBar = document.getElementById('progressBar');
-const mainSite = document.getElementById('mainSite');
-let width = 0;
-const loaderInterval = setInterval(()=>{
-  width += Math.random()*5 + 1;
-  if(width>=100) width=100;
-  progressBar.style.width = width+'%';
-  if(width>=100){
-    clearInterval(loaderInterval);
-    setTimeout(()=>{
-      document.getElementById('app').style.opacity=0;
-      mainSite.style.opacity=1;
-      setTimeout(()=>{document.getElementById('app').remove();},500);
-    },500);
+/* ===== Page Loader Simulation ===== */
+const logs=[
+  'Loading Core Modules...', 'Initializing BEM Solver...', 'Setting up SH-Wave Propagation...', 'Computing Boundaries...', 'Optimizing Memory Allocation...', 'Finalizing Engine...'
+];
+const viewport=document.getElementById('viewport');
+const progressBar=document.getElementById('progressBar');
+let i=0;
+function loadNext(){
+  if(i<logs.length){
+    const line=document.createElement('div'); line.className='logLine';
+    line.textContent=logs[i]; viewport.appendChild(line);
+    progressBar.style.width=((i+1)/logs.length*100)+'%';
+    i++; setTimeout(loadNext,600+Math.random()*400);
+  } else {
+    const final=document.createElement('div'); final.className='finalLine';
+    final.textContent='DASBEM Initialized!';
+    viewport.appendChild(final);
+    setTimeout(()=>{document.getElementById('app').style.display='none';
+      document.getElementById('mainSite').style.opacity='1';
+    },1200);
   }
-},50);
+}
+loadNext();
 
-// ===== Wizard Buttons =====
-const wizard = document.getElementById('wizard');
-const wThumb = document.getElementById('w-thumb');
-const wBody = document.getElementById('w-body');
+/* ===== FAB Popup ===== */
+emailjs.init('IlTw12Nz7SSQucp4C');
 
-document.getElementById('aboutBtn').addEventListener('click', ()=>{
-  wThumb.innerHTML='';
-  wBody.textContent = "The DASBEM Project is a software tool developed over a decade for advanced boundary element analysis in half-space problems, focused on seismic SH wave simulations and dynamic structure analysis.";
-  wizard.style.left=(window.innerWidth/2-190)+'px';
-  wizard.style.top=(window.innerHeight/2-150)+'px';
-  wizard.classList.add('show');
+const fabAbout=document.getElementById('fab-about');
+const fabContact=document.getElementById('fab-contact');
+const overlay=document.getElementById('popup-overlay');
+const popupAbout=document.getElementById('popup-about');
+const popupContact=document.getElementById('popup-contact');
+
+function showPopup(popup){
+  overlay.classList.add('show');
+  popup.classList.add('show');
+  popup.setAttribute('aria-hidden','false');
+}
+function hidePopup(){
+  overlay.classList.remove('show');
+  [popupAbout, popupContact].forEach(p=>{
+    p.classList.remove('show');
+    p.setAttribute('aria-hidden','true');
+  });
+}
+fabAbout.addEventListener('click',()=>showPopup(popupAbout));
+fabContact.addEventListener('click',()=>showPopup(popupContact));
+overlay.addEventListener('click', hidePopup);
+
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  emailjs.sendForm('default_service','template_1',this)
+    .then(()=>{ alert('Message sent successfully!'); this.reset(); hidePopup(); })
+    .catch(err=>{ alert('Failed to send message.'); console.error(err); });
 });
-document.getElementById('contactBtn').addEventListener('click', ()=>{
-  wThumb.innerHTML='';
-  wBody.textContent = "Contact us via email at mojtabazadeh@outlook.com or visit our homepage for more info.";
-  wizard.style.left=(window.innerWidth/2-190)+'px';
-  wizard.style.top=(window.innerHeight/2-150)+'px';
-  wizard.classList.add('show');
+
+/* ===== Load Papers Dynamically ===== */
+const papers=[
+  {title:'DASBEM Numerical Study', authors:'M. Panji, S. Mojtabazadeh', year:'2024', thumb:'https://via.placeholder.com/300x160'},
+  {title:'SH-Wave Scattering Simulation', authors:'S. Mojtabazadeh', year:'2023', thumb:'https://via.placeholder.com/300x160'}
+];
+const paperList=document.getElementById('paperList');
+papers.forEach(p=>{
+  const div=document.createElement('div'); div.className='paper';
+  div.innerHTML=`<div class="thumb"><img src="${p.thumb}" alt="${p.title} thumb" class="loaded"></div>
+  <div class="meta"><div class="p-title">${p.title}</div><div class="p-auth">${p.authors}<span class="year">${p.year}</span></div></div>`;
+  paperList.appendChild(div);
 });
-wizard.addEventListener('click',()=>{ wizard.classList.remove('show'); });
+
+/* ===== Background Canvas ===== */
+const canvas=document.getElementById('waveCanvas');
+const ctx=canvas.getContext('2d');
+let w=canvas.width=window.innerWidth;
+let h=canvas.height=window.innerHeight;
+const particles=[];
+for(let i=0;i<180;i++){
+  particles.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*2+0.5,d:Math.random()*1});
+}
+function draw(){
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='rgba(255,180,120,0.1)';
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);
+    ctx.fill();
+  });
+  update();
+}
+function update(){
+  particles.forEach(p=>{
+    p.y+=Math.sin(p.d)+0.2;
+    p.x+=Math.cos(p.d);
+    if(p.y>h){p.y=0; p.x=Math.random()*w;}
+    if(p.x>w){p.x=0; p.y=Math.random()*h;}
+  });
+}
+setInterval(draw,30);
+window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
 </script>
 </body>
 </html>
